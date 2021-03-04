@@ -1,0 +1,43 @@
+/* ******* COMPONENTS: SCROLL PAGINATION *** */
+
+.com__scroll-pagination {
+    .cm__box;
+}
+
+.com__scroll-pagination__scroll {
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.com__scroll-pagination__page {
+    opacity: 0;
+    .mx__transition(opacity, @CmUI-Transition-Duration);
+
+    &.is-hidden {
+        visibility: hidden;
+    }
+
+    &.is-loaded {
+        opacity: 1;
+    }
+}
+
+.com__scroll-pagination__bar {
+    height: @CmForm-FieldHeight;
+    margin: @CmIndent-Medium 0;
+    overflow: hidden;
+    text-align: center;
+    user-select: none;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &.is-hidden {
+        display: none;
+    }
+}

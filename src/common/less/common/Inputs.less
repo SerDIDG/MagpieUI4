@@ -1,0 +1,168 @@
+/* ******* COMMON: INPUTS ******* */
+
+.input {
+    width: 100%;
+    margin: 0;
+    vertical-align: top;
+    background: @CmInput-DefaultBackground;
+    border: @CmInput-BorderWidth @CmInput-BorderStyle @CmInput-DefaultBorder;
+    border-radius: @CmBorder-Radius;
+    box-shadow: none;
+    cursor: text;
+    background-clip: padding-box;
+    .mx__transition(background border-color color box-shadow text-shadow, @CmUI-Transition-Duration);
+
+    &.input-hover,
+    &:hover {
+        background: @CmInput-HoverBackground;
+        border-color: @CmInput-HoverBorder;
+    }
+
+    &.input-focus,
+    &:focus {
+        background: @CmInput-ActiveBackground;
+        border-color: @CmInput-ActiveBorder;
+    }
+
+    &.input-disabled,
+    &[disabled] {
+        background-color: @CmInput-DisabledBackground;
+        border-color: @CmInput-DisableBorder;
+        cursor: default;
+    }
+
+    &.input-dark {
+        color: @CmFont-Base-ColorOpposite;
+        text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    }
+
+    &.input-light {
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7),
+                     0 -1px 1px rgba(255, 255, 255, 0.7),
+                     1px 0 1px rgba(255, 255, 255, 0.7),
+                     -1px 0 1px rgba(255, 255, 255, 0.7);
+    }
+
+    &.input-transparent {
+        background: transparent;
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    &.input-clear {
+        .input.input-transparent;
+        height: auto;
+        min-height: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+    }
+
+    &.input-checkers {
+        background-color: #fdffff;
+        background-image: url("@{CmPath-Images}/parts/transparent.png");
+        text-shadow: 0 0 5px #ffffff,
+                     0 0 5px #ffffff,
+                     0 1px 1px #ffffff,
+                     0 -1px 1px #ffffff,
+                     1px 0 1px #ffffff,
+                     -1px 0 1px #ffffff;
+    }
+
+    .input--size(@CmForm-FieldHeight, @CmInput-Padding, @CmBorder-Width, @CmFont-Base-LineHeight);
+
+    &.input--large {
+        .input--size(@CmSize-Large, @CmInput-Padding, @CmBorder-Width, @CmFont-Base-LineHeight);
+    }
+
+    &.input--xlarge {
+        .input--size(@CmSize-XLarge, @CmInput-Padding, @CmBorder-Width, @CmFont-Base-LineHeight);
+    }
+
+    &.input--xxlarge {
+        .input--size(@CmSize-XXLarge, @CmInput-Padding, @CmBorder-Width, @CmFont-Base-LineHeight);
+    }
+}
+
+.textarea {
+    @padding: max(ceil((@CmForm-FieldHeight - @CmFont-Base-LineHeight - @CmBorder-Width * 2) / 2), @CmInput-Padding);
+
+    height: @CmTextarea-Height;
+    min-height: @CmForm-FieldHeight;
+    padding: @padding;
+    resize: vertical;
+}
+
+.select {
+    &[multiple] {
+        height: @CmSelect-Size * @CmFont-Base-LineHeight + @CmBorder-Width * 2;
+        padding: 0;
+    }
+}
+
+/* *** MIXINS *** */
+
+.input--size (@height: @CmForm-FieldHeight, @padding: @CmInput-Padding, @border: @CmBorder-Width, @lineHeight: @CmFont-Base-LineHeight) {
+    .input--size-helper(@height, @padding, @border, @lineHeight);
+
+    &.is-borderless {
+        .input--size-helper(@height, @padding, 0px, @lineHeight);
+    }
+}
+
+.input--size-helper (@height, @padding, @border, @lineHeight) {
+    @padding_calc: max(ceil((@height - @lineHeight - @border * 2) / 2), 0px);
+    @padding_x: max(ceil((@height - @lineHeight - @border * 2) / 2), @padding);
+
+    height: @height;
+    padding: @padding_calc @padding_x;
+    border-width: @border;
+}
+
+/* *** TAGS *** */
+
+.input-alike {
+
+}
+
+input, select, textarea, button {
+    .cm__font;
+    margin: 0;
+    outline: none;
+    .mx__placeholder(@CmFont-Placeholder-Color, @CmFont-Placeholder-Size, @CmFont-Placeholder-Style);
+}
+
+input[type="file"] {
+    height: @CmForm-FieldHeight;
+    width: 100%;
+    line-height: @CmForm-FieldHeight;
+    cursor: pointer;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    cursor: pointer;
+}
+
+input[type="search"] {
+    -webkit-appearance: none;
+
+    &::-webkit-search-decoration {
+        -webkit-appearance: none;
+    }
+
+    &::-webkit-search-cancel-button {
+        -webkit-appearance: none;
+    }
+}
+
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="number"],
+input[type="time"],
+input[type="password"],
+textarea,
+select {
+    &:extend(.input-alike all);
+}

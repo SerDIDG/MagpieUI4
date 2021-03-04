@@ -1,0 +1,68 @@
+/* ******* SELECT ******* */
+
+.com__select {
+    position: relative;
+    z-index: 1;
+    outline: none;
+
+    .pt__input {
+        .pt__input.is-less-indent;
+
+        .icon.default {
+            .svg__chevron-down;
+            .mx__transition(transform, @CmUI-Transition-Duration);
+        }
+    }
+
+    &:focus,
+    &.active {
+        .pt__input {
+            .icon.default {
+                .mx__transform(rotate(180deg));
+            }
+        }
+    }
+}
+
+/* Tooltip */
+
+.com__tooltip {
+    &.com__select__tooltip {
+        user-select: none;
+
+        > .inner > .scroll {
+            max-height: @ComSelect-MaxHeight;
+        }
+    }
+}
+
+/* Select Multiple */
+
+.com__select-multi {
+    user-select: none;
+
+    .inner {
+        .input;
+        height: auto;
+        min-height: @CmForm-FieldHeight;
+        padding: @CmIndent-XXXSmall;
+        cursor: default;
+    }
+
+    .pt__listing-items > ul {
+        max-height: @ComSelect-MaxHeight;
+    }
+
+    &.is-max {
+        .pt__listing-items > ul {
+            height: @ComSelect-MaxHeight;
+        }
+    }
+
+    &.disabled {
+        .inner {
+            .input.input-disabled;
+            cursor: default;
+        }
+    }
+}

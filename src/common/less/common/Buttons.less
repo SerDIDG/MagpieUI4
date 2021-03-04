@@ -1,0 +1,562 @@
+/* ******* COMMON: BUTTONS ******* */
+
+.button {
+    @padding: max(ceil((@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2), 0px);
+
+    .cm__text-nowrap;
+    min-height: @CmForm-FieldHeight;
+    margin: 0;
+    padding: @padding @CmButton-PaddingX;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    border: none;
+    border-radius: @CmBorder-Radius;
+    text-align: center;
+    text-decoration: none;
+    line-height: @CmFont-Base-LineHeight;
+    font-size: @CmFont-Base-Size;
+    white-space: nowrap;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    box-sizing: border-box;
+    background-clip: border-box;
+    user-select: none;
+    .mx__transition(background color box-shadow border-color, @CmUI-Transition-Duration);
+
+    &:hover {
+        text-decoration: none;
+        .mx__transition(background color box-shadow border-color, @CmUI-Transition-DurationReverse);
+    }
+
+    .button.button-primary;
+
+    // /* *** PRIMARY *** */
+
+    &.button-primary {
+        .mx__background__color(@CmColor-Primary-DarkDefault, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+
+        &:focus,
+        &.focus {
+            .button.button-primary--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-primary--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-primary--active;
+        }
+    }
+
+    &.button-primary--focus {
+    }
+
+    &.button-primary--hover {
+        .mx__background__color(@CmColor-Primary-DarkHover, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-primary--active {
+        .mx__background__color(@CmColor-Primary-DarkActive, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** MIDDLE *** */
+
+    &.button-middle {
+        .mx__background__color(@CmColor-Primary-MiddleDefault, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+
+        &:focus,
+        &.focus {
+            .button.button-middle--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-middle--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-middle--active;
+        }
+    }
+
+    &.button-middle--focus {
+    }
+
+    &.button-middle--hover {
+        .mx__background__color(@CmColor-Primary-MiddleHover, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-middle--active {
+        .mx__background__color(@CmColor-Primary-MiddleActive, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** SECONDARY *** */
+
+    &.button-secondary {
+        .mx__background__color(@CmColor-Secondary-LightHighlight, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+
+        &:focus,
+        &.focus {
+            .button.button-secondary--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-secondary--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-secondary--active;
+        }
+    }
+
+    &.button-secondary--focus {
+    }
+
+    &.button-secondary--hover {
+        .mx__background__color(@CmColor-Secondary-LightActive, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-secondary--active {
+        .mx__background__color(@CmColor-Secondary-LightActiveHover, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** SUCCESS *** */
+
+    &.button-success {
+        .mx__background__color(@CmColor-Success-DarkDefault, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+
+        &:focus,
+        &.focus {
+            .button.button-success--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-success--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-success--active;
+        }
+    }
+
+    &.button-success--focus {
+    }
+
+    &.button-success--hover {
+        .mx__background__color(@CmColor-Success-DarkHover, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-success--active {
+        .mx__background__color(@CmColor-Success-DarkActive, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** DANGER *** */
+
+    &.button-danger {
+        .mx__background__color(@CmColor-Danger-DarkDefault, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+
+        &:focus,
+        &.focus {
+            .button.button-danger--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-danger--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-danger--active;
+        }
+    }
+
+    &.button-danger--focus {
+    }
+
+    &.button-danger--hover {
+        .mx__background__color(@CmColor-Danger-DarkHover, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-danger--active {
+        .mx__background__color(@CmColor-Danger-DarkActive, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** WARNING *** */
+
+    &.button-warning {
+        .mx__background__color(@CmColor-Warning-DarkDefault, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+
+        &:focus,
+        &.focus {
+            .button.button-warning--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-warning--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-warning--active;
+        }
+    }
+
+    &.button-warning--focus {
+    }
+
+    &.button-warning--hover {
+        .mx__background__color(@CmColor-Warning-DarkHover, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-warning--active {
+        .mx__background__color(@CmColor-Warning-DarkActive, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** TRANSPARENT *** */
+
+    &.button-transparent,
+    &.transparent {
+        .mx__background__color(@CmColor-Secondary-LightDefault, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+        background-image: none;
+        box-shadow: none;
+        border: none;
+
+        &:focus,
+        &.focus {
+            .button.button-transparent--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-transparent--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-transparent--active;
+        }
+    }
+
+    &.button-transparent--focus {
+    }
+
+    &.button-transparent--hover {
+        .mx__background__color(@CmColor-Secondary-LightHover, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-transparent--active {
+        .mx__background__color(@CmColor-Secondary-LightActive, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** WHITE *** */
+
+    &.button-white {
+        .mx__background__color(#ffffff, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+
+        &:focus,
+        &.focus {
+            .button.button-white--focus;
+        }
+
+        &:hover,
+        &.hover {
+            .button.button-white--hover;
+        }
+
+        &:active,
+        &.active {
+            .button.button-white--active;
+        }
+    }
+
+    &.button-white--focus {
+    }
+
+    &.button-white--hover {
+        .mx__background__color(@CmColor-Primary-LightHover, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+    }
+
+    &.button-white--active {
+        .mx__background__color(@CmColor-Primary-LightActive, @CmColor-Primary-DarkDefault, @CmFont-Base-ColorOpposite);
+        box-shadow: @CmUI-ShadowInner;
+    }
+
+    // /* *** DISABLED *** */
+
+    &.button-disabled {
+        .mx__background__color(@CmColor-Secondary-LightActive, @CmColor-Font-Disabled, @CmFont-Base-ColorOpposite);
+        cursor: default;
+
+        &:focus,
+        &.focus {
+            outline: none;
+        }
+
+        &:hover,
+        &.hover {
+            .mx__background__color(@CmColor-Secondary-LightActive, @CmColor-Font-Disabled, @CmFont-Base-ColorOpposite);
+        }
+
+        &:active,
+        &.active {
+            .mx__background__color(@CmColor-Secondary-LightActive, @CmColor-Font-Disabled, @CmFont-Base-ColorOpposite);
+        }
+    }
+
+    // /* *** CLEAR *** */
+
+    &.button-clear {
+        background: none;
+        box-shadow: none;
+        border: none;
+        color: @CmColor-Primary-DarkDefault;
+        cursor: default;
+    }
+
+    // /* *** SIZES *** */
+
+    &.button--large {
+        @padding: max(ceil((@CmSize-Large - @CmFont-Base-LineHeight) / 2), 0px);
+        min-height: @CmSize-Large;
+        padding: @padding @CmIndent-Medium;
+    }
+
+    &.button--xlarge {
+        @padding: max(ceil((@CmSize-XLarge - @CmFont-Base-LineHeight) / 2), 0px);
+        min-height: @CmSize-XLarge;
+        padding: @padding @CmIndent-Large;
+    }
+
+    &.button--xxlarge {
+        @padding: max(ceil((@CmSize-XXLarge - @CmFont-Base-LineHeight) / 2), 0px);
+        min-height: @CmSize-XXLarge;
+        padding: @padding @CmIndent-Large;
+    }
+
+    @media only screen and (min-width: (@CmUI-AdaptiveFrom + 1px)) {
+        &.button--large {
+            .button.button--large;
+        }
+
+        &.button--xlarge {
+            .button.button--xlarge;
+        }
+
+        &.button--desktop-xxlarge {
+            .button.button--xxlarge;
+        }
+    }
+
+    // /* *** ICONS *** */
+
+    &.has-icon {
+        .icon {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .image {
+
+        }
+
+        .label {
+            display: inline-block;
+            vertical-align: top;
+            text-decoration: inherit;
+
+            &:not(:first-child){
+                margin-left: @CmIndent-XXSmall;
+            }
+
+            &:not(:last-child){
+                margin-right: @CmIndent-XXSmall;
+            }
+        }
+
+        &.valign-middle {
+            .icon,
+            .label {
+                vertical-align: middle;
+            }
+        }
+    }
+
+    &.has-icon-small {
+        .icon {
+            @margin: round((@CmFont-Base-LineHeight - @CmSize-Small) / 2);
+            margin-top: @margin;
+            margin-bottom: @margin;
+        }
+    }
+
+    &.has-icon-medium {
+        .icon {
+            @margin: round((@CmFont-Base-LineHeight - @CmSize-Medium) / 2);
+            margin-top: @margin;
+            margin-bottom: @margin;
+        }
+    }
+
+    &.has-icon-large {
+        .icon {
+            @margin: round((@CmFont-Base-LineHeight - @CmSize-Large) / 2);
+            margin-top: @margin;
+            margin-bottom: @margin;
+        }
+    }
+
+    // /* *** SPINNER *** */
+
+    &.button-spinner {
+        .label,
+        .icon {
+            visibility: hidden;
+            opacity: 0;
+            .mx__transition(all, @CmUI-Transition-Duration);
+
+            &.is-hide {
+                visibility: hidden;
+                opacity: 0;
+                .mx__transform(scale(0));
+            }
+
+            &.is-show {
+                visibility: visible;
+                opacity: 1;
+                .mx__transform(scale(1));
+            }
+        }
+
+        .icon {
+            .cm-ia__spinner;
+            position: absolute;
+            .mx__position(0, 0, 0, 0);
+        }
+    }
+
+    // /* *** FLAGS *** */
+
+    &.is-wrap {
+        .cm__text-wrap;
+    }
+
+    &.is-hidden {
+        display: none;
+    }
+
+    &.is-wide,
+    &.is-box,
+    &.wide {
+        width: 100%;
+        margin: 0;
+        display: block;
+    }
+
+    &.is-static {
+        cursor: default;
+
+        &:focus,
+        &.focus {
+            outline: none;
+        }
+    }
+}
+
+/* *** MIXINS *** */
+
+.button--size (@height, @lineHeight: @CmFont-Base-LineHeight, @border: 0px) {
+    @padding: max(ceil((@height - @lineHeight - (@border * 2)) / 2), 0px);
+    min-height: @height;
+    padding-top: @padding;
+    padding-bottom: @padding;
+    line-height: @lineHeight;
+    border-width: @border;
+}
+
+/* *** BROWSE BUTTON **** */
+
+.browse-button {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    cursor: pointer;
+
+    > .inner {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+    }
+
+    input[type="file"] {
+        width: auto;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .button {
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    &:hover {
+        .button {
+            .button.button-primary--hover;
+        }
+    }
+
+    &:active {
+        .button {
+            .button.button-primary--active;
+        }
+    }
+}
+
+/* *** TAGS *** */
+
+.button-alike {
+    &.is-hidden {
+        display: none;
+    }
+}
+
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+button {
+    &::-moz-focus-inner {
+        border: 0;
+    }
+}
+
+.button,
+.browse-button,
+.cm__button-wrapper,
+.com__menu {
+    &:extend(.button-alike all);
+}

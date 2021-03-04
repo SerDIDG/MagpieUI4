@@ -1,0 +1,324 @@
+.pt__field {
+    .clearfix;
+    margin: 0 0 @CmForm-FieldIndent 0;
+    padding: 0;
+    display: block;
+    clear: both;
+
+    &.is-first,
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &.is-last,
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    > dt,
+    > .field__title {
+        width: @CmForm-FieldTitleWidth;
+        display: block;
+        margin: 0;
+        padding: ((@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2) 0;
+        float: left;
+        line-height: @CmFont-Base-LineHeight;
+
+        span.required {
+            margin: 0 0 0 @CmIndent-XXXSmall;
+            color: @CmColor-Danger-DarkDefault;
+        }
+    }
+
+    > dd,
+    > .field__descr {
+        display: block;
+        margin: 0 0 0 (@CmForm-FieldTitleWidth + @CmForm-FieldIndent);
+        padding: 0;
+        position: relative;
+
+        &:first-child {
+            margin: 0;
+        }
+    }
+
+    &.error,
+    &.danger {
+        > dt,
+        > .field__title {
+            color: @CmColor-Danger-DarkDefault;
+        }
+
+        .pt__field__error {
+            color: @CmColor-Danger-DarkDefault;
+        }
+
+        .input {
+            border: 1px solid @CmColor-Danger-DarkDefault;
+            background-color: @CmColor-Danger-LightHighlight;
+        }
+    }
+
+    &.ok,
+    &.success {
+        > dt,
+        > .field__title {
+            color: @CmColor-Success-DarkDefault;
+        }
+
+        .pt__field__error {
+            color: @CmColor-Success-DarkDefault;
+        }
+
+        .input {
+            border: 1px solid @CmColor-Success-DarkDefault;
+            background-color: @CmColor-Success-LightHighlight;
+        }
+    }
+
+    &.is-text {
+        > dt,
+        > .field__title {
+            padding: 0;
+        }
+    }
+
+    &.is-no-label {
+        > dt,
+        > .field__title {
+            display: none;
+        }
+
+        > dd,
+        > .field__descr {
+            margin-left: 0;
+        }
+    }
+
+    &.is-check-line {
+        display: flex;
+        align-content: space-between;
+
+        > dt,
+        > .field__title {
+            width: auto;
+            float: none;
+            flex: auto;
+        }
+
+        > dd,
+        > .field__descr {
+            margin-left: @CmForm-FieldInnerIndent;
+        }
+    }
+
+    &.is-box,
+    &.is-form-box {
+        .cm__box;
+
+        > dt,
+        > .field__title {
+            width: auto;
+            float: none;
+        }
+
+        > dd,
+        > .field__descr {
+            margin: 0 0 @CmForm-FieldInnerIndent 0;
+            padding: 0;
+
+            &:last-child {
+                margin: 0;
+            }
+        }
+
+        &.is-no-label {
+            > dt,
+            > .field__title {
+                display: none;
+            }
+        }
+
+        &.field-indent,
+        &.field-inner-indent {
+            .cm__box;
+            margin-bottom: @CmForm-FieldInnerIndent;
+        }
+
+        &.field-outer-indent {
+            .cm__box;
+            margin-bottom: @CmForm-FieldIndent;
+        }
+
+        &.is-no-indent {
+            margin: 0;
+        }
+
+        &.is-first {
+            > dt,
+            > .field__title {
+                padding-top: 0;
+            }
+        }
+    }
+
+    &.is-form-box {
+        .cm__box;
+        margin-bottom: @CmForm-FieldIndent;
+    }
+
+    &.is-hidden {
+        display: none;
+    }
+
+    &.align-center {
+        > dt,
+        > .field__title {
+            text-align: center;
+        }
+    }
+}
+
+.pt__field-label {
+    @padding: max(round((@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2), 0);
+    display: block;
+    margin: 0;
+    padding: @padding 0;
+    line-height: @CmFont-Base-LineHeight;
+}
+
+/* *** FIELD HINT *** */
+
+.pt__field__hint {
+    &:extend(.cm__inherit all);
+    .cm__font--hint-cursive;
+    text-transform: none;
+
+    &.success {
+        .cm__color__success;
+    }
+
+    &.warning {
+        .cm__color__warning;
+    }
+
+    &.danger {
+        .cm__color__danger;
+    }
+}
+
+ul.pt__field__hint {
+    @padding: max(min(round((@CmForm-FieldIndent - @CmFont-Base-LineHeightSmall) / 2), 4px), 0);
+    margin: 0;
+    padding: @padding 0;
+    display: block;
+    list-style: none;
+
+    li {
+        margin-top: 4px;
+
+        &:first-child {
+            margin: 0;
+        }
+
+        &:before {
+            content: '-';
+            margin-right: 4px;
+        }
+    }
+}
+
+/* *** CONTENT *** */
+
+.pt__field__content {
+    .placeholder {
+        .cm__font--placeholder;
+        .cm__text-nowrap;
+        position: absolute;
+        z-index: 2;
+        padding: 0 @CmInput-Padding;
+        cursor: text;
+        pointer-events: none;
+        .mx__position(0, 0, 0, 0);
+        user-select: none;
+
+        span {
+            display: block;
+            transform-origin: left top;
+            .mx__transition(all, @CmUI-Transition-Duration, @CmUI-MotionAsymmetric);
+        }
+
+        &.pull-top {
+            span {
+                .mx__transform(scale(0.75) translateY(-6px));
+            }
+        }
+    }
+
+    .pt__field__content--size-helper(@CmForm-FieldHeight, @CmInput-Padding, @CmBorder-Width, @CmFont-Base-LineHeight);
+}
+
+
+// /* *** MIXINS *** */
+
+.pt__filed--size (@size, @indent: @CmForm-FieldIndent) {
+    > dt,
+    > .field__title {
+        width: @size;
+    }
+
+    > dd,
+    > .field__descr {
+        margin-left: @size + @indent;
+    }
+}
+
+.pt__field__content--size-helper (@height, @paddingX, @borderWidth, @lineHeight) {
+    @inputPadding: max(ceil((@height - @lineHeight - @borderWidth * 2) / 2), @paddingX);
+
+    .placeholder {
+        line-height: @height;
+        padding: 0 (@inputPadding + @borderWidth);
+    }
+
+    &.is-placeholder-above {
+        .input {
+            padding-top: ceil(@inputPadding * 0.75 * 2);
+            padding-bottom: ceil(@inputPadding * 0.25 * 2);
+        }
+    }
+}
+
+/* ******* PART: FIELD: ADAPTIVE ******* */
+
+@media only screen and (max-width: @CmScreen-Mobile) {
+
+    html.is-adaptive {
+        .pt__field {
+            &.is-check-line {
+                display: block;
+            }
+
+            &.is-hidden {
+                display: none;
+            }
+
+            > dt,
+            > .field__title {
+                width: auto;
+                float: none;
+            }
+
+            > dd,
+            > .field__descr {
+                margin: 0 0 @CmForm-FieldInnerIndent;
+                float: none;
+
+                &:last-child {
+                    margin: 0;
+                }
+            }
+        }
+    }
+
+}

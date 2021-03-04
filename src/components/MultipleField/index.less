@@ -1,0 +1,82 @@
+/* ******* COMPONENTS: MULTI FIELD  ******* */
+
+.com__multiple-field {
+
+}
+
+.com__multiple-field__content {
+    .cm__list-clear;
+
+    &.pt__dnd-area {
+        min-height: 0;
+
+        &:after {
+            display: none;
+        }
+    }
+}
+
+.com__multiple-field__toolbar {
+    .com__multiple-field__item {
+        &:after {
+            display: none;
+        }
+    }
+}
+
+.com__multiple-field__item {
+    display: flex;
+    position: relative;
+    flex-flow: row wrap;
+    justify-content: flex-end;
+
+    &:after {
+        height: @CmForm-FieldInnerIndent;
+        display: block;
+        content: '';
+        flex: 0 0 100%;
+    }
+
+    > .icon {
+        width: @CmForm-FieldHeight;
+        height: @CmForm-FieldHeight;
+        flex: 0 0 auto;
+
+        &.drag {
+            .icon.small.drag-vertical;
+            cursor: move;
+            touch-action: none;
+        }
+
+        &.remove {
+            .icon.small.remove;
+        }
+
+        &.add {
+            .icon.small.add;
+        }
+    }
+
+    > .field {
+        flex: 1 1 0;
+    }
+
+    &.pt__dnd-helper {
+        position: fixed;
+    }
+}
+
+/* *** THEMES *** */
+
+.com__multiple-field {
+    &.theme-cards {
+        .com__multiple-field__item {
+            > .field {
+                padding: @CmIndent-XSmall;
+                border: @CmBorder-Width dashed @CmColor-Border;
+                background: @CmColor-Background;
+                border-radius: @CmBorder-Radius;
+            }
+        }
+    }
+}

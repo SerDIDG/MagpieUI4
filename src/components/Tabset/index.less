@@ -1,0 +1,533 @@
+/* ******* COMPONENTS: TABSET ******* */
+
+.com__tabset {
+    .cm__box;
+}
+
+/* *** TITLE *** */
+
+.com__tabset__head-title {
+    position: relative;
+    z-index: 2;
+    display: none;
+}
+
+.com__tabset__head-text {
+    .cm__text-overflow;
+    position: relative;
+    overflow: hidden;
+    padding: 0 @CmIndent-Medium;
+    border: @ComTabset-Border;
+    border-bottom: none;
+    border-radius: @ComTabset-BorderRadius @ComTabset-BorderRadius 0 0;
+    line-height: @ComTabset-Tabs-Height;
+    font-size: @ComTabset-Tabs-FontSize;
+    .mx__background__color(@ComTabset-TabsTitle-Background, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+}
+
+.com__tabset__head-menu {
+    height: @ComTabset-Tabs-Height;
+    position: absolute;
+    .mx__position(@ComTabset-BorderWidth, @ComTabset-BorderWidth, @ComTabset-BorderWidth, @ComTabset-BorderWidth);
+
+    .icon {
+        width: @ComTabset-Tabs-Height;
+        height: @ComTabset-Tabs-Height;
+        position: absolute;
+        .mx__position(0, 0, 0, auto);
+
+        &.default {
+            .icon.medium.menu;
+        }
+    }
+
+    .pt__menu-dropdown {
+        .pt__menu-dropdown--base;
+        .pt__menu-dropdown--position;
+        .pt__menu-dropdown--position.pull-justify;
+
+        right: -@ComTabset-BorderWidth;
+        left: -@ComTabset-BorderWidth;
+    }
+}
+
+/* *** TABS *** */
+
+.com__tabset__head-tabs {
+    position: relative;
+    z-index: 2;
+
+    ul {
+        .cm__list-clear;
+
+        li {
+            position: relative;
+            background: @ComTabset-Tabs-DefaultBackground;
+            border: @ComTabset-Border;
+            border-radius: @ComTabset-BorderRadius;
+            .mx__transition(all, @ComTabset-Duration);
+
+            a {
+                display: flex;
+                .cm__font;
+                padding: 0 @ComTabset-Tabs-IndentInner;
+                line-height: @ComTabset-Tabs-Height;
+                font-size: @ComTabset-Tabs-FontSize;
+                text-decoration: none;
+                .mx__only__color(@ComTabset-Tabs-DefaultBackground, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+                align-items: center;
+                justify-content: flex-start;
+                flex-flow: row nowrap;
+
+
+                .image {
+                    position: relative;
+                    flex: 0 0 auto;
+
+                    img {
+                        .cm__image-centered;
+                    }
+                }
+
+                .title {
+                    .cm__text-nowrap;
+
+                    &:first-child {
+                        margin-left: 0;
+                    }
+
+                    &:last-child {
+                        margin-right: 0;
+                    }
+                }
+            }
+
+            &:hover {
+                background: @ComTabset-Tabs-HoverBackground;
+                .mx__transition(all, @CmUI-Transition-DurationReverse);
+
+                a {
+                    .mx__only__color(@ComTabset-Tabs-HoverBackground, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+                }
+            }
+
+            &.active {
+                background: @ComTabset-Tabs-ActiveBackground;
+
+                a {
+                    .mx__only__color(@ComTabset-Tabs-ActiveBackground, @CmFont-Base-Color, @CmFont-Base-ColorOpposite);
+                }
+            }
+        }
+    }
+
+    .com__tabset__tabs__image-size(@ComTabset-Tabs-ImageSize);
+    .com__tabset__tabs__title-indent(@ComTabset-Tabs-TitleIndent);
+}
+
+/* *** TABS CONTENT *** */
+
+.com__tabset__content {
+    position: relative;
+    z-index: 1;
+    padding: @ComTabset-Content-Padding;
+    background: @ComTabset-Content-Background;
+    border: @ComTabset-Border;
+    border-radius: @ComTabset-BorderRadius;
+
+    > ul {
+        .cm__list-clear;
+        position: relative;
+
+        > li {
+            .clearfix;
+            .marginfix;
+            display: none;
+            background-color: @ComTabset-Content-Background;
+
+            &.active {
+                display: block;
+            }
+        }
+    }
+
+    &.is-animated {
+        > ul {
+            > li {
+                position: absolute;
+                z-index: 1;
+                overflow: hidden;
+                opacity: 0;
+                .mx__position(0, 0, 0, 0);
+                .mx__transition(opacity visibility, @ComTabset-Duration);
+
+                &.active {
+                    position: relative;
+                    z-index: 2;
+                    overflow: visible;
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}
+
+.com__tabset__content-ul {
+    > li {
+        display: none;
+    }
+}
+
+/* *** TABS POSITION *** */
+
+.com__tabset {
+    &.is-tabs-top {
+        .com__tabset--top;
+
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--top;
+        }
+
+        > .com__tabset__content {
+            .com__tabset__content--top
+        }
+    }
+
+    &.is-tabs-bottom {
+        .com__tabset--bottom;
+
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--bottom;
+        }
+
+        > .com__tabset__content {
+            .com__tabset__content--bottom;
+        }
+    }
+
+    &.is-tabs-right {
+        .com__tabset--right;
+
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--right;
+        }
+
+        > .com__tabset__content {
+            .com__tabset__content--right;
+        }
+    }
+
+    &.is-tabs-left {
+        .com__tabset--left;
+
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--left;
+        }
+
+        > .com__tabset__content {
+            .com__tabset__content--left;
+        }
+    }
+}
+
+// /* *** MIXINS *** */
+
+.com__tabset--vertical () {
+    display: flex;
+    flex-flow: row nowrap;
+
+    > .com__tabset__head-tabs {
+        width: @ComTabset-Column-Width;
+        flex: 0 0 auto;
+    }
+
+    > .com__tabset__content {
+        width: calc(~'100% - @{ComTabset-Column-Width}');
+        flex: 1 1 auto;
+    }
+}
+
+.com__tabset--horizontal () {
+    &.is-tabs-flexible {
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--flexible;
+        }
+    }
+
+    &.is-tabs-pull-left {
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--pull-left;
+        }
+    }
+
+    &.is-tabs-pull-center {
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--pull-center;
+        }
+    }
+
+    &.is-tabs-pull-right {
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--pull-right;
+        }
+    }
+
+    &.is-tabs-pull-justify {
+        > .com__tabset__head-tabs {
+            .com__tabset__head-tabs--pull-justify;
+        }
+    }
+}
+
+.com__tabset--top () {
+    .com__tabset--horizontal;
+}
+
+.com__tabset--bottom () {
+    .com__tabset--horizontal;
+}
+
+.com__tabset--right () {
+    .com__tabset--vertical;
+}
+
+.com__tabset--left () {
+    .com__tabset--vertical;
+}
+
+.com__tabset__content--top () {
+    border-radius: @ComTabset-BorderRadius;
+}
+
+.com__tabset__content--bottom () {
+    border-radius: @ComTabset-BorderRadius;
+}
+
+.com__tabset__content--right () {
+    border-radius: @ComTabset-BorderRadius;
+}
+
+.com__tabset__content--left () {
+    border-radius: @ComTabset-BorderRadius;
+}
+
+.com__tabset__head-tabs--horizontal () {
+    ul {
+        display: flex;
+        padding: 0 @ComTabset-Tabs-HorizontalIndent;
+        flex-flow: row wrap;
+
+        li {
+            max-width: 50%;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+}
+
+.com__tabset__head-tabs--vertical () {
+    ul {
+        padding: @ComTabset-Tabs-VerticalIndent 0;
+
+        li {
+            margin: 0 0 @ComTabset-Tabs-Indent 0;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.com__tabset__head-tabs--flexible () {
+    ul {
+        li {
+            max-width: 100%;
+            text-align: center;
+            flex: 1 1;
+
+            a {
+                justify-content: center;
+            }
+        }
+    }
+}
+
+.com__tabset__head-tabs--pull-left () {
+    ul {
+        justify-content: flex-start;
+
+        li {
+            margin: 0 @ComTabset-Tabs-Indent 0 0;
+        }
+    }
+}
+
+.com__tabset__head-tabs--pull-center () {
+    ul {
+        justify-content: center;
+
+        li {
+            margin: 0 @ComTabset-Tabs-Indent 0 0;
+        }
+    }
+}
+
+.com__tabset__head-tabs--pull-right () {
+    ul {
+        justify-content: flex-end;
+
+        li {
+            margin: 0 0 0 @ComTabset-Tabs-Indent;
+        }
+    }
+}
+
+.com__tabset__head-tabs--pull-justify () {
+    ul {
+        li {
+            max-width: 100%;
+            margin: 0 0 0 @ComTabset-Tabs-Indent;
+            text-align: center;
+            flex: 1 1;
+
+            a {
+                justify-content: center;
+            }
+        }
+    }
+}
+
+.com__tabset__head-tabs--top () {
+    .com__tabset__head-tabs--horizontal;
+    margin-bottom: @ComTabset-Tabs-IndentBetween;
+
+    ul {
+        li {
+            border-radius: @ComTabset-BorderRadius @ComTabset-BorderRadius @ComTabset-BorderOverlapRadius @ComTabset-BorderOverlapRadius;
+
+            &.active {
+                border-bottom-color: @ComTabset-BorderOverlap;
+            }
+        }
+    }
+}
+
+.com__tabset__head-tabs--bottom () {
+    .com__tabset__head-tabs--horizontal;
+    margin-top: @ComTabset-Tabs-IndentBetween;
+
+    ul {
+        li {
+            border-radius: @ComTabset-BorderOverlapRadius @ComTabset-BorderOverlapRadius @ComTabset-BorderRadius @ComTabset-BorderRadius;
+
+            &.active {
+                border-top-color: @ComTabset-BorderOverlap;
+            }
+        }
+    }
+}
+
+.com__tabset__head-tabs--right () {
+    .com__tabset__head-tabs--vertical;
+    margin-left: @ComTabset-Tabs-IndentBetween;
+
+    ul {
+        li {
+            border-radius: @ComTabset-BorderOverlapRadius @ComTabset-BorderRadius @ComTabset-BorderRadius @ComTabset-BorderOverlapRadius;
+
+            &.active {
+                border-left-color: @ComTabset-BorderOverlap;
+            }
+        }
+    }
+}
+
+.com__tabset__head-tabs--left () {
+    .com__tabset__head-tabs--vertical;
+    margin-right: @ComTabset-Tabs-IndentBetween;
+
+    ul {
+        li {
+            border-radius: @ComTabset-BorderRadius @ComTabset-BorderOverlapRadius @ComTabset-BorderOverlapRadius @ComTabset-BorderRadius;
+
+            &.active {
+                border-right-color: @ComTabset-BorderOverlap;
+            }
+        }
+    }
+}
+
+.com__tabset__tabs__image-size (@size: @ComTabset-Tabs-ImageSize) {
+    ul {
+        li {
+            a {
+                .image {
+                    width: @size;
+                    height: @size;
+                }
+            }
+        }
+    }
+
+    .pt__image {
+        width: @size;
+        height: @size;
+    }
+}
+
+.com__tabset__tabs__title-indent (@indent: @ComTabset-Tabs-TitleIndent) {
+    ul {
+        li {
+            a {
+                .title {
+                    margin-left: @indent;
+                    margin-right: @indent;
+
+                    &:first-child {
+                        margin-left: 0;
+                    }
+
+                    &:last-child {
+                        margin-right: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* ******* COMPONENTS: TABSET: ADAPTIVE ******* */
+
+@media only screen and (max-width : @ComTabset-AdaptiveFrom) {
+
+    html.is-adaptive {
+        .com__tabset {
+            &.is-adaptive {
+                display: block !important;
+
+                > .com__tabset__head-title {
+                    display: block !important;
+                }
+
+                > .com__tabset__head-tabs {
+                    width: auto !important;
+                    display: none !important;
+                }
+
+                > .com__tabset__content {
+                    width: auto !important;
+                    display: block !important;
+                    border-radius: 0 0 @ComTabset-BorderRadius @ComTabset-BorderRadius;
+                }
+            }
+        }
+    }
+
+}

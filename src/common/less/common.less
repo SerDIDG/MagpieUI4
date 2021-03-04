@@ -1,0 +1,438 @@
+
+// /* ************************************************ */
+// /* ******* MAGPIE UI: COMMON ******* */
+// /* ************************************************ */
+
+@import (css) url('@{CmProtocol}//fonts.googleapis.com/css?family=@{CmUI-GoogleFont}:@{CmUI-GoogleFont-Weight}');
+
+@font-face {
+    font-family: @CmIconVars-Family;
+    src: url('@{CmPath-Fonts}/Magpie-UI-Glyphs.eot?@{CmIconVars-Version}');
+    src: url('@{CmPath-Fonts}/Magpie-UI-Glyphs.eot?#iefix@{CmIconVars-Version}') format('embedded-opentype'),
+         url('@{CmPath-Fonts}/Magpie-UI-Glyphs.woff?@{CmIconVars-Version}') format('woff'),
+         url('@{CmPath-Fonts}/Magpie-UI-Glyphs.ttf?@{CmIconVars-Version}') format('truetype'),
+         url('@{CmPath-Fonts}/Magpie-UI-Glyphs.svg?@{CmIconVars-Version}#Magpie-UI-Glyphs') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ******* HELPERS ******* */
+
+.cm__scroll-bar-size-checker {
+    width: 100px;
+    height: 100px;
+    overflow: scroll;
+    position: fixed;
+    .mx__position(-9000px, auto, auto, -9000px);
+}
+
+.cm__textarea-clipboard {
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    .mx__position(-9000px, auto, auto, -9000px);
+}
+
+/* ******* INLINE STYLES ******* */
+
+.clearfix,
+.clear {
+    &:after {
+        content: ".";
+        display: block;
+        clear: both;
+        visibility: hidden;
+        line-height: 0;
+        font-size: 0;
+        height: 0;
+    }
+}
+
+.marginfix {
+    &:before {
+        content: ".";
+        display: block;
+        clear: both;
+        visibility: hidden;
+        line-height: 0;
+        font-size: 0;
+        height: 0;
+    }
+}
+
+.display-none {
+    display: none !important;
+}
+
+.display-inline {
+    display: inline-block;
+}
+
+.display-flex {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.display-inline-flex {
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+}
+
+.margin-none {
+    margin: 0 !important;
+}
+
+.align-left {
+    text-align: left !important;
+}
+
+.align-center {
+    text-align: center !important;
+}
+
+.align-right {
+    text-align: right !important;
+}
+
+.valign-top {
+    vertical-align: top !important;
+}
+
+.valign-middle {
+    vertical-align: middle !important;
+}
+
+.valign-bottom {
+    vertical-align: bottom !important;
+}
+
+.link {
+    &:extend(.cm__link all);
+    &:extend(.cm__inherit all);
+}
+
+.link--inner {
+    &:extend(.cm__link all);
+    &:extend(.cm__link--inner all);
+    &:extend(.cm__inherit all);
+}
+
+.link--inherit {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.disable-hover,
+.disable-hover * {
+    pointer-events: none !important;
+}
+
+.cm__bold {
+    font-weight: @CmFont-Base-BoldWeight;
+}
+
+/* ******* COMMON ******* */
+
+.cm__inherit {
+
+}
+
+.cm__box {
+    margin-bottom: @CmUI-BoxIndent;
+
+    &.bottom,
+    &.is-last,
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.cm__box-reverse {
+    margin-top: @CmUI-BoxIndent;
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
+
+.cm__button-wrapper {
+    .button,
+    .browse-button,
+    .com__menu {
+        width: 100% !important;
+        margin: 0 !important;
+        flex: none !important;
+    }
+
+    > .hidden {
+        display: none;
+    }
+}
+
+.cm__flex--center {
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.cm__flex--middle {
+    align-content: center;
+    align-items: center;
+}
+
+.cm__flex--left {
+    align-content: flex-start;
+    align-items: flex-start;
+}
+
+/* *** SCROLLBAR *** */
+
+.cm__scrollbar {
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+        width: @CmScrollBar-Size;
+        height: @CmScrollBar-Size;
+    }
+    &::-webkit-scrollbar-track {
+        background-color: @CmScrollBar-TrackBackground;
+        border-radius: @CmScrollBar-Radius;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: @CmScrollBar-ThumbColor;
+        background-clip: padding-box;
+        border: 1px solid transparent;
+        border-radius: @CmScrollBar-Radius;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: @CmScrollBar-ThumbColorHover;
+    }
+}
+
+.cm__scrollbar--light {
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+        width: @CmScrollBar-Size;
+        height: @CmScrollBar-Size;
+    }
+    &::-webkit-scrollbar-track {
+        background-color: @CmScrollBar-TrackBackground;
+        border-radius: @CmScrollBar-Radius;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: @CmScrollBar-Light-ThumbColor;
+        background-clip: padding-box;
+        border: 1px solid transparent;
+        border-radius: @CmScrollBar-Radius;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: @CmScrollBar-Light-ThumbColorHover;
+    }
+}
+
+/* *** COUNTER *** */
+
+.cm__counter {
+    height: @CmCounter-Size;
+    display: inline-block;
+    vertical-align: top;
+    padding: 0 5px;
+    background-color: @CmColor-Secondary-LightDefault;
+    border: @CmCounter-Border solid @CmColor-Primary-DarkDefault;
+    border-radius: @CmBorder-Radius;
+    text-align: center;
+    font-size: @CmFont-Base-SizeSmall;
+    line-height: @CmCounter-Size - (@CmCounter-Border * 2);
+    color: @CmColor-Primary-DarkDefault;
+    background-clip: border-box;
+    .mx__transition(all, @CmUI-Transition-Duration);
+
+    &.active {
+        .cm__counter--active;
+    }
+}
+
+.cm__counter--hover {
+    background-color: @CmColor-Primary-DarkHover;
+    border-color: @CmColor-Primary-DarkHover;
+    color: @CmFont-UI-ColorOpposite;
+}
+
+.cm__counter--active {
+    background-color: @CmColor-Primary-DarkActive;
+    border-color: @CmColor-Primary-DarkActive;
+    color: @CmFont-UI-ColorOpposite;
+}
+
+.cm__counter--active-hover {
+    background-color: @CmColor-Primary-DarkActiveHover;
+    border-color: @CmColor-Primary-DarkActiveHover;
+    color: @CmFont-UI-ColorOpposite;
+}
+
+/* *** VIEW ALL *** */
+
+.cm__view-all {
+    margin: @CmIndent-Medium 0 0 0;
+    text-align: right;
+
+    &.pull-left {
+        text-align: left;
+    }
+
+    &.pull-center {
+        text-align: center;
+    }
+
+    &.pull-right {
+        text-align: right;
+    }
+}
+
+/* *** MARK *** */
+
+.cm__mark {
+    background: @CmColor-Mark;
+}
+
+/* *** EMPTY *** */
+
+.cm__empty {
+    &:extend(.cm__inherit all);
+    .cm__font--cursive;
+    padding: @CmIndent-XSmall;
+    text-align: center;
+
+    &:before,
+    &:after {
+        margin: 0 4px;
+        content: '-';
+    }
+}
+
+.cm__empty--inline {
+    &:extend(.cm__inherit all);
+    .cm__font--cursive;
+    text-align: left;
+
+    &:before,
+    &:after {
+        margin: 0 4px;
+        content: '-';
+    }
+}
+
+/* *** OTHER *** */
+
+.mark-new {
+    display: inline-block;
+    margin: 0 0 0 6px;
+    position: relative;
+    top: -5px;
+    color: #f8504b;
+    font-size: 8px;
+    text-transform: uppercase;
+}
+
+.cm-autoresize {
+    height: 0;
+    overflow: hidden;
+    resize: none;
+}
+
+.cm__image-resizable {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.cm__image-flexible {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.cm__image-adaptive {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.cm__image-centered {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    position: absolute;
+    .mx__position(0, 0, 0, 0);
+}
+
+.cm__text-nowrap,
+.cm__text-overflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.cm__text-wrap {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: clip;
+}
+
+.cm__scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow: scroll;
+}
+
+.cm__scroll--none {
+    overflow: hidden;
+}
+
+.cm__scroll--auto {
+    -webkit-overflow-scrolling: touch;
+    overflow: auto;
+}
+
+.cm__scroll-y,
+.cm__scroll--y {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.cm__scroll-y-a,
+.cm__scroll--y-auto {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.cm__transition-none {
+    -webkit-transition: none !important;
+            transition: none !important;
+}
+
+.cm__transition-disable {
+    .cm__transition-none;
+
+    * {
+        .cm__transition-none;
+
+        &:before,
+        &:after {
+            .cm__transition-none;
+        }
+    }
+}

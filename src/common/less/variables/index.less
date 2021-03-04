@@ -1,0 +1,79 @@
+@CmVersion: '@@VERSION';
+@CmProtocol: '';
+
+// /* ******* PATH ******* */
+
+@CmPath-Images: '../img';
+@CmPath-Fonts: '../fonts';
+
+// /* ******* SCREEN TYPES ******* */
+
+@CmScreen-Mobile: 640px;
+@CmScreen-MobilePortrait: 480px;
+@CmScreen-Tablet: 1024px;
+@CmScreen-TabletPortrait: 768px;
+
+// /* ******* SIZES ******* */
+
+@CmSize-None: 0px;
+@CmSize-XXXXSmall: 2px;
+@CmSize-XXXSmall: 4px;
+@CmSize-XXSmall: 8px;
+@CmSize-XSmall: 12px;
+@CmSize-Small: 16px;
+@CmSize-Medium: 24px;
+@CmSize-Large: 32px;
+@CmSize-XLarge: 48px;
+@CmSize-XXLarge: 64px;
+@CmSize-XXXLarge: 96px;
+
+@CmIndent-None: @CmSize-None;
+@CmIndent-XXXXSmall: @CmSize-XXXXSmall;
+@CmIndent-XXXSmall: @CmSize-XXXSmall;
+@CmIndent-XXSmall: @CmSize-XXSmall;
+@CmIndent-XSmall: @CmSize-XSmall;
+@CmIndent-Small: @CmSize-Small;
+@CmIndent-Medium: @CmSize-Medium;
+@CmIndent-Large: @CmSize-Large;
+@CmIndent-XLarge: @CmSize-XLarge;
+@CmIndent-XXLarge: @CmSize-XXLarge;
+@CmIndent-XXXLarge: @CmSize-XXXLarge;
+
+@CmIndents: @CmIndent-None @CmSize-XXXXSmall @CmIndent-XXXSmall @CmIndent-XXSmall @CmIndent-XSmall @CmIndent-Small @CmIndent-Medium @CmIndent-Large @CmIndent-XLarge @CmIndent-XXLarge @CmIndent-XXXLarge;
+
+// /* ******* UI ******* */
+
+@CmUI-Transition-Duration: 250ms;
+@CmUI-Transition-DurationMedium: 150ms;
+@CmUI-Transition-DurationShort: 100ms;
+@CmUI-Transition-DurationLong: 500ms;
+@CmUI-Transition-DurationXLong: 750ms;
+@CmUI-Transition-DurationXXLong: 1000ms;
+@CmUI-Transition-DurationReverse: 100ms;
+@CmUI-Transition-DurationNone: 0ms;
+@CmUI-Transition-Delay-Hide: 300ms;
+@CmUI-MotionAsymmetric: cubic-bezier(.5,0,.15,1);
+@CmUI-Opacity-Hover: 0.7;
+@CmUI-Shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+@CmUI-ShadowLight: 0 0 2px rgba(0,0,0,0.2);
+@CmUI-ShadowInner: 0 2px 2px rgba(0,0,0,0.4) inset;
+@CmUI-Shadow-Bottom: 0 2px 5px rgba(0,0,0,0.15);
+@CmUI-Shadow-BottomLarge: 0 2px 12px rgba(0, 0, 0, 0.2);
+@CmUI-Shadow-BottomSmall: 0 1px 2px rgba(0,0,0,0.15);
+@CmUI-Shadow-Right: 2px 0 5px rgba(0,0,0,0.15);
+@CmUI-Shadow-Left: -2px 0 5px rgba(0,0,0,0.15);
+@CmUI-Shadow-Card: 0 1px 2px rgba(0,0,0,0.25);
+@CmUI-Overlay: @CmUI-Overlay-Light;
+@CmUI-Overlay-Fade: 0.7;
+@CmUI-Overlay-FadeMedium: 0.3;
+@CmUI-Overlay-FadeP: 70%;
+@CmUI-Overlay-FadeMediumP: 30%;
+@CmUI-Overlay-Dark: rgba(0, 0, 0, @CmUI-Overlay-Fade);
+@CmUI-Overlay-Light: rgba(255, 255, 255, @CmUI-Overlay-Fade);
+@CmUI-Overlay-Duration: @CmUI-Transition-DurationLong;
+@CmUI-AdaptiveFrom: @CmScreen-TabletPortrait;
+@CmUI-TooltipWidth: 320px;
+@CmUI-ColumnIndent: @CmIndent-Medium;
+@CmUI-BoxIndent: @CmIndent-Medium;
+@CmUI-GoogleFont: "Open+Sans";
+@CmUI-GoogleFont-Weight: "100,300,400,600,700,800";

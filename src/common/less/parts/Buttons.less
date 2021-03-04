@@ -1,0 +1,136 @@
+/* ******* PARTS: BUTTONS ******* */
+
+.pt__buttons {
+    @buttonIndent: round(@CmForm-ButtonsIndent / 2);
+
+    .cm__box;
+    .cm__box-reverse;
+
+    > .inner {
+        display: flex;
+        margin: -@buttonIndent;
+
+        > .left,
+        > .right {
+            display: flex;
+            flex: 1;
+            align-items: flex-start;
+
+            &.column--auto {
+                flex: 1 1 auto;
+            }
+
+            &.column--none {
+                flex: none;
+            }
+        }
+
+        > .left {
+            justify-content: flex-start;
+        }
+
+        > .right {
+            justify-content: flex-end;
+        }
+    }
+
+    .button-alike {
+        margin: @buttonIndent;
+    }
+
+    .hint {
+        margin: @buttonIndent;
+        flex: auto;
+        align-self: center;
+    }
+
+    /* *** ALIGN *** */
+
+    &.pull-right {
+        > .inner {
+            justify-content: flex-end;
+        }
+    }
+
+    &.pull-left {
+        > .inner {
+            justify-content: flex-start;
+        }
+    }
+
+    &.pull-center {
+        > .inner {
+            justify-content: center;
+        }
+    }
+
+    &.pull-justify {
+        .button-alike {
+            flex: 1 1 0;
+        }
+    }
+
+    &.pull-top {
+        > .inner {
+            align-items: flex-start;
+        }
+    }
+
+    &.pull-middle {
+        > .inner {
+            align-items: center;
+        }
+    }
+
+    &.pull-bottom {
+        > .inner {
+            align-items: flex-end;
+        }
+    }
+
+    /* *** DISPLAY *** */
+
+    &.is-box {
+        .pt__buttons--box;
+    }
+}
+
+.pt__buttons--box {
+    > .inner {
+        display: block;
+        margin: 0;
+
+        > .left,
+        > .right {
+            width: 100%;
+            margin: @CmForm-FieldIndent 0 0 0;
+
+            &:first-child {
+                margin: 0;
+            }
+        }
+    }
+
+    .button-alike {
+        width: 100%;
+        margin: @CmForm-FieldIndent 0 0 0;
+
+        &:first-child {
+            margin: 0;
+        }
+    }
+}
+
+/* ******* PARTS: BUTTONS: ADAPTIVE ******* */
+
+@media only screen and (max-width : @CmScreen-Mobile) {
+
+    html.is-adaptive {
+        .pt__buttons {
+            &.is-adaptive {
+                .pt__buttons--box;
+            }
+        }
+    }
+
+}

@@ -1,0 +1,105 @@
+// /* ******* PREFIXES ******* */
+
+.mx__position (@top: auto, @right: auto, @bottom: auto, @left: auto) {
+    top: @top;
+    right: @right;
+    bottom: @bottom;
+    left: @left;
+}
+
+.mx__transition (@properties, @duration: @CmUI-Transition-Duration, @function: ease-in-out, @delay: 0ms) {
+    .for(@properties); .-each(@property) {
+        .property(@property) when (@property = transform) {
+            -webkit-transition+: -webkit-transform @duration @function @delay;
+                    transition+: -webkit-transform @duration @function @delay;
+                    transition+: -ms-transform @duration @function @delay;
+                    transition+: transform @duration @function @delay;
+        }
+
+        .property(@property) when not (@property = transform) {
+            -webkit-transition+: @property @duration @function @delay;
+                    transition+: @property @duration @function @delay;
+        }
+
+        .property(@property);
+    }
+}
+
+.mx__transform (@properties) {
+    .for(@properties); .-each(@property) {
+        -webkit-transform+_: @property;
+            -ms-transform+_: @property;
+                transform+_: @property;
+    }
+}
+
+.mx__linear-gradient (@params) {
+    background-image: -webkit-linear-gradient(@params);
+    background-image: linear-gradient(@params);
+}
+
+.mx__placeholder (@color, @size: inherit, @style: inherit) {
+    &:-ms-input-placeholder {
+        .mx__placeholder__content(@color, @size, @style);
+    }
+    &::-webkit-input-placeholder {
+        .mx__placeholder__content(@color, @size, @style);
+    }
+    &::placeholder {
+        .mx__placeholder__content(@color, @size, @style);
+    }
+}
+
+.mx__placeholder__content (@color, @size: inherit, @style: inherit) {
+    opacity: 1;
+    color: @color;
+    font-size: @size;
+    font-style: @style;
+}
+
+// /* ******* COMMON ******* */
+
+.mx__only__color (@background, @colorDark, @colorLight) when (alpha(@background) = 1) and (lightness(@background) >= 60%) {
+    color: @colorDark;
+}
+.mx__only__color (@background, @colorDark, @colorLight) when (alpha(@background) = 1) and (lightness(@background) < 60%) {
+    color: @colorLight;
+}
+.mx__only__color (@background, @colorDark, @colorLight) when (alpha(@background) = 0) {
+    color: @colorDark;
+}
+.mx__background__color (@background, @colorDark, @colorLight) {
+    background-color: @background;
+    .mx__only__color(@background, @colorDark, @colorLight);
+}
+
+.mx__align (@value) when (@value = left){
+    margin: 0;
+}
+.mx__align (@value) when (@value = center){
+    margin: 0 auto;
+}
+.mx__align (@value) when (@value = right){
+    margin: 0 0 0 auto;
+}
+
+// /* ******* VENDORS ******* */
+
+// /* *** FOREACH ***/
+// /* https://github.com/seven-phases-max */
+
+// ............................................................
+// .for
+
+.for(@i, @n) {.-each(@i)}
+.for(@n)     when (isnumber(@n)) {.for(1, @n)}
+.for(@i, @n) when not (@i = @n)  {
+    .for((@i + (@n - @i) / abs(@n - @i)), @n);
+}
+
+// ............................................................
+// .for-each
+
+.for(@array)   when (default()) {.for-impl_(length(@array))}
+.for-impl_(@i) when (@i > 1)    {.for-impl_((@i - 1))}
+.for-impl_(@i) when (@i > 0)    {.-each(extract(@array, @i))}

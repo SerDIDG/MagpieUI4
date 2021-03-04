@@ -1,0 +1,42 @@
+/* ******* TIME SELECT ******* */
+
+.com__timeselect {
+    width: 100%;
+    max-width: @ComTimeSelect-Width;
+    display: inline-block;
+    vertical-align: top;
+
+    > .inner {
+        display: flex;
+        position: relative;
+
+        > .field {
+            height: @CmForm-FieldHeight;
+            flex: 1 1;
+        }
+
+        > .sep {
+            .cm__font;
+            width: @ComTimeSelect-Indent;
+            text-align: center;
+            line-height: @CmForm-FieldHeight;
+        }
+    }
+
+    html.ie9 & {
+        > .inner {
+            .clearfix;
+            display: block;
+
+            > .field {
+                display: table-cell;
+                flex: none;
+
+            }
+
+            > .sep {
+                display: table-cell;
+            }
+        }
+    }
+}

@@ -1,0 +1,50 @@
+/* ******* COMPONENTS: FILE MANAGER ******* */
+
+.com__file-manager {
+    > .inner {
+        position: relative;
+    }
+
+    &.is-fullsize {
+        height: 100%;
+
+        > .inner {
+            display: flex;
+            height: 100%;
+            flex-flow: column nowrap;
+
+            .com__file-manager__holder {
+                height: 100%;
+                position: relative;
+
+                > .inner {
+                    height: 100%;
+                    position: absolute;
+                    overflow: hidden;
+                    .mx__position(0, 0, 0, 0);
+                }
+            }
+        }
+    }
+}
+
+.com__file-manager__content {
+    .cm__box-reverse;
+
+    &.is-hidden {
+        display: none;
+    }
+}
+
+.com__file-manager__holder {
+    > .inner {
+    }
+
+    &.is-hidden {
+        display: none;
+    }
+
+    &.is-hidden + .com__file-manager__content {
+        margin-top: 0;
+    }
+}

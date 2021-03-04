@@ -1,0 +1,122 @@
+// /* ******* FONT ******* */
+
+// /* *** BASE *** */
+
+@CmFont-Base-LightWeight: 300;
+@CmFont-Base-NormalWeight: 400;
+@CmFont-Base-MediumWeight: 500;
+@CmFont-Base-BoldWeight: 600;
+
+@CmFont-Base-LineHeight: 18px;
+@CmFont-Base-LineHeightSmall: 18px;
+@CmFont-Base-Family: @CmUI-GoogleFont, arial, helvetica, sans-serif;
+@CmFont-Base-Size: 14px;
+@CmFont-Base-SizeSmall: 12px;
+@CmFont-Base-Weight: @CmFont-Base-NormalWeight;
+@CmFont-Base-Color: @CmColor-Font;
+@CmFont-Base-ColorOpposite: @CmColor-Font-Opposite;
+
+@CmFont-Base-Hint-Size: 12px;
+@CmFont-Base-Hint-Color: @CmColor-Font-Hint;
+
+@CmFont-Placeholder-Size: inherit;
+@CmFont-Placeholder-SizeSmall: @CmFont-Base-Hint-Size;
+@CmFont-Placeholder-Style: inherit;
+@CmFont-Placeholder-Color: @CmColor-Font-Placeholder;
+
+// /* *** UI *** */
+
+@CmFont-UI-LightWeight: 300;
+@CmFont-UI-NormalWeight: 400;
+@CmFont-UI-BoldWeight: 600;
+
+@CmFont-UI-LineHeight: 18px;
+@CmFont-UI-Size: 14px;
+@CmFont-UI-SizeSmall: 12px;
+@CmFont-UI-Family: @CmUI-GoogleFont, arial, helvetica, sans-serif;
+@CmFont-UI-Weight: @CmFont-UI-NormalWeight;
+@CmFont-UI-Color: @CmColor-Font;
+@CmFont-UI-ColorOpposite: @CmColor-Font-Opposite;
+
+@CmFont-UI-H1-LineHeight: 32px;
+@CmFont-UI-H1-Size: 24px;
+@CmFont-UI-H1-Weight: @CmFont-UI-LightWeight;
+@CmFont-UI-H1-Color: @CmColor-Font;
+
+@CmFont-UI-H4-LineHeight : 24px;
+@CmFont-UI-H4-Size: 16px;
+@CmFont-UI-H4-Weight: @CmFont-UI-LightWeight;
+@CmFont-UI-H4-Color: @CmColor-Font;
+
+// /* ******* BORDER ******* */
+
+@CmBorder-Radius: 3px;
+@CmBorder-Width: 1px;
+@CmBorder-Style: solid;
+@CmBorder-BoxWidth: 2px;
+@CmBorder-TemporaryWidth: @CmBorder-BoxWidth;
+@CmBorder-Default: @CmBorder-Width @CmBorder-Style @CmColor-Border;
+@CmBorder-Separator: @CmBorder-Width dotted @CmColor-Border;
+@CmBorder-Editable: @CmBorder-Width dashed @CmColor-BorderActive;
+@CmBorder-Box: @CmBorder-BoxWidth @CmBorder-Style @CmColor-Border;
+@CmBorder-BoxHover: @CmBorder-BoxWidth @CmBorder-Style @CmColor-BorderHover;
+@CmBorder-BoxActive: @CmBorder-BoxWidth @CmBorder-Style @CmColor-BorderActive;
+@CmBorder-BoxSelected: @CmBorder-BoxWidth @CmBorder-Style @CmColor-BorderSelected;
+@CmBorder-Temporary: @CmBorder-TemporaryWidth dashed @CmColor-Border;
+@CmBorder-TemporaryHover: @CmBorder-TemporaryWidth dashed @CmColor-BorderHover;
+@CmBorder-TemporaryActive: @CmBorder-TemporaryWidth dashed @CmColor-BorderActive;
+@CmBorder-TemporarySelected: @CmBorder-TemporaryWidth dashed @CmColor-BorderSelected;
+
+// /* ******* BUTTONS ******* */
+
+@CmButton-PaddingX: @CmIndent-XSmall;
+@CmButton-OutlineWidth: 1px;
+@CmButton-OutlineOffset: 1px;
+
+// /* ******* INPUTS ******* */
+
+@CmInput-Padding: 6px;
+@CmInput-BorderWidth: @CmBorder-Width;
+@CmInput-BorderStyle: @CmBorder-Style;
+@CmInput-DefaultBackground: @CmColor-Background;
+@CmInput-DefaultBorder: @CmColor-Border;
+@CmInput-HoverBackground: @CmInput-DefaultBackground;
+@CmInput-HoverBorder: @CmColor-BorderHover;
+@CmInput-ActiveBackground: @CmInput-DefaultBackground;
+@CmInput-ActiveBorder: @CmColor-BorderActive;
+@CmInput-DisabledBackground: @CmColor-Secondary-LightHighlight;
+@CmInput-DisableBorder: @CmColor-BorderDisabled;
+@CmTextarea-Height: 100px;
+@CmSelect-Size: 7;
+
+// /* ******* SCROLLBAR ******* */
+
+@CmScrollBar-Size: @CmSize-XXSmall;
+@CmScrollBar-Radius: @CmBorder-Radius;
+@CmScrollBar-TrackBackground: fade(@CmColor-Secondary-LightHighlight, 50%);
+@CmScrollBar-ThumbColor: @CmColor-Secondary-LightActiveHover;
+@CmScrollBar-ThumbColorHover: @CmColor-Secondary-MiddleDefault;
+
+@CmScrollBar-Light-ThumbColor: @CmColor-Primary-LightHighlight;
+@CmScrollBar-Light-ThumbColorHover: @CmColor-Primary-LightHover;
+
+// /* ******* FORM ******* */
+
+@CmForm-FieldHeight: 32px;
+@CmForm-FieldIndent: @CmIndent-Small;
+@CmForm-FieldTitleWidth: 156px;
+@CmForm-FieldTitleWidthSpaceless: 128px;
+@CmForm-FieldInnerIndent: @CmForm-FieldIndent / 2;
+@CmForm-FieldSmallWidth: 210px;
+@CmForm-ButtonsIndent: @CmIndent-XSmall;
+@CmForm-IconsIndent: @CmIndent-XXSmall;
+@CmForm-ImageBox-ButtonWidth: 100px;
+@CmForm-Cols-Names: one two three four five six seven eight nine ten;
+@CmForm-Cols-Indent: 2%;
+@CmForm-FilesList-Count: 3;
+
+// /* ******* COUNTER ******* */
+
+@CmCounter-Size: @CmSize-Small;
+@CmCounter-Border: 1px;
+@CmCounter-Radius: @CmCounter-Size;

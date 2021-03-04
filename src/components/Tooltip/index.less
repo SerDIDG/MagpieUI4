@@ -1,0 +1,79 @@
+/* ******* COMPONENT: TOOLTIP ******* */
+
+.com__tooltip {
+    position: absolute;
+    display: none;
+    left: 0;
+    top: 0;
+    z-index: 1001;
+    opacity: 0;
+
+    > .inner {
+        > .title {
+            margin: 0 0 8px;
+
+            &:last-child {
+                margin: 0;
+            }
+
+            .cm__tags {
+                margin: 0;
+            }
+        }
+
+        > .scroll {
+            &.is-auto {
+                .cm__scroll-y-a;
+            }
+
+            &.is-scroll {
+                .cm__scroll-y-a;
+                @indent: (@PtBox-BorderWidth + @PtBox-Padding) * 2;
+                max-height: ~"calc(100vh - @{indent})";
+            }
+        }
+    }
+
+    &.animate--drop-bottom-left {
+        .mx__transition(transform, @CmUI-Transition-Duration, @CmUI-MotionAsymmetric);
+        transform-origin: right top;
+        transform: scale(0);
+
+        &.is-hide {
+            transform: scale(0);
+        }
+
+        &.is-show {
+            transform: scale(1);
+        }
+    }
+}
+
+/* ******* COMPONENT: TOOLTIP: THEMES ******* */
+
+.com__tooltip {
+    &.theme-default {
+        > .inner {
+            .pt__box;
+        }
+    }
+
+    &.theme-dark,
+    &.theme-black {
+        > .inner {
+            .pt__box--black;
+        }
+    }
+}
+
+/* ******* COMPONENT: TOOLTIP: INNER COMPONENTS ******* */
+
+/* *** ITEMS LIST *** */
+
+.com__tooltip {
+    .pt__listing-items {
+        ul {
+            max-height: none;
+        }
+    }
+}

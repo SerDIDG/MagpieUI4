@@ -1,0 +1,65 @@
+// /* ******* SELECTABLE*** */
+
+@PtSelectable-Hover-Background: @CmColor-Secondary-LightHighlight;
+@PtSelectable-Hover-Border: @CmColor-Secondary-LightHover;
+
+@PtSelectable-Active-Background: @CmColor-Primary-LightHighlight;
+@PtSelectable-Active-Border: @CmColor-Primary-LightActive;
+
+// /* ******* EDITABLE ******* */
+
+@PtEditable-HoverBackground: fade(#ffffff, 50%);
+@PtEditable-ActiveBackground: fade(#ffffff, 50%);
+
+@PtEditable-Drag-DefaultBackground: @CmColor-Secondary-LightHighlight;
+@PtEditable-Drag-HoverBackground: @CmColor-Secondary-LightHover;
+@PtEditable-Drag-ActiveBackground: @CmColor-Primary-LightActive;
+
+// /* ******* DRAG ******* */
+
+@PtDrag-Vertical-Width: @CmSize-XLarge;
+@PtDrag-Vertical-Height: @CmSize-Small;
+@PtDrag-Vertical-Icon-Width: 18px;
+@PtDrag-Vertical-Icon-Height: 6px;
+
+@PtDrag-Horizontal-Width: @CmSize-Small;
+@PtDrag-Horizontal-Height: @CmSize-Large;
+@PtDrag-Horizontal-Icon-Width: 6px;
+@PtDrag-Horizontal-Icon-Height: 14px;
+
+@PtDrag-DefaultBackground: @CmColor-Secondary-LightHighlight;
+@PtDrag-DefaultBorder: @CmColor-Border;
+
+@PtDrag-HoverBackground: @CmColor-Secondary-LightHover;
+@PtDrag-HoverBorder: @CmColor-BorderHover;
+
+@PtDrag-ActiveBackground: @CmColor-Primary-LightActive;
+@PtDrag-ActiveBorder: @CmColor-Primary-MiddleActive;
+
+@PtDrag-Line-Size: @CmBorder-BoxWidth;
+@PtDrag-Line-DefaultBackground: @CmColor-Secondary-LightActive;
+@PtDrag-Line-HoverBackground: @CmColor-Secondary-LightActive;
+@PtDrag-Line-ActiveBackground: @CmColor-Primary-DarkDefault;
+
+// /* ******* RULER ******* */
+
+@PtRuler-Line-Size: @CmBorder-BoxWidth;
+@PtRuler-Line-Indent: @CmIndent-XSmall;
+@PtRuler-Line-DefaultBackground: @CmColor-Secondary-LightActive;
+@PtRuler-Line-HoverBackground: @CmColor-Secondary-LightActive;
+@PtRuler-Line-ActiveBackground: @CmColor-Primary-DarkDefault;
+
+// /* ******* DRAG AND DROP ******* */
+
+@PtDnD-Area-Padding: @CmIndent-Small;
+@PtDnD-Area-BorderRadius: @CmBorder-Radius;
+@PtDnD-DropDuration: 400ms;
+@PtDnD-MoveDuration: 200ms;
+
+@PtDnD-Chassis-HighlightIndent: @CmIndent-Medium;
+
+@PtDnD-Area-ActiveBackground: hsla(@CmColor-Primary, @CmColor-Primary-DarkSaturation, 55%, 0.12);
+@PtDnD-Area-ActiveBorder: 1px dashed @CmColor-Primary-DarkDefault;
+
+@PtDnD-Area-HighlightBackground: hsla(@CmColor-Primary, @CmColor-Primary-DarkSaturation, 55%, 0.05);
+@PtDnD-Area-HighlightBorder: 1px dashed fade(@CmColor-Primary-DarkDefault, 30%);

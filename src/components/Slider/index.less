@@ -1,0 +1,347 @@
+/* ******* COMPONENTS: SLIDER ******* */
+
+.com__slider {
+    .cm__box;
+
+    > .inner {
+        position: relative;
+
+        > .size {
+            img {
+                .cm__image-resizable;
+            }
+        }
+
+        > .slides {
+            position: absolute;
+            z-index: 1;
+            .mx__position(0,0,0,0);
+
+            > ul {
+                .cm__list-clear;
+                position: absolute;
+                overflow: hidden;
+                .mx__position(0,0,0,0);
+
+                > li {
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                    z-index: 1;
+                    .mx__position(0,0,0,0);
+
+                    &:first-child {
+                        display: block;
+                        z-index: 2;
+                    }
+
+                    > .pt__image {
+                        width: 100%;
+                        height: 100%;
+                        position: absolute;
+                        z-index: 1;
+
+                        > .inner {
+                            width: 100%;
+                            height: 100%;
+                        }
+
+                        > .pull {
+                            opacity: 0;
+                            .mx__transition(opacity, @CmUI-Transition-Duration);
+                        }
+                    }
+
+                    > .image {
+                        width: 100%;
+                        height: 100%;
+                        overflow: hidden;
+                        position: absolute;
+                        z-index: 1;
+
+                        img {
+                            .cm__image-flexible;
+                        }
+                    }
+
+                    > .text {
+                        padding: @CmIndent-Medium;
+                        position: absolute;
+                        z-index: 2;
+                        overflow: hidden;
+                        text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+                        .mx__position(0, 0, 0, 0);
+                        user-select: text;
+
+                        .cm__tags {
+                            color: #fff;
+                        }
+                    }
+
+                    > .slide-area {
+                        position: absolute;
+                        z-index: 3;
+                        .mx__position(0, 0, 0, 0);
+                        user-select: text;
+                    }
+
+                    > .slide-link {
+                        position: absolute;
+                        z-index: 4;
+                        .mx__position(0, 0, 0, 0);
+                    }
+                }
+            }
+
+            .com__slider__effects;
+        }
+    }
+
+    &.is-adaptive-content {
+        > .inner {
+            .mx__transition(height, @ComSlider-Duration);
+
+            > .slides {
+                > ul {
+                    > li {
+                        > .slide-area,
+                        > .text {
+                            position: relative;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &.is-editable {
+        > .inner {
+            height: auto !important;
+            .cm__transition-none;
+
+            > .size {
+                display: none;
+            }
+
+            > .slides {
+                > ul {
+                    overflow: visible;
+
+                    > li {
+                        > .slide-link {
+                            display: none;
+                        }
+                    }
+                }
+            }
+
+            > .com__gallery-controls {
+                display: none;
+            }
+        }
+    }
+
+    &:hover {
+        > .inner {
+            > .com__gallery-controls {
+                opacity: 1;
+            }
+
+            > .slides  > ul > li {
+                > .pt__image {
+                    > .pull {
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+    }
+
+    &.has-border {
+        padding: @CmIndent-XSmall;
+        border: @CmBorder-Box;
+    }
+}
+
+// /* *** MIXINS *** */
+
+.com__slider__effects () {
+    &.effect-none {
+        position: relative;
+
+        > ul {
+            position: relative;
+
+            > li {
+                display: none;
+                position: relative;
+
+                &:first-child {
+                    display: block;
+                }
+
+                > .slide-area {
+                    position: relative;
+                }
+            }
+        }
+    }
+
+    &.effect-edit {
+        position: relative;
+
+        > ul {
+            position: relative;
+
+            > li {
+                display: none;
+                position: relative;
+
+                &:first-child {
+                    display: block;
+                }
+
+                > .slide-area {
+                    position: relative;
+                }
+            }
+        }
+    }
+
+    &.effect-fade {
+        > ul {
+            > li {
+                display: none;
+                position: absolute;
+                opacity: 0;
+                .mx__position(0, auto, auto, 0);
+
+                &:first-child {
+                    display: block;
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    &.effect-fade-out {
+        > ul {
+            > li {
+                display: none;
+                position: absolute;
+                opacity: 0;
+                .mx__position(0, auto, auto, 0);
+
+                &:first-child {
+                    display: block;
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    &.effect-push {
+        > ul {
+            .cm__list-inline;
+            white-space: nowrap;
+
+            > li {
+                position: relative;
+                white-space: normal;
+            }
+        }
+    }
+
+    &.effect-pull {
+        > ul {
+            > li {
+                display: none;
+                position: absolute;
+                .mx__position(0, auto, auto, 100%);
+
+                &:first-child {
+                    display: block;
+                    left: 0%;
+                }
+            }
+        }
+    }
+
+    &.effect-pull-overlap {
+        > ul {
+            > li {
+                display: none;
+                position: absolute;
+                .mx__position(0, auto, auto, 100%);
+
+                &:first-child {
+                    display: block;
+                    left: 0%;
+                }
+            }
+        }
+    }
+
+    &.effect-pull-parallax {
+        > ul {
+            > li {
+                display: none;
+                position: absolute;
+                .mx__position(0, auto, auto, 100%);
+
+                &:first-child {
+                    display: block;
+                    left: 0%;
+                }
+            }
+        }
+    }
+
+    &.effect-pull-parallax-css {
+        > ul {
+            > li {
+                display: none;
+                position: absolute;
+                .mx__position(0, auto, auto, 0);
+
+                &:first-child {
+                    display: block;
+                }
+            }
+        }
+    }
+
+    &.effect-custom {
+        > ul {
+            > li {
+                display: none;
+                position: absolute;
+                .mx__position(0, auto, auto, 0);
+
+                &:first-child {
+                    display: block;
+                }
+            }
+        }
+    }
+}
+
+/* ******* ADAPTIVE ******* */
+
+@media only screen and (max-width : @CmUI-AdaptiveFrom) {
+
+    html.is-adaptive {
+        .com__slider {
+            > .inner {
+                > .slides {
+                    > ul {
+                        > li {
+                            background-attachment: scroll !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}

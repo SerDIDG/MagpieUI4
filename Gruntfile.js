@@ -1,12 +1,17 @@
+'use strict';
+
 module.exports = function(grunt) {
+    const fs = require('fs');
+    const webp = require("imagemin-webp");
     // Load all grunt tasks
     require('load-grunt-tasks')(grunt);
     // Display how match time it took to build each task
     require('@lodder/time-grunt')(grunt);
     // Project configuration.
     grunt.initConfig({
-        pkg : grunt.file.readJSON('package.json'),
-        banner : '/*! ************ <%= pkg.name %> v<%= pkg.version %> (<%= grunt.template.today("yyyy-mm-dd HH:MM") %>) ************ */\n',
+        pkg: grunt.file.readJSON('package.json'),
+        banner: '/*! ************ <%= pkg.name %> v<%= pkg.version %> ************ */\n',
+        timestamp: '<%= Date.now() %>',
 
         paths : {
             modules : 'node_modules',
@@ -53,6 +58,9 @@ module.exports = function(grunt) {
         },
 
         clean : {
+            options: {
+                force: true
+            },
             scripts : [
                 '<%= paths.build %>/js/*',
                 '<%= paths.docs %>/build/js/*'
@@ -80,40 +88,44 @@ module.exports = function(grunt) {
                 '<%= paths.docs %>/build/libs/*'
             ],
             temp : [
-                '<%= paths.temp %>'
+                '<%= paths.temp %>/less',
+                '<%= paths.temp %>/js',
+                '<%= paths.temp %>/img'
             ]
         },
 
-        concat : {
-            scripts : {
+        concat: {
+            scripts: {
                 options: {
                     banner: '<%= banner %>'
                 },
-                src : [
+                src: [
                     '<%= components.tinycolor.scripts %>',
-                    '<%= paths.src %>/js/polyfill.js',
-                    '<%= paths.src %>/js/common.js',
-                    '<%= paths.src %>/js/modules.js',
-                    '<%= paths.src %>/js/parts.js',
-                    '<%= paths.src %>/js/init.js',
-                    '<%= paths.src %>/js/helpers/**/*.js',
-                    '<%= paths.src %>/js/abstracts/AbstractController.js',
-                    '<%= paths.src %>/js/abstracts/AbstractContainer.js',
-                    '<%= paths.src %>/js/abstracts/AbstractInput.js',
-                    '<%= paths.src %>/js/abstracts/AbstractFileManager.js',
-                    '<%= paths.src %>/js/abstracts/AbstractFileManagerContainer.js',
-                    '<%= paths.src %>/js/abstracts/**/*.js',
-                    '<%= paths.src %>/js/components/Form.js',
-                    '<%= paths.src %>/js/components/TabsetHelper.js',
-                    '<%= paths.src %>/js/components/ScrollPagination.js',
-                    '<%= paths.src %>/js/components/**/*.js',
-                    '<%= paths.src %>/js/fields/MultipleInput.js',
-                    '<%= paths.src %>/js/fields/BoxTools.js',
-                    '<%= paths.src %>/js/fields/**/*.js',
-                    '!<%= paths.src %>/js/components/dev/**/*.js',
-                    '!<%= paths.src %>/js/components/old/**/*.js'
+                    '<%= paths.src %>/common/js/config.js',
+                    '<%= paths.src %>/common/js/polyfill.js',
+                    '<%= paths.src %>/common/js/common.js',
+                    '<%= paths.src %>/common/js/modules.js',
+                    '<%= paths.src %>/common/js/parts.js',
+                    '<%= paths.src %>/common/js/**/*.js',
+                    '<%= paths.src %>/abstracts/Controller/**/*.js',
+                    '<%= paths.src %>/abstracts/Container/**/*.js',
+                    '<%= paths.src %>/abstracts/**/*.js',
+                    '<%= paths.src %>/components/**/*.js',
+                    '<%= paths.src %>/fields/**/*.js',
+                    '!<%= paths.src %>/**/langs/*.js',
+                    '!<%= paths.src %>/common/js/init.js',
+                    '<%= paths.src %>/common/js/init.js'
                 ],
-                dest : '<%= paths.build %>/js/<%= pkg.name %>.js'
+                dest: '<%= paths.build %>/js/<%= pkg.name %>.js'
+            },
+            scripts_langs: {
+                files : [{
+                    src : '<%= paths.src %>/**/langs/ru.js',
+                    dest : '<%= paths.build %>/js/<%= pkg.name %>.ru.<%= pkg.version %>.js'
+                },{
+                    src : '<%= paths.src %>/**/langs/en.js',
+                    dest : '<%= paths.build %>/js/<%= pkg.name %>.en.<%= pkg.version %>.js'
+                }]
             },
             scripts_docs : {
                 src : [
@@ -125,44 +137,36 @@ module.exports = function(grunt) {
                 ],
                 dest : '<%= paths.docs %>/build/js/<%= pkg.name %>.js'
             },
-            codemirror : {
-                src : [
-                    '<%= components.codemirror.scripts %>'
-                ],
-                dest : '<%= paths.build %>/libs/codemirror_comp/codemirror.js'
-            },
-            styles : {
+            styles: {
                 options: {
                     banner: '<%= banner %>'
                 },
-                src : [
+                src: [
                     '<%= components.animatecss.styles %>',
                     '<%= components.codemirror.styles %>',
-                    '<%= paths.src %>/less/helpers/**/*.less',
-                    '<%= paths.src %>/less/extra/*.less',
-                    '<%= paths.src %>/less/variables/*.less',
-                    '<%= paths.src %>/less/mixins.less',
-                    '<%= paths.src %>/less/common.less',
-                    '<%= paths.src %>/less/common/Font.less',
-                    '<%= paths.src %>/less/common/Size.less',
-                    '<%= paths.src %>/less/common/Indent.less',
-                    '<%= paths.src %>/less/common/Colors.less',
-                    '<%= paths.src %>/less/common/Aspect.less',
-                    '<%= paths.src %>/less/common/Icons.less',
-                    '<%= paths.src %>/less/common/Tags.less',
-                    '<%= paths.src %>/less/common/Inputs.less',
-                    '<%= paths.src %>/less/common/Buttons.less',
-                    '<%= paths.src %>/less/common/List.less',
-                    '<%= paths.src %>/less/common/Form.less',
-                    '<%= paths.src %>/less/common/**/*.less',
-                    '<%= paths.src %>/less/parts/**/*.less',
-                    '<%= paths.src %>/less/layouts/**/*.less',
-                    '<%= paths.src %>/less/components/Input.less',
-                    '<%= paths.src %>/less/components/ToggleBox.less',
-                    '<%= paths.src %>/less/components/Tooltip.less',
-                    '<%= paths.src %>/less/components/**/*.less'
+                    '<%= paths.src %>/common/less/variables/**/.less',
+                    '<%= paths.src %>/common/less/svg.less',
+                    '<%= paths.src %>/common/less/mixins.less',
+                    '<%= paths.src %>/common/less/common.less',
+                    '<%= paths.src %>/common/less/*.less',
+                    '<%= paths.src %>/common/less/common/Font.less',
+                    '<%= paths.src %>/common/less/common/Size.less',
+                    '<%= paths.src %>/common/less/common/Indent.less',
+                    '<%= paths.src %>/common/less/common/Colors.less',
+                    '<%= paths.src %>/common/less/common/Aspect.less',
+                    '<%= paths.src %>/common/less/common/Icons.less',
+                    '<%= paths.src %>/common/less/common/Tags.less',
+                    '<%= paths.src %>/common/less/common/Inputs.less',
+                    '<%= paths.src %>/common/less/common/Buttons.less',
+                    '<%= paths.src %>/common/less/common/List.less',
+                    '<%= paths.src %>/common/less/common/**/*.less',
+                    '<%= paths.src %>/common/less/parts/**/*.less',
+                    '<%= paths.src %>/common/less/layouts/**/*.less',
+                    '<%= paths.src %>/abstracts/**/*.less',
+                    '<%= paths.src %>/components/**/*.less',
+                    '<%= paths.src %>/fields/**/*.less'
                 ],
-                dest : '<%= paths.build %>/less/<%= pkg.name %>.less'
+                dest: '<%= paths.build %>/less/<%= pkg.name %>.less'
             },
             styles_docs : {
                 src : [
@@ -172,11 +176,12 @@ module.exports = function(grunt) {
                 ],
                 dest : '<%= paths.docs %>/build/less/<%= pkg.name %>.less'
             },
-            variables : {
-                src : [
-                    '<%= paths.src %>/less/variables/**/*.less'
+            variables: {
+                src: [
+                    '<%= paths.src %>/**/variables/*.less',
+                    '<%= paths.src %>/**/variables.less'
                 ],
-                dest : '<%= paths.build %>/less/<%= pkg.name %>.variables.less'
+                dest: '<%= paths.build %>/less/<%= pkg.name %>.variables.less'
             },
             variables_docs : {
                 src : [
@@ -184,38 +189,28 @@ module.exports = function(grunt) {
                     '<%= paths.docs %>/src/less/variables/*.less'
                 ],
                 dest : '<%= paths.docs %>/build/less/<%= pkg.name %>.variables.less'
-            }
-        },
-
-        jshint : {
-            src : {
-                options: {
-                    '-W002' : false,
-                    '-W069' : false
-                },
-                src :[
-                    '<%= paths.src %>/js/common.js',
-                    '<%= paths.src %>/js/modules.js',
-                    '<%= paths.src %>/js/parts.js',
-                    '<%= paths.src %>/js/init.js',
-                    '<%= paths.src %>/js/components/AbstractInput.js',
-                    '<%= paths.src %>/js/components/AbstractRange.js',
-                    '<%= paths.src %>/js/components/Form.js',
-                    '<%= paths.src %>/js/components/BoxTools.js',
-                    '<%= paths.src %>/js/components/**/*.js'
-                ]
+            },
+            codemirror : {
+                src : [
+                    '<%= components.codemirror.scripts %>'
+                ],
+                dest : '<%= paths.build %>/libs/codemirror_comp/codemirror.js'
             }
         },
 
         svgcss : {
-            build : {
+            options : {
+                previewhtml : null
+            },
+            svg : {
                 options : {
-                    previewhtml : null,
                     cssprefix : 'svg__',
-                    csstemplate : '<%= paths.src %>/hbs/svg.hbs'
+                    csstemplate : '<%= paths.src %>/common/hbs/svg.hbs'
                 },
-                src : ['<%= paths.src %>/img/svg/*.svg'],
-                dest : '<%= paths.src %>/less/extra/svg.less'
+                files: [{
+                    src: ['<%= paths.src %>/common/img/svg/*.svg'],
+                    dest : '<%= paths.src %>/common/less/svg.less'
+                }]
             }
         },
 
@@ -249,12 +244,9 @@ module.exports = function(grunt) {
 
         replace: {
             options: {
-                patterns: [
-                    {
-                        match: 'VERSION',
-                        replacement: '<%= pkg.version %>'
-                    }
-                ]
+                variables: {
+                    'VERSION' : '<%= pkg.version %>'
+                }
             },
             scripts: {
                 src: ['<%= paths.build %>/js/<%= pkg.name %>.js'],
@@ -284,8 +276,16 @@ module.exports = function(grunt) {
 
         uglify : {
             build : {
-                src : ['<%= paths.build %>/js/<%= pkg.name %>.js'],
-                dest : '<%= paths.build %>/js/<%= pkg.name %>.min.js'
+                files: [{
+                    src: ['<%= paths.build %>/js/<%= pkg.name %>.js'],
+                    dest: '<%= paths.build %>/js/<%= pkg.name %>.min.js'
+                },{
+                    src : '<%= paths.build %>/js/<%= pkg.name %>.ru.js',
+                    dest : '<%= paths.build %>/js/<%= pkg.name %>.ru.min.js'
+                },{
+                    src : '<%= paths.build %>/js/<%= pkg.name %>.en.js',
+                    dest : '<%= paths.build %>/js/<%= pkg.name %>.en.min.js'
+                }]
             },
             codemirror : {
                 src : ['<%= paths.build %>/libs/codemirror_comp/codemirror.js'],
@@ -313,6 +313,23 @@ module.exports = function(grunt) {
                         '!animated/**/*.*'
                     ],
                     dest : '<%= paths.temp %>/img/'
+                }]
+            },
+            webp: {
+                options: {
+                    use: [webp({
+                        quality: 85
+                    })]
+                },
+                files: [{
+                    expand: true,
+                    cwd: '<%= paths.build %>/img/',
+                    src: [
+                        '**/*.{png,jpg}',
+                        '!animated/**/*.*'
+                    ],
+                    dest: '<%= paths.build %>/img/',
+                    ext: '.webp'
                 }]
             }
         },
@@ -456,6 +473,7 @@ module.exports = function(grunt) {
             }
         }
     });
+
     // Custom Tasks
     grunt.registerTask('default', ['clean', 'pre', 'scripts', 'images', 'styles', 'fonts', 'libs', 'stuff']);
     grunt.registerTask('optimize', ['clean:temp', 'default', 'uglify:build', 'cssmin', 'imagemin', 'copy:images_optimize', 'clean:temp']);

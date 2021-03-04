@@ -1,0 +1,190 @@
+/* ******* LAYOUTS: COLLAPSIBLE ******* */
+
+.lt__collapsible {
+    @width-hide: 24px + (@CmIndent-XSmall * 2);
+
+    position: absolute;
+    .mx__position(0,0,0,0);
+
+    > .sidebar {
+        width: @LtCollapsible-SidebarWidth;
+        height: 100%;
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+        background: @CmColor-Background;
+        box-shadow: @CmUI-Shadow;
+        .mx__transition(width, @LtCollapsible-Duration);
+
+        > .inner {
+            width: @LtCollapsible-SidebarWidth;
+            position: absolute;
+
+            > .title {
+                .cm__font--ui-h1;
+                padding: 6px @CmIndent-XSmall;
+                position: absolute;
+                background: @CmColor-Background;
+                user-select: none;
+                .mx__position(0, 0, auto, 0);
+
+                .icon {
+                    position: absolute;
+                    top: 14px;
+                    cursor: pointer;
+                    .mx__transition(transform opacity, @LtCollapsible-Duration);
+
+                    &.default {
+                        .cm__size__medium;
+
+                        &:hover {
+                            opacity: @CmUI-Opacity-Hover;
+                        }
+                    }
+                }
+            }
+
+            > .descr {
+                .cm__scroll-y;
+                padding: @CmIndent-XSmall;
+                position: absolute;
+                background: @CmColor-Background;
+                .mx__transition(opacity, @LtCollapsible-Duration);
+                .mx__position(50px, 0, 0, 0);
+            }
+        }
+
+        &.left {
+            float: left;
+
+            > .inner {
+                .mx__position(0, 0, 0, auto);
+
+                > .title {
+                    text-align: left;
+
+                    .icon {
+                        right: @CmIndent-XSmall;
+
+                        &.default {
+                            .icon.medium.ui-arrow-left;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.right {
+            float: right;
+
+            > .inner {
+                .mx__position(0, auto, 0, 0);
+
+                > .title {
+                    text-align: right;
+
+                    .icon {
+                        left: @CmIndent-XSmall;
+
+                        &.default {
+                            .icon.medium.ui-arrow-right;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    > .inner {
+        .cm__scroll-y-a;
+        height: 100%;
+        position: relative;
+        z-index: 1;
+
+        > iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    }
+
+    &.is-immediately {
+        > .sidebar {
+            .cm__transition-none;
+
+            > .inner {
+                > .title {
+                    .icon {
+                        .cm__transition-none;
+                    }
+                }
+
+                > .descr {
+                    .cm__transition-none;
+                }
+            }
+        }
+    }
+
+    &.is-sidebar-left-collapsed {
+        > .sidebar.left {
+            width: @width-hide;
+
+            > .inner {
+                > .title {
+                    .icon {
+                        .mx__transform(rotate(180deg));
+                    }
+                }
+
+                > .descr {
+                    opacity: 0;
+                }
+            }
+        }
+    }
+
+    &.is-sidebar-right-collapsed {
+        > .sidebar.right {
+            width: @width-hide;
+
+            > .inner {
+                > .title {
+                    .icon {
+                        .mx__transform(rotate(180deg));
+                    }
+                }
+
+                > .descr {
+                    opacity: 0;
+                }
+            }
+        }
+    }
+}
+
+/* *** ADAPTIVE *** */
+
+@media only screen and (max-width : @CmScreen-Tablet) {
+
+    html.is-adaptive {
+        .lt__collapsible {
+            > .sidebar {
+                .cm__transition-none;
+
+                > .inner {
+                    > .title {
+                        .icon {
+                            .cm__transition-none;
+                        }
+                    }
+
+                    > .descr {
+                        .cm__transition-none;
+                    }
+                }
+            }
+        }
+    }
+
+}

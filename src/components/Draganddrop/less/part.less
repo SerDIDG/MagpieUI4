@@ -1,0 +1,98 @@
+.pt__dnd-body,
+.pt__dnd-body * {
+    cursor: move !important;
+    user-select: none;
+
+    .pt__dnd-area {
+        pointer-events: none;
+    }
+}
+
+.pt__dnd-item {
+    pointer-events: none;
+}
+
+.pt__dnd-helper {
+    position: fixed;
+    z-index: 9000;
+    pointer-events: none;
+    user-select: none;
+
+    &.is-drop {
+        .mx__transition(all, @PtDnD-DropDuration);
+    }
+}
+
+.pt__dnd-chassis {
+    height: 0;
+    position: relative;
+    .mx__transition(height, 0s, linear);
+
+    &:before {
+        display: block;
+        position: absolute;
+        opacity: 0;
+        content: '';
+        background: url('@{CmPath-Images}/parts/pattern-diagonal-2x50.png') 0 0 repeat;
+        border: 2px dashed #ffffff;
+        border-radius: @CmBorder-Radius;
+        .mx__position(0, 0, @PtDnD-Chassis-HighlightIndent, 0);
+        .mx__transition(opacity, @CmUI-Transition-Duration);
+    }
+
+    &.is-highlight {
+        &:before {
+            opacity: 1;
+            .mx__transition(opacity, @CmUI-Transition-DurationReverse);
+        }
+    }
+
+    &.is-immediately {
+        .cm__transition-none;
+    }
+}
+
+.pt__dnd-removable {
+    overflow: hidden;
+}
+
+.pt__dnd-area {
+    .clearfix;
+    min-height: @CmIndent-Medium;
+    padding: @PtDnD-Area-Padding;
+    position: relative;
+
+    &.is-available {
+        .mx__transition(background-color, @CmUI-Transition-Duration);
+
+        &:before {
+            .mx__transition(border-color, @CmUI-Transition-Duration);
+        }
+
+        &.is-highlight {
+            background-color: @PtDnD-Area-HighlightBackground;
+            border-radius: @PtDnD-Area-BorderRadius;
+
+            &:before {
+                position: absolute;
+                display: block;
+                content: '';
+                border: @PtDnD-Area-HighlightBorder;
+                border-radius: @PtDnD-Area-BorderRadius;
+                .mx__position(-1px,-1px,-1px,-1px);
+            }
+
+            &.is-active {
+                background-color: @PtDnD-Area-ActiveBackground;
+
+                &:before {
+                    border: @PtDnD-Area-ActiveBorder;
+                }
+
+                .pt__dnd-area {
+                    background-color: rgba(255,255,255,0.4);
+                }
+            }
+        }
+    }
+}

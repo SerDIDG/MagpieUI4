@@ -1,0 +1,115 @@
+/* ******* COMPONENT: GALLERY: LAYOUT ******* */
+
+.com__gallery-layout {
+    .cm__box;
+
+    > .inner {
+        position: relative;
+    }
+
+    // /* Preview */
+
+    .com__gallery-preview {
+        margin: @CmIndent-XSmall 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // /* Set sizes */
+
+    .loop(@counter) when (@counter > 0) {
+        .loop((@counter - 1));
+
+        @size: 100% / @counter;
+
+        &.size-@{counter} {
+            > .inner {
+                padding: 0 @size;
+            }
+
+            .com__gallery-bar {
+                width: @size;
+
+                .pt__grid {
+                    .pt__grid__col(@counter);
+                }
+            }
+        }
+    }
+
+    .loop(@ComGalleryLayout-SizesCount);
+
+    // /* Bar Horizontal */
+
+    &.is-bar-top,
+    &.is-bar-bottom,
+    &.is-bar-none {
+        > .inner {
+            padding: 0;
+        }
+
+        .com__gallery-bar {
+            width: auto;
+        }
+    }
+
+    &.is-bar-none {
+        .com__gallery-preview {
+            margin: 0;
+        }
+    }
+
+    // /* Bar vertical */
+
+    &.is-bar-left,
+    &.is-bar-right {
+        .com__gallery-preview {
+            margin: 0;
+        }
+
+        .com__gallery-bar {
+            position: absolute;
+            box-sizing: border-box;
+            .mx__position(0, auto, 0, auto);
+
+            .pt__grid > ul > li {
+                width: 100%;
+            }
+        }
+    }
+
+    &.is-bar-left {
+        > .inner {
+            padding-right: 0;
+        }
+
+        .com__gallery-bar {
+            padding: 0 @CmIndent-XSmall 0 0;
+            left: 0;
+        }
+    }
+
+    &.is-bar-right {
+        > .inner {
+            padding-left: 0;
+        }
+
+        .com__gallery-bar {
+            padding: 0 0 0 @CmIndent-XSmall;
+            right: 0;
+        }
+    }
+
+    // /* *** Gallery Border *** */
+
+    &.has-border {
+        padding: @CmIndent-XSmall;
+        border: @CmBorder-Box;
+    }
+}

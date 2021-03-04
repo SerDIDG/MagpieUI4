@@ -1,0 +1,97 @@
+/* *** FORM ICONS *** */
+
+.cm__form__icons {
+    min-height: @CmForm-FieldHeight;
+    position: relative;
+
+    .loop(@counter) when (@counter > 0) {
+        .loop((@counter - 1));
+
+        &.count-@{counter} {
+            @x-small: @counter * (@CmSize-XSmall + @CmForm-IconsIndent);
+            @small: @counter * (@CmSize-Small + @CmForm-IconsIndent);
+            @medium: @counter * (@CmSize-Medium + @CmForm-IconsIndent);
+
+            &.x-small {
+                margin-right: @x-small;
+
+                .cm__form__icons-outside {
+                    width: @x-small;
+                    right: -@x-small;
+                }
+            }
+            &.small {
+                margin-right: @small;
+
+                .cm__form__icons-outside {
+                    width: @small;
+                    right: -@small;
+                }
+            }
+            &.medium {
+                margin-right: @medium;
+
+                .cm__form__icons-outside {
+                    width: @medium;
+                    right: -@medium;
+                }
+            }
+        }
+    }
+
+    .loop(5);
+}
+
+.cm__form__icons-outside {
+    position: absolute;
+    top: 0;
+    line-height: @CmForm-FieldHeight;
+    font-size: 0;
+    text-align: left;
+
+    .icon {
+        display: inline-block;
+        margin: 0 0 0 @CmForm-IconsIndent;
+        vertical-align: middle;
+    }
+}
+
+.cm__form__icons-inside {
+    text-align: left;
+    white-space: nowrap;
+    font-size: 0;
+
+    .icon,
+    .icon.inline {
+        display: inline-block;
+        margin: 0 0 0 @CmForm-IconsIndent;
+        vertical-align: middle;
+
+        &:first-child {
+            margin: 0;
+        }
+    }
+
+    .text {
+        .cm__font;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 0 0 @CmForm-IconsIndent;
+
+        &:first-child {
+            margin: 0;
+        }
+    }
+
+    &.pull-left {
+        text-align: left;
+    }
+
+    &.pull-center {
+        text-align: center;
+    }
+
+    &.pull-right {
+        text-align: right;
+    }
+}

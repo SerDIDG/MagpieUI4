@@ -1,0 +1,517 @@
+/* ******* PART: IMAGE BOX ******* */
+
+.pt__image {
+    @title-bottom: (@PtImage-TitlePaddingTop * 2) + @CmFont-Base-LineHeight;
+
+    .cm__box;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    background: transparent 50% 50% no-repeat;
+    background-size: contain;
+    user-select: none;
+
+    > .inner {
+        width: 100%;
+        height: 100%;
+        display: block;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+        font-size: 0;
+        .mx__transition(opacity, @CmUI-Transition-Duration);
+
+        > .descr {
+            .icon.initial;
+            .cm__image-resizable;
+            position: relative;
+            z-index: 1;
+            .mx__transition(opacity, @CmUI-Transition-Duration);
+        }
+
+        > .text {
+            padding: @CmIndent-Medium;
+            position: absolute;
+            z-index: 2;
+            overflow: hidden;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+            user-select: text;
+            .mx__position(0,0,0,0);
+
+            > .inner {
+                height: 100%;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .cm__tags {
+                color: @PtImage-Color;
+            }
+        }
+
+        > iframe.descr {
+            width: 100%;
+            height: 100%;
+        }
+
+        > .icon {
+            z-index: 2;
+        }
+
+        > .title {
+            overflow: hidden;
+            position: absolute;
+            z-index: 3;
+            background: @CmUI-Overlay-Dark;
+            opacity: 0;
+            .mx__transition(bottom opacity visibility, @CmUI-Transition-Duration);
+            .mx__position(auto, 0, -@title-bottom, 0);
+
+            .inner {
+                .cm__font;
+                .cm__text-nowrap;
+                padding: @PtImage-TitlePaddingTop @CmIndent-XXSmall;
+                color: @CmFont-Base-ColorOpposite;
+
+                & * {
+                    color: @CmFont-Base-ColorOpposite;
+                }
+            }
+
+            &.is-nowrap {
+                .inner {
+                    .cm__text-nowrap;
+                }
+            }
+
+            &.is-wrap {
+                .inner {
+                    .cm__text-wrap;
+                }
+            }
+
+            &.pull-center {
+                .inner {
+                    text-align: center;
+                }
+            }
+
+            &.pull-left {
+                .inner {
+                    text-align: left;
+                }
+            }
+
+            &.pull-right {
+                .inner {
+                    text-align: right;
+                }
+            }
+
+            &.success {
+                background: fade(@CmColor-Success-DarkDefault, @CmUI-Overlay-FadeP);
+            }
+
+            &.warning {
+                background: fade(@CmColor-Warning-DarkDefault, @CmUI-Overlay-FadeP);
+            }
+
+            &.danger {
+                background: fade(@CmColor-Danger-DarkDefault, @CmUI-Overlay-FadeP);
+            }
+
+            &.is-hide {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            &.is-show {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+
+    // /* *** OVERLAY *** */
+
+    > .overlay {
+        position: absolute;
+        z-index: 2;
+        .mx__position(0, 0, 0, 0);
+        .mx__transition(all, @CmUI-Transition-Duration);
+
+        &.to-top {
+            .mx__linear-gradient(~"to top, transparent 50%, @{CmUI-Overlay-Dark} 100%");
+        }
+
+        &.is-light {
+            background-color: @CmUI-Overlay-Light;
+        }
+
+        &.is-dark {
+            background-color: @CmUI-Overlay-Dark;
+        }
+
+        &.on-hover {
+            opacity: 0;
+        }
+    }
+
+    &:hover {
+        > .overlay.on-hover {
+            opacity: 1;
+        }
+    }
+
+    // /* *** BUTTONS ***/
+
+    .pt__buttons {
+        margin: 0;
+        padding: @PtImage-ButtonsIndent;
+        z-index: 5;
+        position: absolute;
+        transform: translateY(100%);
+        .mx__position(auto, 0, 0, 0);
+        .mx__transition(all, @CmUI-Transition-Duration);
+
+        &.is-box {
+            .button-alike {
+                margin: @PtImage-ButtonsIndent 0 0 0;
+            }
+        }
+    }
+
+    &:hover {
+        .pt__buttons {
+            transform: translateY(0);
+        }
+    }
+
+    // /* *** TOOLS AND CHECKBOX *** /
+
+    > label {
+        position: absolute;
+        z-index: 3;
+        cursor: pointer;
+        .mx__position(0, 0, 0, 0);
+    }
+
+    > .pull {
+        position: absolute;
+        padding: @PtImage-Padding;
+        border-radius: @CmBorder-Radius;
+        background-color: @CmUI-Overlay-Light;
+        z-index: 4;
+
+        &.top-right {
+            .mx__position(@CmIndent-XXXSmall, @CmIndent-XXXSmall, auto, auto);
+        }
+
+        &.top-left {
+            .mx__position(@CmIndent-XXXSmall, auto, auto, @CmIndent-XXXSmall);
+        }
+
+        &.bottom-right {
+            .mx__position(auto, @CmIndent-XXXSmall, @CmIndent-XXXSmall, auto);
+        }
+
+        &.bottom-left {
+            .mx__position(auto, auto, @CmIndent-XXXSmall, @CmIndent-XXXSmall);
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            display: block;
+        }
+
+        .icon {
+            float: left;
+            margin: 0 0 0 @CmIndent-XXSmall;
+
+            &:first-child {
+                margin: 0;
+            }
+        }
+    }
+
+    // /* *** STATES ***/
+
+    &:hover,
+    &.is-title-fixed {
+        .pt__image-title-hover;
+    }
+
+    &.is-no-hover {
+        cursor: default;
+
+        > a.inner {
+            cursor: default;
+        }
+    }
+
+    &.is-hover,
+    &.is-zoom {
+        cursor: pointer;
+
+        > a.inner {
+            cursor: pointer;
+        }
+
+        &:hover {
+            > .inner {
+                > .descr {
+                    opacity: @CmUI-Opacity-Hover;
+                    .mx__transition(opacity, @CmUI-Transition-DurationReverse);
+                }
+            }
+        }
+    }
+
+    &.is-zoom {
+        cursor: zoom-in;
+
+        > a.inner {
+            cursor: zoom-in;
+        }
+    }
+
+    &.is-no-image {
+        background: url('@{CmPath-Images}/parts/no-image-150.png') 50% 50% no-repeat;
+        background-size: cover;
+
+        > .inner {
+            opacity: 0;
+        }
+    }
+
+    &.is-tools-hover {
+        > .pull {
+            opacity: 0;
+            .mx__transition(opacity, @CmUI-Transition-Duration);
+        }
+
+        &:hover {
+            > .pull {
+                opacity: 1;
+                .mx__transition(opacity, @CmUI-Transition-DurationReverse);
+            }
+        }
+    }
+
+    &.is-checkable {
+        cursor: pointer;
+
+        > .inner {
+            > .descr {
+                opacity: @CmUI-Opacity-Hover;
+                .mx__transition(opacity, @CmUI-Transition-Duration);
+            }
+        }
+
+        &:hover,
+        &.active {
+            .pt__image--active;
+        }
+    }
+
+    &.is-centered {
+        background-color: @PtImage-Background;
+
+        &:not(.has-aspect) {
+            padding-bottom: 100%;
+        }
+
+        > .inner {
+            position: absolute;
+            text-align: center;
+            .mx__position(0, 0, 0, 0);
+
+            > .descr {
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: 100%;
+                margin: auto;
+                position: absolute;
+                .mx__position(0, 0, 0, 0);
+            }
+
+            > iframe.descr {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+
+    &.is-adaptive {
+        > .inner {
+            > .descr {
+                .cm__image-adaptive;
+            }
+        }
+    }
+
+    &.is-flexible {
+        > .inner {
+            > .descr {
+                .cm__image-flexible;
+            }
+        }
+    }
+
+    &.is-background {
+        > .inner {
+            > .descr {
+                .cm__image-flexible;
+            }
+        }
+    }
+
+    &.is-origin {
+        > .inner {
+            > .descr {
+                width: auto;
+                height: auto;
+            }
+        }
+    }
+
+    &.is-contain {
+        > .inner {
+            > .descr {
+                background-size: contain;
+            }
+
+            > img.descr {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+        }
+    }
+
+    &.is-cover {
+        > .inner {
+            > .descr {
+                background-size: cover;
+            }
+
+            > img.descr {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+
+    &.is-parallax {
+        > .inner {
+            > .descr {
+                background-attachment: fixed;
+            }
+        }
+    }
+
+    &.is-default-image {
+        > .inner {
+            > .descr {
+                .icon.initial;
+                .svg__no-image;
+                background-color: @CmColor-Secondary-MiddleDefault;
+                background-size: cover;
+            }
+        }
+    }
+
+    &.is-loading {
+        > .inner {
+            > .descr {
+                opacity: 0;
+                .mx__transition(opacity, @CmUI-Transition-Duration);
+            }
+        }
+    }
+
+    &.is-loaded {
+        > .inner {
+            > .descr {
+                opacity: 1;
+            }
+        }
+    }
+
+    &.has-border {
+        > .inner {
+            border: @CmBorder-Box;
+        }
+    }
+
+    &.has-aspect {
+        > .inner {
+            position: absolute;
+            .mx__position(0, 0, 0, 0);
+        }
+    }
+
+    &.pull-left {
+        > .inner {
+            > .descr {
+                .mx__align(left);
+            }
+        }
+    }
+
+    &.pull-center {
+        > .inner {
+            > .descr {
+                .mx__align(center);
+            }
+        }
+    }
+
+    &.pull-right {
+        > .inner {
+            > .descr {
+                .mx__align(right);
+            }
+        }
+    }
+}
+
+.pt__image--active {
+    > .inner {
+        > .descr {
+            opacity: 1;
+        }
+    }
+}
+
+.pt__image-title-hover {
+    > .inner {
+        > .title {
+            bottom: 0;
+            opacity: 1;
+            .mx__transition(top opacity, @CmUI-Transition-DurationReverse);
+        }
+    }
+}
+
+.pt__image__container {
+    .cm__box;
+
+    &.pull-left {
+        .mx__align(left);
+        .cm__box;
+    }
+
+    &.pull-center {
+        .mx__align(center);
+        .cm__box;
+    }
+
+    &.pull-right {
+        .mx__align(right);
+        .cm__box;
+    }
+}
