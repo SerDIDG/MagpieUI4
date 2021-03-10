@@ -70,7 +70,7 @@ function(params){
     Com.TabsetHelper.apply(that, arguments);
 });
 
-cm.getConstructor('Com.Tabset2', function(classConstructor, className, classProto, classInherit){
+cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto, classInherit){
     classProto.onConstructStart = function(){
         var that = this;
         that.isMenuShown = false;
