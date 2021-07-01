@@ -23,6 +23,7 @@ cm.define('Com.DatePicker', {
         'embedStructure' : 'replace',
         'customEvents' : true,
         'renderInBody' : true,
+        'size' : 'default',                                                 // default, full, custom
         'format' : 'cm._config.dateFormat',
         'displayFormat' : 'cm._config.displayDateFormat',
         'isDateTime' : false,
@@ -50,7 +51,7 @@ cm.define('Com.DatePicker', {
             'targetEvent' : 'click',
             'hideOnReClick' : false,
             'className' : 'com__datepicker__tooltip',
-            'top' : 'cm._config.tooltipDown'
+            'top' : cm._config.tooltipDown
         }
     }
 },
@@ -129,6 +130,9 @@ function(params){
                 nodes['calendarContainer'] = cm.Node('div', {'class' : 'calendar-holder'})
             )
         );
+        if(!cm.isEmpty(that.params['size'])){
+            cm.addClass(nodes['container'], ['size', that.params['size']].join('-'));
+        }
         /* *** ATTRIBUTES *** */
         // Title
         if(that.params['showTitleTooltip'] && !cm.isEmpty(that.params['title'])){

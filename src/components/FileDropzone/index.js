@@ -11,7 +11,10 @@ cm.define('Com.FileDropzone', {
         'max' : 0,                                  // 0 - infinity
         '_height' : 128,
         '_duration' : 'cm._config.animDuration',
-        'Com.FileReader' : {}
+        'fileReaderConstructor' : 'Com.FileReader',
+        'fileReaderParams' : {
+            'readValueType' : 'base64'
+        }
     }
 },
 function(params){

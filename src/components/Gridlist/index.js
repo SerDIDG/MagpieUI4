@@ -17,7 +17,13 @@ cm.define('Com.Gridlist', {
         'onRender',
         'onRenderStart',
         'onRenderEnd',
+        'onLoadStart',
         'onLoadEnd',
+        'onLoadError',
+        'onPageRenderStart',
+        'onPageRenderEnd',
+        'onRenderTitleItem',
+        'onRenderFilterItem',
         'onColumnsChange',
         'onColumnsResize'
     ],
@@ -51,15 +57,22 @@ cm.define('Com.Gridlist', {
         'visibleDateFormat' : 'cm._config.dateTimeFormat',          // Render date format
 
         // Pagination and request
+        'renderEmptyMessage' : true,
+        'renderEmptyTable' : false,
+        'renderFilter' : false,
+        'divideTableHeader' : false,
         'pagination' : true,
         'perPage' : 25,
         'responseKey' : 'data',                                     // Response data response key
+        'responseErrorsKey' : 'errors',
+        'responseMessageKey' : 'message',
         'responseCountKey' : 'count',                               // Response data count response key
+        'showLoader' : true,
         'request' : {
             'type' : 'json',
             'method' : 'get',
-            'url' : '',                                             // Request URL. Variables: %orderBy%, %sortBy%, %page%, %offset%, %perPage%, %limit%, %callback% for JSONP.
-            'params' : ''                                           // Params object. Variables: %orderBy%, %sortBy%, %page%, %offset%, %perPage%, %limit%, %callback% for JSONP.
+            'url' : '',                                             // Request URL. Variables: %orderBy%, %orderByLower%, %sortBy%, %page%, %offset%, %perPage%, %limit%, %callback% for JSONP.
+            'params' : ''                                           // Params object. Variables: %orderBy%, %orderByLower%, %sortBy%, %page%, %offset%, %perPage%, %limit%, %callback% for JSONP.
         },
 
         // Columns manipulation
@@ -87,7 +100,9 @@ cm.define('Com.Gridlist', {
         'Com.GridlistHelper' : {
             'customEvents' : false
         },
-        'Com.Pagination' : {
+        'autoSend' : true,
+        'paginationConstructor' : 'Com.Pagination',
+        'paginationParams' : {
             'renderStructure' : true,
             'embedStructureOnRender' : true,
             'animateSwitch' : true,
@@ -130,19 +145,25 @@ function(params){
         that.sortBy = that.params['sortBy'];
         that.orderBy = that.params['orderBy'];
         // Data
-        that.params['data'] = that.callbacks.filter(that, that.params['data']);
+        if(!cm.isEmpty(that.params['data']) && cm.isArray(that.params['data'])){
+            that.params['data'] = that.callbacks.filter(that, that.params['data']);
+        }
         // Request
         if(!cm.isEmpty(that.params['request']['url'])){
             that.isRequest = true;
             that.params['pagination'] = true;
-            that.params['Com.Pagination']['request'] = that.params['request'];
-            that.params['Com.Pagination']['responseCountKey'] = that.params['responseCountKey'];
-            that.params['Com.Pagination']['responseKey'] = that.params['responseKey'];
+            that.params['paginationParams']['autoSend'] = that.params['autoSend'];
+            that.params['paginationParams']['request'] = that.params['request'];
+            that.params['paginationParams']['showLoader'] = that.params['showLoader'];
+            that.params['paginationParams']['responseKey'] = that.params['responseKey'];
+            that.params['paginationParams']['responseCountKey'] = that.params['responseCountKey'];
+            that.params['paginationParams']['responseMessageKey'] = that.params['responseMessageKey'];
+            that.params['paginationParams']['responseErrorsKey'] = that.params['responseErrorsKey'];
         }else{
-            that.params['Com.Pagination']['count'] = that.params['data'].length;
+            that.params['paginationParams']['count'] = that.params['data'].length;
         }
         // Pagination
-        that.params['Com.Pagination']['perPage'] = that.params['perPage'];
+        that.params['paginationParams']['perPage'] = that.params['perPage'];
         // Helper
         that.params['Com.GridlistHelper']['columns'] = that.params['columns'];
     };
@@ -171,16 +192,19 @@ function(params){
     };
 
     var renderInitialTable = function(){
+        if(that.params['divideTableHeader']){
+            renderTableHeader(that.nodes['container']);
+        }
         if(that.isRequest){
             // Render dynamic pagination
             renderPagination();
         }else if(!cm.isEmpty(that.params['data'])){
+            // Sort data array for first time
+            that.params['sort'] && arraySort();
             // Counter
             if(that.params['showCounter']){
                 renderCounter(that.params['data'].length);
             }
-            // Sort data array for first time
-            that.params['sort'] && arraySort();
             if(that.params['pagination']){
                 // Render static pagination
                 renderPagination();
@@ -288,9 +312,9 @@ function(params){
     /*** PAGINATION AND TABLE ****/
 
     var renderPagination = function(){
-        cm.getConstructor('Com.Pagination', function(classConstructor, className){
+        cm.getConstructor(that.params['paginationConstructor'], function(classConstructor){
             that.components['pagination'] = new classConstructor(
-                cm.merge(that.params[className], {
+                cm.merge(that.params['paginationParams'], {
                     'container' : that.nodes['container'],
                     'callbacks' : {
                         'afterPrepare' : function(pagination, config){
@@ -298,14 +322,21 @@ function(params){
                         }
                     },
                     'events' : {
-                        'onPageRender' : function(pagination, data){
-                            renderPaginationPage(data);
+                        'onStart' : function(pagination){
+                            that.triggerEvent('onLoadStart');
                         },
-                        'onPageRenderEnd' : function(pagination, data){
-                            that.redraw();
-                            that.triggerEvent('onLoadEnd', {
-                                'page' : data
+                        'onPageRenderError' : function(pagination, page){
+                            that.triggerEvent('onLoadError', {
+                                'page' : page
                             });
+                            that.triggerEvent('onLoadEnd');
+                        },
+                        'onPageRender' : function(pagination, page){
+                            that.callbacks.renderPage(that, page);
+                        },
+                        'onPageRenderEnd' : function(pagination, page){
+                            that.redraw();
+                            that.triggerEvent('onLoadEnd', {'page' : page});
                         },
                         'onSetCount' : function(pagination, count){
                             that.params['showCounter'] && renderCounter(count);
@@ -314,25 +345,6 @@ function(params){
                 })
             );
         });
-    };
-
-    var renderPaginationPage = function(data){
-        var startIndex, endIndex, dataArray;
-        if(that.isRequest){
-            if(!cm.isEmpty(data['data'])){
-                data['data'] = that.callbacks.filter(that, data['data']);
-            }
-            if(!cm.isEmpty(data['data'])){
-                renderTable(data['page'], data['data'], data['container']);
-            }else{
-                renderEmptiness(data['container']);
-            }
-        }else{
-            startIndex = that.params['perPage'] * (data['page'] - 1);
-            endIndex = Math.min(that.params['perPage'] * data['page'], that.params['data'].length);
-            dataArray = that.params['data'].slice(startIndex, endIndex);
-            renderTable(data['page'], dataArray, data['container']);
-        }
     };
 
     var renderCounter = function(count){
@@ -345,9 +357,40 @@ function(params){
         });
     };
 
-    var renderEmptiness = function(container){
-        that.nodes['empty'] = cm.node('div', {'class' : 'cm__empty'}, that.lang('empty'));
+    var renderEmptiness = function(container, errors){
+        errors = !cm.isEmpty(errors) ? errors : that.lang('empty');
+        if(that.nodes['empty'] && cm.isParent(container, that.nodes['empty'])){
+            cm.remove(that.nodes['empty']);
+        }
+        that.nodes['empty'] = cm.node('div', {'class' : 'cm__empty'}, errors);
         cm.appendChild(that.nodes['empty'], container);
+    };
+
+    var renderTableHeader = function(container){
+        var nodes = {};
+        that.nodes['header'] = nodes;
+        // Render Table
+        nodes['container'] = cm.node('div', {'class' : 'pt__gridlist pt__gridlist--header'},
+            nodes['table'] = cm.node('table',
+                nodes['head'] = cm.node('thead',
+                    nodes['title'] = cm.node('tr')
+                )
+            )
+        );
+        // Render Table Title
+        cm.forEach(that.params['cols'], function(item, i){
+            renderTitleItem(item, i, nodes['title']);
+        });
+        // Render Table Filter
+        if(that.params['renderFilter']){
+            nodes['filter'] = cm.node('tr');
+            cm.forEach(that.params['cols'], function(item, i){
+                renderFilterItem(item, i, nodes['filter']);
+            });
+            cm.appendChild(nodes['filter'], nodes['head']);
+        }
+        // Append
+        cm.appendChild(nodes['container'], container);
     };
 
     var renderTable = function(page, data, container){
@@ -359,17 +402,38 @@ function(params){
         });
         // Reset table
         resetTable();
+        if(that.nodes['table'] && cm.isParent(container, that.nodes['table'])){
+            cm.remove(that.nodes['table']);
+        }
         // Render Table
         that.nodes['table'] = cm.node('div', {'class' : 'pt__gridlist'},
-            cm.node('table',
-                cm.node('thead',
+            that.nodes['tableInner'] = cm.node('table',
+                that.nodes['head'] = cm.node('thead',
                     that.nodes['title'] = cm.node('tr')
                 ),
                 that.nodes['content'] = cm.node('tbody')
             )
         );
-        // Render Table Title
-        cm.forEach(that.params['cols'], renderTh);
+        if(!that.params['divideTableHeader']) {
+            // Render Table Title
+            cm.forEach(that.params['cols'], function(item, i){
+                renderTitleItem(item, i, that.nodes['title']);
+            });
+            // Render Table Filter
+            if(that.params['renderFilter']) {
+                that.nodes['filter'] = cm.node('tr');
+                cm.forEach(that.params['cols'], function(item, i){
+                    renderFilterItem(item, i, that.nodes['filter']);
+                });
+                cm.appendChild(that.nodes['filter'], that.nodes['head']);
+            }
+        }else{
+            // Render Table Title Placeholder
+            cm.forEach(that.params['cols'], function(item, i){
+                renderTitleItemPlaceholder(item, i, that.nodes['title']);
+            });
+            cm.addClass(that.nodes['head'], 'is-hidden');
+        }
         // Render Table Row
         cm.forEach(data, function(item, i){
             renderRow(that.rows, item, (i + (page -1)));
@@ -412,18 +476,19 @@ function(params){
         }
     };
 
-    var renderTh = function(item, i){
+    var renderTitleItem = function(item, i, container){
         // Merge cell parameters
         item = that.params['cols'][i] = cm.merge({
             '_component' : null,            // System attribute
             'width' : 'auto',               // number | % | auto
             'access' : true,                // Render column if is accessible
-            'type' : 'text',		        // text | number | url | date | html | icon | checkbox | empty | actions | links
+            'type' : 'text',		            // text | number | url | date | html | icon | checkbox | empty | actions | links
             'key' : '',                     // Data array key
             'title' : '',                   // Table th title
             'sort' : that.params['sort'],   // Sort this column or not
             'sortKey' : '',                 // Sort key
-            'class' : '',		            // Icon css class, for type="icon"
+            'filterKey' : null,
+            'class' : '',		                // Icon css class, for type="icon"
             'target' : '_blank',            // Link target, for type="url"
             'rel' : '',                     // Link rel, for type="url"
             'textOverflow' : null,          // Overflow long text to single line
@@ -444,10 +509,8 @@ function(params){
         // Check access
         if(item['access']){
             // Structure
-            that.nodes['title'].appendChild(
-                item['nodes']['container'] = cm.node('th',
-                    item['nodes']['inner'] = cm.node('div', {'class' : 'inner'})
-                )
+            item['nodes']['container'] = cm.node('th',
+                item['nodes']['inner'] = cm.node('div', {'class' : 'inner'})
             );
             // Set column width
             if(/%|px|auto/.test(item['width'])){
@@ -455,12 +518,14 @@ function(params){
             }else{
                 item['nodes']['container'].style.width = parseFloat(item['width']) + 'px';
             }
+            // Embed
+            cm.appendChild(item['nodes']['container'], container);
             // Insert specific specified content in th
             switch(item['type']){
                 case 'checkbox' :
                     cm.addClass(item['nodes']['container'], 'control');
                     item['nodes']['inner'].appendChild(
-                        item['nodes']['checkbox'] = cm.node('input', {'type' : 'checkbox', 'class' : 'input', 'title' : that.lang('check_all')})
+                        item['nodes']['checkbox'] = cm.node('input', {'type' : 'checkbox', 'class' : 'checkbox', 'title' : that.lang('check_all')})
                     );
                     item['nodes']['checkbox'].checked = that.isCheckedAll;
                     cm.addEvent(item['nodes']['checkbox'], 'click', function(){
@@ -481,17 +546,15 @@ function(params){
             }
             // Render sort arrow and set function on click to th
             if(item['sort'] && !/icon|empty|actions|links|checkbox/.test(item['type'])){
-                cm.addClass(item['nodes']['container'], 'sort');
-                if(item['sortKey'] === that.sortBy || item['key'] === that.sortBy){
-                    item['nodes']['inner'].appendChild(
-                        cm.node('div', {'class' : that.params['icons']['arrow'][that.orderBy.toLowerCase()]})
-                    );
-                }
+                setTableHeaderItemSort(item, i);
                 cm.addEvent(item['nodes']['inner'], 'click', function(){
                     that.sortBy = !cm.isEmpty(item['sortKey']) ? item['sortKey'] : item['key'];
                     that.orderBy = that.orderBy === 'ASC' ? 'DESC' : 'ASC';
                     if(!that.isRequest){
                         arraySort();
+                    }
+                    if(that.params['divideTableHeader']){
+                        cm.forEach(that.params['cols'], setTableHeaderItemSort);
                     }
                     if(that.params['pagination']){
                         that.components['pagination'].rebuild();
@@ -500,6 +563,64 @@ function(params){
                     }
                 });
             }
+            // Trigger event
+            that.triggerEvent('onRenderTitleItem', {
+                'nodes' : item['nodes'],
+                'item' : item,
+                'i' : i
+            });
+        }
+    };
+
+    var setTableHeaderItemSort = function(item, i){
+        if(!item['access'] || /icon|empty|actions|links|checkbox/.test(item['type'])){
+            return;
+        }
+        cm.removeClass(item['nodes']['container'], 'sort');
+        if(item['sort']){
+            cm.addClass(item['nodes']['container'], 'sort');
+            cm.remove(item['nodes']['sort']);
+            if(item['sortKey'] === that.sortBy || item['key'] === that.sortBy){
+                item['nodes']['sort'] = cm.node('div', {'class' : that.params['icons']['arrow'][that.orderBy.toLowerCase()]});
+                cm.appendChild(item['nodes']['sort'], item['nodes']['inner']);
+            }
+        }
+    };
+
+    var renderTitleItemPlaceholder = function(item, i, container){
+        item['nodes']['placeholder'] = {};
+        // Check access
+        if(item['access']){
+            // Structure
+            item['nodes']['placeholder']['container'] = cm.node('th',
+                item['nodes']['placeholder']['inner'] = cm.node('div', {'class' : 'inner'})
+            )
+            // Set column width
+            if(/%|px|auto/.test(item['width'])){
+                item['nodes']['placeholder']['container'].style.width = item['width'];
+            }else{
+                item['nodes']['placeholder']['container'].style.width = parseFloat(item['width']) + 'px';
+            }
+            // Embed
+            cm.appendChild(item['nodes']['placeholder']['container'], container);
+        }
+    };
+
+    var renderFilterItem = function(item, i, container){
+        item['nodes']['filter'] = {};
+        // Check access
+        if(item['access']){
+            // Structure
+            item['nodes']['filter']['container'] = cm.node('td',
+                item['nodes']['filter']['inner'] = cm.node('div', {'class' : 'inner'})
+            )
+            cm.appendChild(item['nodes']['filter']['container'], container);
+            // Trigger event
+            that.triggerEvent('onRenderFilterItem', {
+                'nodes' : item['nodes']['filter'],
+                'item' : item,
+                'i' : i
+            });
         }
     };
 
@@ -688,51 +809,54 @@ function(params){
     };
 
     var renderCellLinks = function(config, row, item){
-        item['nodes']['links'] = [];
-        item['nodes']['inner'].appendChild(
-            item['nodes']['node'] = cm.node('div', {'class' : ['pt__links', config['class']].join(' ')},
-                item['nodes']['linksList'] = cm.node('ul')
-            )
-        );
-        cm.forEach(config['links'], function(actionItem){
-            var actionNode;
-            actionItem = cm.merge({
-                'label' : '',
-                'attr' : {},
-                'events' : {}
-            }, actionItem);
-            cm.forEach(row['data'], function(itemValue, itemKey){
-                actionItem['attr'] = cm.replaceDeep(actionItem['attr'], new RegExp([cm.strWrap(itemKey, '%'), cm.strWrap(itemKey, '%25')].join('|'), 'g'), itemValue);
-            });
-            item['nodes']['linksList'].appendChild(
-                cm.node('li',
-                    actionNode = cm.node('a', actionItem['attr'], actionItem['label'])
-                )
-            );
-            cm.forEach(actionItem['events'], function(actionEventHandler, actionEventName){
-                cm.addEvent(actionNode, actionEventName, actionEventHandler);
-            });
-            item['nodes']['links'].push(actionNode);
-        });
+        // Structure
+        item['nodes']['items'] = item['nodes']['links'] = [];
+        item['nodes']['node'] = cm.node('div', {'class' : ['pt__links', config['class']].join(' ')},
+            item['nodes']['itemsList'] = item['nodes']['linksList'] = cm.node('ul')
+        )
+        // Items
+        item['links'] = renderCellActionItems(config, row, item, 'links');
+        // Embed
+        if(item['nodes']['links'].length){
+            cm.appendChild(item['nodes']['node'], item['nodes']['inner']);
+        }
     };
 
     var renderCellActions = function(config, row, item){
-        var isInArray, isEmpty;
         // Structure
-        item['nodes']['actions'] = [];
+        item['nodes']['items'] = item['nodes']['actions'] = [];
         item['nodes']['node'] = cm.node('div', {'class' : ['pt__links', 'pull-right', config['class']].join(' ')},
             cm.node('ul',
                 item['nodes']['componentNode'] = cm.node('li', {'class' : 'com__menu', 'data-node' : 'ComMenu:{}:button'},
                     cm.node('a', {'class' : 'label'}, that.lang('actions')),
                     cm.node('span', {'class' : 'cm-i__chevron-down xx-small inline'}),
                     cm.node('div', {'class' : 'pt__menu', 'data-node' : 'ComMenu.target'},
-                        item['nodes']['actionsList'] = cm.node('ul', {'class' : 'pt__menu-dropdown'})
+                        item['nodes']['itemsList'] = item['nodes']['actionsList'] = cm.node('ul', {'class' : 'pt__menu-dropdown'})
                     )
                 )
             )
         );
         // Items
-        cm.forEach(config['actions'], function(actionItem){
+        item['actions'] = renderCellActionItems(config, row, item, 'actions');
+        // Embed
+        if(item['nodes']['actions'].length){
+            cm.appendChild(item['nodes']['node'], item['nodes']['inner']);
+            // Render menu component
+            cm.getConstructor('Com.Menu', function(classConstructor, className){
+                item['component'] = new classConstructor(
+                    cm.merge(that.params[className], {
+                        'node' : item['nodes']['componentNode']
+                    })
+                );
+            });
+        }
+    };
+
+    var renderCellActionItems = function(config, row, item, list){
+        var isInArray,
+            isEmpty,
+            items = [];
+        cm.forEach(config[list], function(actionItem, key){
             actionItem = cm.merge({
                 'name' : '',
                 'label' : '',
@@ -751,44 +875,38 @@ function(params){
             if(isEmpty || isInArray){
                 renderCellActionItem(config, row, item, actionItem);
             }
+            // Export
+            items.push(actionItem);
         });
-        // Embed
-        if(item['nodes']['actions'].length){
-            cm.appendChild(item['nodes']['node'], item['nodes']['inner']);
-        }
-    };
+        return items;
+    }
 
     var renderCellActionItem = function(config, row, item, actionItem){
         // WTF is that? - that is attribute bindings, for example - href
         cm.forEach(row['data'], function(itemValue, itemKey){
-            actionItem['attr'] = cm.replaceDeep(actionItem['attr'], new RegExp([cm.strWrap(itemKey, '%'), cm.strWrap(itemKey, '%25')].join('|'), 'g'), itemValue);
+            actionItem['attr'] = cm.replaceDeep(
+                actionItem['attr'],
+                new RegExp([cm.strWrap(itemKey, '%'), cm.strWrap(itemKey, '%25')].join('|'), 'g'),
+                itemValue
+            );
         });
-        item['nodes']['actionsList'].appendChild(
+        item['nodes']['itemsList'].appendChild(
             cm.node('li',
                 actionItem['node'] = cm.node('a', actionItem['attr'], actionItem['label'])
             )
         );
-        // Render menu component
-        cm.getConstructor('Com.Menu', function(classConstructor, className){
-            item['component'] = new classConstructor(
-                cm.merge(that.params[className], {
-                    'node' : item['nodes']['componentNode']
-                })
-            );
-        });
         if(actionItem['constructor']){
             cm.getConstructor(actionItem['constructor'], function(classConstructor){
-                actionItem['controller'] = new classConstructor(
-                    cm.merge(actionItem['constructorParams'], {
-                        'node' : actionItem['node'],
-                        'data' : row['data'],
-                        'rowItem' : row,
-                        'cellItem' : item,
-                        'actionItem' : actionItem
-                    })
-                );
+                actionItem['_constructorParams'] = cm.merge(actionItem['constructorParams'], {
+                    'node' : actionItem['node'],
+                    'data' : row['data'],
+                    'rowItem' : row,
+                    'cellItem' : item,
+                    'actionItem' : actionItem
+                });
+                actionItem['controller'] = new classConstructor(actionItem['_constructorParams']);
                 actionItem['controller'].addEvent('onRenderControllerEnd', function(){
-                    item['component'].hide(false);
+                    item['component'] && item['component'].hide(false);
                 });
             });
         }else{
@@ -798,25 +916,26 @@ function(params){
                 actionItem['callback'](e, actionItem, row);
             });
         }
-        item['nodes']['actions'].push(actionItem['node']);
+        item['nodes']['items'].push(actionItem['node']);
     };
 
     /*** HELPING FUNCTIONS ***/
 
-    var resetTable = function(){
+    var resetTable = function(container){
+        cm.customEvent.trigger(that.nodes['table'], 'destruct', {
+            'direction' : 'child',
+            'self' : false
+        });
         that.unCheckAll();
         that.rows = [];
         that.checked = [];
-        if(!that.params['pagination']){
-            cm.remove(that.nodes['table']);
-        }
     };
 
     var arraySort = function(){
         // Get item
         var item, textA, textB, t1, t2, value;
         cm.forEach(that.params['cols'], function(col){
-            if(col['key'] == that.sortBy){
+            if(col['key'] === that.sortBy){
                 item = col;
             }
         });
@@ -829,25 +948,25 @@ function(params){
                     t1 = cm.getTextNodesStr(cm.strToHTML(textA));
                     t2 = cm.getTextNodesStr(cm.strToHTML(textB));
                     value = (t1 < t2)? -1 : ((t1 > t2)? 1 : 0);
-                    return (that.orderBy == 'ASC')? value : (-1 * value);
+                    return (that.orderBy === 'ASC')? value : (-1 * value);
                     break;
 
                 case 'date':
                     t1 = cm.parseDate(textA, that.params['dateFormat']);
                     t2 = cm.parseDate(textB, that.params['dateFormat']);
-                    return (that.orderBy == 'ASC')? (t1 - t2) : (t2 - t1);
+                    return (that.orderBy === 'ASC')? (t1 - t2) : (t2 - t1);
                     break;
 
                 case 'number':
                     value = textA - textB;
-                    return (that.orderBy == 'ASC')? value : (-1 * value);
+                    return (that.orderBy === 'ASC')? value : (-1 * value);
                     break;
 
                 default :
                     t1 = textA? textA.toLowerCase() : '';
                     t2 = textB? textB.toLowerCase() : '';
                     value = (t1 < t2)? -1 : ((t1 > t2)? 1 : 0);
-                    return (that.orderBy == 'ASC')? value : (-1 * value);
+                    return (that.orderBy === 'ASC')? value : (-1 * value);
                     break;
             }
         });
@@ -929,20 +1048,49 @@ function(params){
 
     /******* CALLBACKS *******/
 
+    that.callbacks.paginationAfterPrepare = function(that, pagination, config){
+        config['url'] = cm.strReplace(config['url'], {
+            '%sortBy%' : that.sortBy,
+            '%orderBy%' : that.orderBy,
+            '%orderByLower%' : that.orderBy.toLowerCase()
+        });
+        config['params'] = cm.objectReplace(config['params'], {
+            '%sortBy%' : that.sortBy,
+            '%orderBy%' : that.orderBy,
+            '%orderByLower%' : that.orderBy.toLowerCase()
+        });
+        return config;
+    };
+
     that.callbacks.filter = function(that, data){
         return data;
     };
 
-    that.callbacks.paginationAfterPrepare = function(that, pagination, config){
-        config['url'] = cm.strReplace(config['url'], {
-            '%sortBy%' : that.sortBy,
-            '%orderBy%' : that.orderBy
-        });
-        config['params'] = cm.objectReplace(config['params'], {
-            '%sortBy%' : that.sortBy,
-            '%orderBy%' : that.orderBy
-        });
-        return config;
+    that.callbacks.renderPage = function(that, page){
+        that.triggerEvent('onPageRenderStart', {'page' : page});
+        if(!that.isRequest){
+            page.data = that.getStaticPageData(page.page);
+        }
+        if(!cm.isEmpty(page.data) && cm.isArray(page.data)){
+            page.data = that.callbacks.filter(that, page.data);
+        }
+        that.renderPageTable(page);
+        that.triggerEvent('onPageRenderEnd', {'page' : page});
+    };
+
+    /******* TABLE *******/
+
+    that.renderPageTable = function(page){
+        if(!cm.isEmpty(page['data'])){
+            renderTable(page['page'], page['data'], page['container']);
+        }else{
+            if(that.params['renderEmptyTable']){
+                renderTable(page['page'], page['data'], page['container']);
+            }
+            if(that.params['renderEmptyMessage']){
+                renderEmptiness(page['container'], page['message']);
+            }
+        }
     };
 
     /******* MAIN *******/
@@ -975,9 +1123,13 @@ function(params){
         return that;
     };
 
+    that.getRows = function(){
+        return that.rows;
+    };
+
     that.check = function(id){
         cm.forEach(that.rows, function(row){
-            if(row['index'] == id){
+            if(row['index'] === id){
                 checkRow(row, true);
             }
         });
@@ -986,7 +1138,7 @@ function(params){
 
     that.unCheck = function(id){
         cm.forEach(that.rows, function(row){
-            if(row['index'] == id){
+            if(row['index'] === id){
                 unCheckRow(row, true);
             }
         });
@@ -1043,9 +1195,15 @@ function(params){
         return rows;
     };
 
+    that.getStaticPageData = function(page){
+        var startIndex = that.params.perPage * (page - 1),
+            endIndex = Math.min(that.params.perPage * page, that.params.data.length);
+        return that.params.data.slice(startIndex, endIndex);
+    };
+
     that.setRowStatus = function(id, status){
         cm.forEach(that.rows, function(row){
-            if(row['index'] == id){
+            if(row['index'] === id){
                 setRowStatus(row, status);
             }
         });
@@ -1054,7 +1212,7 @@ function(params){
 
     that.clearRowStatus = function(id){
         cm.forEach(that.rows, function(row){
-            if(row['index'] == id){
+            if(row['index'] === id){
                 clearRowStatus(row);
             }
         });
@@ -1064,7 +1222,7 @@ function(params){
     that.getRowsByStatus = function(status){
         var rows = [];
         cm.forEach(that.rows, function(row){
-            if(row['status'] == status){
+            if(row['status'] === status){
                 rows.push(row);
             }
         });

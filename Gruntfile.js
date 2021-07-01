@@ -231,14 +231,18 @@ module.exports = function(grunt) {
             }
         },
 
-        less : {
-            build : {
-                src : ['<%= paths.build %>/less/<%= pkg.name %>.less'],
-                dest : '<%= paths.build %>/css/<%= pkg.name %>.css'
+        less: {
+            options: {
+                strictMath: false,
+                strictUnits: false
             },
-            docs : {
-                src : ['<%= paths.docs %>/build/less/<%= pkg.name %>.less'],
-                dest : '<%= paths.docs %>/build/css/<%= pkg.name %>.css'
+            build: {
+                src: ['<%= paths.build %>/less/<%= pkg.name %>.less'],
+                dest: '<%= paths.build %>/css/<%= pkg.name %>.css'
+            },
+            docs: {
+                src: ['<%= paths.docs %>/build/less/<%= pkg.name %>.less'],
+                dest: '<%= paths.docs %>/build/css/<%= pkg.name %>.css'
             }
         },
 

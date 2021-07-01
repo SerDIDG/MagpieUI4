@@ -109,13 +109,11 @@ cm.getConstructor('Com.TabsetHelper', function(classConstructor, className, clas
     classProto.onSetEvents = function(){
         var that = this;
         that.params['toggleOnHashChange'] && cm.addEvent(window, 'hashchange', that.hashChangeHandler);
-        return that;
     };
 
     classProto.onUnsetEvents = function(){
         var that = this;
         that.params['toggleOnHashChange'] && cm.removeEvent(window, 'hashchange', that.hashChangeHandler);
-        return that;
     };
 
     classProto.onConstructEnd = function(){
@@ -352,7 +350,10 @@ cm.getConstructor('Com.TabsetHelper', function(classConstructor, className, clas
                     );
                 });
             }
-        }else if(item.isRequest && (!item['cache'] || (item['cache'] && !item.isCached))){
+        }else if(
+            item.isRequest
+            && (!item['cache'] || (item['cache'] && !item.isCached))
+        ){
             that.requestHandler = classProto.callbacks.request(that, {
                 'config' : cm.merge(that.params['request'], item['request'])
             }, item);

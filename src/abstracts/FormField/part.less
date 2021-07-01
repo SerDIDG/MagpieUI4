@@ -95,6 +95,13 @@
         }
     }
 
+    &.is-hidden-label {
+        > dt,
+        > .field__title {
+            visibility: hidden;
+        }
+    }
+
     &.is-check-line {
         display: flex;
         align-content: space-between;
@@ -139,21 +146,6 @@
             }
         }
 
-        &.field-indent,
-        &.field-inner-indent {
-            .cm__box;
-            margin-bottom: @CmForm-FieldInnerIndent;
-        }
-
-        &.field-outer-indent {
-            .cm__box;
-            margin-bottom: @CmForm-FieldIndent;
-        }
-
-        &.is-no-indent {
-            margin: 0;
-        }
-
         &.is-first {
             > dt,
             > .field__title {
@@ -165,6 +157,21 @@
     &.is-form-box {
         .cm__box;
         margin-bottom: @CmForm-FieldIndent;
+    }
+
+    &.field-indent,
+    &.field-inner-indent {
+        .cm__box;
+        margin-bottom: @CmForm-FieldInnerIndent;
+    }
+
+    &.field-outer-indent {
+        .cm__box;
+        margin-bottom: @CmForm-FieldIndent;
+    }
+
+    &.is-no-indent {
+        margin: 0;
     }
 
     &.is-hidden {
@@ -180,7 +187,8 @@
 }
 
 .pt__field-label {
-    @padding: max(round((@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2), 0);
+    @padding_calc: (@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2;
+    @padding: max(round((@padding_calc)), 0px);
     display: block;
     margin: 0;
     padding: @padding 0;
@@ -208,7 +216,8 @@
 }
 
 ul.pt__field__hint {
-    @padding: max(min(round((@CmForm-FieldIndent - @CmFont-Base-LineHeightSmall) / 2), 4px), 0);
+    @padding_calc: (@CmForm-FieldIndent - @CmFont-Base-LineHeightSmall) / 2;
+    @padding: max(min(round((@padding_calc)), 4px), 0px);
     margin: 0;
     padding: @padding 0;
     display: block;
@@ -250,7 +259,7 @@ ul.pt__field__hint {
 
         &.pull-top {
             span {
-                .mx__transform(scale(0.75) translateY(-6px));
+                .mx__transform(scale(@CmForm-FieldPlaceholder-Scale) translateY(-6px));
             }
         }
     }
@@ -274,7 +283,8 @@ ul.pt__field__hint {
 }
 
 .pt__field__content--size-helper (@height, @paddingX, @borderWidth, @lineHeight) {
-    @inputPadding: max(ceil((@height - @lineHeight - @borderWidth * 2) / 2), @paddingX);
+    @inputPadding_calc: (@height - @lineHeight - @borderWidth * 2) / 2;
+    @inputPadding: max(ceil((@inputPadding_calc)), @paddingX);
 
     .placeholder {
         line-height: @height;
@@ -283,8 +293,8 @@ ul.pt__field__hint {
 
     &.is-placeholder-above {
         .input {
-            padding-top: ceil(@inputPadding * 0.75 * 2);
-            padding-bottom: ceil(@inputPadding * 0.25 * 2);
+            padding-top: ceil((@inputPadding * 0.75 * 2));
+            padding-bottom: ceil((@inputPadding * 0.25 * 2));
         }
     }
 }

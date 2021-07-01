@@ -1,7 +1,7 @@
 /* ******* COMPONENT: DATEPICKER ******* */
 
 .com__datepicker-input {
-    @clear-button-indent: @CmForm-FieldHeight + @CmForm-FieldInnerIndent;
+    @clear-button-indent: (@CmForm-FieldHeight + @CmForm-FieldInnerIndent);
 
     width: 100%;
     max-width: @ComDatePicker-Width;
@@ -10,6 +10,10 @@
     position: relative;
     z-index: 1;
     outline: none;
+
+    &.size-full {
+        max-width: none;
+    }
 
     &.has-clear-button {
         max-width: @ComDatePicker-Width + @clear-button-indent;

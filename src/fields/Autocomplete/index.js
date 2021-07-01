@@ -20,6 +20,8 @@ cm.define('Com.Autocomplete', {
         'onReset',
         'onSelect',
         'onChange',
+        'onEnable',
+        'onDisable',
         'onClickSelect',
         'onAbort',
         'onError',
@@ -35,6 +37,7 @@ cm.define('Com.Autocomplete', {
         'minLength' : 3,
         'direction' : 'auto',                                       // auto | start
         'className' : '',
+        'disabled' : false,
         'delay' : 'cm._config.requestDelay',
         'clearOnEmpty' : true,                                      // Clear input and value if item didn't selected from tooltip
         'showListOnEmpty' : false,                                  // Show options list, when input is empty
@@ -123,6 +126,8 @@ function(params){
         that.params['data'] = that.callbacks.convert(that, that.params['data']);
         // Value
         that.params['value'] = !cm.isEmpty(that.params['value']) ? that.params['value'] : that.params['defaultValue'];
+        // Input
+        that.params['disabled'] = that.params['node'].disabled || that.params['node'].readOnly || that.params['disabled'];
         // Tooltip
         that.params['Com.Tooltip']['className'] = [
             'com__ac-tooltip',
@@ -152,6 +157,8 @@ function(params){
         that.setInput(that.params['node']);
         // Set
         !cm.isEmpty(that.params['value']) && that.set(that.params['value'], false);
+        // Disabled state
+        that.params['disabled'] && that.disable();
     };
 
     var setListItem = function(index){
@@ -194,7 +201,6 @@ function(params){
                 break;
             // Arrow Down
             case 40:
-                cm.log(that.registeredItems);
                 listLength = that.registeredItems.length;
                 if(listLength){
                     if(that.selectedItemIndex === null){
@@ -353,14 +359,6 @@ function(params){
         return params['config'];
     };
 
-    that.callbacks.beforePrepare = function(that, params){
-        return params['config'];
-    };
-
-    that.callbacks.afterPrepare = function(that, params){
-        return params['config'];
-    };
-
     that.callbacks.request = function(that, params){
         params = cm.merge({
             'response' : null,
@@ -388,8 +386,8 @@ function(params){
 
     that.callbacks.filter = function(that, params){
         var data = [],
-            dataItem = cm.objectSelector(that.params['responseKey'], params['response']);
-        if(dataItem && !cm.isEmpty(dataItem)){
+            dataItem = cm.reducePath(that.params['responseKey'], params['response']);
+        if(!cm.isEmpty(dataItem)){
             data = dataItem;
         }
         return data;
@@ -591,6 +589,44 @@ function(params){
         return that;
     };
 
+    that.setAction = function(o, mode, update){
+        mode = cm.inArray(['raw', 'update', 'current'], mode)? mode : 'current';
+        switch(mode){
+            case 'raw':
+                that.params.request = cm.merge(that._raw.params.request, o);
+                break;
+            case 'current':
+                that.params.request = cm.merge(that.params.request, o);
+                break;
+            case 'update':
+                that.params.request = cm.merge(that._update.params.request, o);
+                break;
+        }
+        if(update){
+            that._update.params.request = cm.clone(that.params.request);
+        }
+        return that;
+    };
+
+    that.setVariables = function(o, mode, update){
+        mode = cm.inArray(['raw', 'update', 'current'], mode)? mode : 'current';
+        switch(mode){
+            case 'raw':
+                that.params.request.variables = cm.merge(that._raw.params.request.variables, o);
+                break;
+            case 'current':
+                that.params.request.variables = cm.merge(that.params.request.variables, o);
+                break;
+            case 'update':
+                that.params.request.variables = cm.merge(that._update.params.request.variables, o);
+                break;
+        }
+        if(update){
+            that._update.params.request.variables = cm.clone(that.params.request.variables);
+        }
+        return that;
+    };
+
     that.abort = function(){
         if(that.requestHandler && that.requestHandler.abort){
             that.requestHandler.abort();
@@ -603,6 +639,26 @@ function(params){
         return that;
     };
 
+    that.enable = function(){
+        var that = this;
+        if(that.disabled){
+            that.disabled = false;
+            that.params['node'].disabled = false;
+            that.triggerEvent('onEnable');
+        }
+        return that;
+    };
+
+    that.disable = function(){
+        var that = this;
+        if(!that.disabled){
+            that.disabled = true;
+            that.params['node'].disabled = true;
+            that.triggerEvent('onDisable');
+        }
+        return that;
+    };
+
     that.isOwnNode = function(node){
         return cm.isParent(that.params['target'], node, true) || that.components['tooltip'].isOwnNode(node);
     };
@@ -610,8 +666,17 @@ function(params){
     init();
 });
 
-cm.getConstructor('Com.Autocomplete', function(classConstructor, className, classProto){
-    var _inherit = classProto._inherit;
+cm.getConstructor('Com.Autocomplete', function(classConstructor, className, classProto, classInherit){
+
+    /*** REQUEST ***/
+
+    classProto.callbacks.beforePrepare = function(that, params){
+        return params['config'];
+    };
+
+    classProto.callbacks.afterPrepare = function(that, params){
+        return params['config'];
+    };
 
     /*** DATA ***/
 

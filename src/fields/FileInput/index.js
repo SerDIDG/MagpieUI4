@@ -9,9 +9,11 @@ cm.define('Com.FileInput', {
         'file' : null,
         'showLink' : true,
         'showFilename' : true,
+        'showClearButton' : true,
         'autoOpen' : false,
         'placeholder' : null,
-        'formData' : false,
+        'readValueType' : 'base64',         // base64 | binary
+        'outputValueType' : 'object',         // file | object
         'local' : true,
         'fileManager' : false,
         'fileManagerConstructor' : 'Com.AbstractFileManagerContainer',
@@ -34,7 +36,8 @@ cm.define('Com.FileInput', {
             'max' : 1,
             'rollover' : true
         },
-        'Com.FileReader' : {}
+        'fileReaderConstructor' : 'Com.FileReader',
+        'fileReaderParams' : {}
     }
 },
 function(params){
@@ -55,8 +58,8 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
 
     classProto.onInitComponentsStart = function(){
         var that = this;
-        cm.getConstructor('Com.FileReader', function(classObject){
-            that.components['validator'] = new classObject();
+        cm.getConstructor(that.params['fileReaderConstructor'], function(classObject){
+            that.components['validator'] = new classObject(that.params['fileReaderParams']);
         });
     };
 
@@ -74,6 +77,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
         that.params['fileUploaderParams']['params']['local'] = that.params['local'];
         that.params['fileUploaderParams']['params']['fileManager'] = that.params['fileManager'];
         // Other
+        that.params['fileReaderParams']['readValueType'] = that.params['readValueType'];
         that.params['local'] = that.params['fileUploader'] ? false : that.params['local'];
         that.params['fileManagerParams']['openOnConstruct'] = that.params['autoOpen'];
         that.params['fileManager'] = that.params['fileUploader'] ? false : that.params['fileManager'];
@@ -98,8 +102,8 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
         // Call parent method - renderViewModel
         classInherit.prototype.renderViewModel.apply(that, arguments);
         // Init FilerReader
-        cm.getConstructor('Com.FileReader', function(classObject, className){
-            that.components['reader'] = new classObject(that.params[className]);
+        cm.getConstructor(that.params['fileReaderConstructor'], function(classObject){
+            that.components['reader'] = new classObject(that.params['fileReaderParams']);
             that.components['reader'].addEvent('onReadSuccess', function(my, item){
                 that.set(item, true);
             });
@@ -166,6 +170,10 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
                 )
             )
         );
+        // Clear button
+        if(!that.params['showClearButton']){
+            cm.addClass(nodes['clear'], 'is-hidden');
+        }
         // Render Browse Buttons
         if(that.params['local']){
             nodes['browseLocal'] = cm.node('div', {'class' : 'browse-button'},
@@ -230,7 +238,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
     classProto.get = function(){
         var that = this,
             value;
-        if(that.params['formData']){
+        if(that.params['outputValueType'] === 'file'){
             value = that.value['file'] || that.value['value'] || that.value['value']   || '';
         }else{
             value = that.value  || '';
@@ -254,13 +262,16 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
             }
             cm.clearNode(that.nodes['content']['label']);
             cm.addClass(that.nodes['content']['label'], 'is-hidden');
-            cm.removeClass(that.nodes['content']['browseLocal'], 'is-hidden');
-            cm.removeClass(that.nodes['content']['browseFileManager'], 'is-hidden');
-            cm.removeClass(that.nodes['content']['browseFileUploader'], 'is-hidden');
-            cm.addClass(that.nodes['content']['clear'], 'is-hidden');
+            if(that.params['showClearButton']){
+                cm.removeClass(that.nodes['content']['browseLocal'], 'is-hidden');
+                cm.removeClass(that.nodes['content']['browseFileManager'], 'is-hidden');
+                cm.removeClass(that.nodes['content']['browseFileUploader'], 'is-hidden');
+                cm.addClass(that.nodes['content']['clear'], 'is-hidden');
+            }
         }else{
             cm.addClass(that.nodes['content']['placeholder'], 'is-hidden');
             cm.clearNode(that.nodes['content']['label']);
+            cm.removeClass(that.nodes['content']['label'], 'is-hidden');
             if(that.params['showFilename']){
                 if(that.params['showLink']){
                     that.nodes['content']['link'] = cm.node('a', {'target' : '_blank', 'href' : that.value['url'], 'title' : that.lang('open')}, that.value['name']);
@@ -269,11 +280,12 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
                 }
                 cm.appendChild(that.nodes['content']['link'], that.nodes['content']['label']);
             }
-            cm.addClass(that.nodes['content']['browseLocal'], 'is-hidden');
-            cm.addClass(that.nodes['content']['browseFileManager'], 'is-hidden');
-            cm.addClass(that.nodes['content']['browseFileUploader'], 'is-hidden');
-            cm.removeClass(that.nodes['content']['clear'], 'is-hidden');
-            cm.removeClass(that.nodes['content']['label'], 'is-hidden');
+            if(that.params['showClearButton']){
+                cm.addClass(that.nodes['content']['browseLocal'], 'is-hidden');
+                cm.addClass(that.nodes['content']['browseFileManager'], 'is-hidden');
+                cm.addClass(that.nodes['content']['browseFileUploader'], 'is-hidden');
+                cm.removeClass(that.nodes['content']['clear'], 'is-hidden');
+            }
         }
         return that;
     };

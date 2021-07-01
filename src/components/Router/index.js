@@ -19,7 +19,7 @@ function(params){
 });
 
 cm.getConstructor('Com.Router', function(classConstructor, className, classProto, classInherit){
-    classProto.onConstructStart = function(){
+    classProto.construct = function(){
         var that = this;
         // Variables
         that.routes = {};
@@ -31,6 +31,8 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
         that.windowClickEventHandler = that.windowClickEvent.bind(that);
         that.popstateEventHandler = that.popstateEvent.bind(that);
         that.hashchangeEventHandler = that.hashchangeEvent.bind(that);
+        // Call parent method
+        classInherit.prototype.construct.apply(that, arguments);
     };
 
     classProto.onSetEvents = function(){
@@ -158,55 +160,71 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
 
     classProto.processRoute = function(state){
         var that = this,
-            isMatch,
-            hasAccess,
-            matchItem,
-            matchCaptures,
             route,
-            redirectTo;
+            matchRouteRedirect,
+            matchRouteData,
+            matchRoutesData = [];
         // Destruct old route
         that.destructRoute(that.current);
         // Match route
-        cm.forEach(that.routes, function(routeItem){
-            isMatch = state['route'].match(routeItem['regexp']);
+        cm.forEach(that.routes, function(item, route){
+            var isMatch = state['route'].match(item['regexp']),
+                hasAccess = that.checkRoleAccess(item['access']),
+                routeData;
             if(isMatch){
-                hasAccess = that.checkRoleAccess(routeItem['access']);
+                item = cm.clone(item);
+                routeData = {
+                    'hasAccess' : hasAccess,
+                    'roure': route,
+                    'item' : item,
+                    'captures' : isMatch
+                };
                 if(hasAccess){
-                    matchCaptures = isMatch;
-                    matchItem = routeItem;
+                    matchRouteData = routeData;
                 }else{
-                    state['match'].push(
-                        cm.clone(routeItem)
-                    );
+                    matchRoutesData.push(routeData);
+                    state['match'].push(item);
                 }
             }
         });
-        if(!matchItem){
-            matchItem = that.get('error');
-        }
-        route = cm.merge(matchItem, state);
-        route['state'] = state;
-        // Get captures
-        if(matchCaptures){
-            route['captures'] = that.mapCaptures(route['map'], matchCaptures);
-        }
-        // Handle redirect
-        if(!cm.isEmpty(route['redirectTo'])){
-            if(cm.isObject(route['redirectTo'])){
-                cm.forEach(route['redirectTo'], function(item, key){
-                    if(that.checkRoleAccess(key)){
-                        redirectTo = item;
-                    }
-                });
-            }else{
-                redirectTo = route['redirectTo'];
-            }
-        }
-        if(redirectTo){
-            that.redirect(redirectTo, route.hash, {
-                'captures' : route['captures'],
-                'data' : route['data']
+        // Try to find route redirects if exists
+        if(!matchRouteData){
+            cm.forEach(matchRoutesData, function(routeData){
+                var redirect = that.getRouteRedirect(routeData.item);
+                if(redirect){
+                    matchRouteData = routeData;
+                    matchRouteRedirect = redirect;
+                }
             });
+        }else{
+            matchRouteRedirect = that.getRouteRedirect(matchRouteData.item);
+        }
+        // If routes and redirects does not found - process error route
+        if(!matchRouteData){
+            matchRouteData = {
+                'hasAccess' : true,
+                'route' : 'error',
+                'item' : that.get('error')
+            };
+        }
+        // Process route
+        route = cm.merge(matchRouteData.item, state);
+        route.state = state;
+        // Map found captures
+        if(matchRouteData.captures){
+            route.captures = that.mapCaptures(route.map, matchRouteData.captures);
+        }
+        // Handle route redirect or route
+        if(matchRouteRedirect){
+            if(cm.isArray(matchRouteRedirect)){
+                that.redirect.apply(that, matchRouteRedirect);
+            }else{
+                that.redirect(matchRouteRedirect, route.hash, {
+                    'urlParams' : route['urlParams'],
+                    'captures' : route['captures'],
+                    'data' : route['data']
+                });
+            }
         }else{
             that.constructRoute(route);
         }
@@ -269,6 +287,26 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
         }
         that.triggerEvent('onChange', route);
         return that;
+    };
+
+    classProto.getRouteRedirect = function(route){
+        var that = this,
+            routeRedirect;
+        if(!cm.isEmpty(route.redirectTo)){
+            if(cm.isObject(route.redirectTo)){
+                cm.forEach(route.redirectTo, function(item, role){
+                    if(that.checkRoleAccess(role)){
+                        routeRedirect = item;
+                    }
+                });
+            }else{
+                routeRedirect = route.redirectTo;
+            }
+        }
+        if(cm.isFunction(routeRedirect)){
+            routeRedirect = routeRedirect(route);
+        }
+        return routeRedirect;
     };
 
     /* *** HELPERS *** */
@@ -348,13 +386,13 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
     };
 
     classProto.fillCaptures = function(route, params){
-        // Set url params
-        if(cm.isObject(params)){
-            route = route.replace(/{(\w+)}/g, function(math, p1){
-                return params[p1] || '';
-            });
-        }
-        return route;
+        return cm.fillVariables(route, params);
+    };
+
+    classProto.checkRouteAccess = function(route){
+        var that = this,
+            item = that.get(route);
+        return item ? that.checkRoleAccess(item['access']) : false;
     };
 
     classProto.checkRoleAccess = function(role){
@@ -401,6 +439,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
                 'href' : null,
                 'redirectTo' : null,
                 'data' : {},
+                'urlParams' : {},
                 //'pushState' : true,
                 //'replaceState' : false,
                 'constructor' : false,
@@ -469,6 +508,16 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
         return that.prepareHref(that.getURL(route, hash, urlParams, data));
     };
 
+    classProto.getRedirect = function(route){
+        var that = this,
+            item = that.get(route),
+            redirect;
+        if(item){
+            redirect = that.getRouteRedirect(item);
+        }
+        return redirect;
+    };
+
     classProto.getCurrent = function(){
         var that = this;
         return that.current;
@@ -528,7 +577,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             route = that.routesBinds[route];
         }
         if(that.routes[route]){
-            item = that.routes[route]
+            item = that.routes[route];
             if(cm.isString(item['name'])){
                 delete that.routesBinds[item['name']];
             }else if(cm.isArray(item['name'])){
@@ -549,7 +598,8 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
 
     classProto.redirect = function(route, hash, params){
         var that = this,
-            href = that.getURL(route, hash, params['captures']);
+            urlParams = !cm.isEmpty(params['urlParams']) ? params['urlParams'] : params['captures'],
+            href = that.getURL(route, hash, urlParams);
         // Important to override push / replace state params in this case
         params = cm.merge(params, {
             'pushState' : false,

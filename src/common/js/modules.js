@@ -236,6 +236,10 @@ Mod['Params'] = {
     'getParams' : function(key){
         var that = this;
         return key ? that.params[key] : that.params;
+    },
+    'getRawParams' : function(key){
+        var that = this;
+        return key ? that._raw.params[key] : that._raw.params;
     }
 };
 
@@ -335,14 +339,15 @@ Mod['Events'] = {
     },
     'triggerEvent' : function(event, params){
         var that = this,
-            args = cm.clone(arguments),
+            data = cm.clone(arguments),
             events;
-        args[0] = that;
+        // Replace event name parameter with context (legacy) in data
+        data[0] = that;
         if(that.events[event]){
-            events = that.events[event].slice();
-            for(var i = 0, l = events.length; i < l; i++){
-                events[i].apply(that, args);
-            }
+            events = cm.clone(that.events[event]);
+            cm.forEach(events, function(event){
+                event.apply(that, data);
+            });
         }else{
             cm.errorLog({
                 'type' : 'attention',
@@ -398,17 +403,8 @@ Mod['Langs'] = {
         if(cm.isUndefined(str) || cm.isEmpty(str)){
             return '';
         }
-        // Try to get string from current controller params array
-        langStr = cm.objectPath(str, that.params['langs']);
-        // Try to get string from current controller strings array
-        if(cm.isUndefined(langStr)){
-            langStr = cm.objectPath(str, that.strings);
-        }
-        // Try to get string from parent controller
-        if(cm.isUndefined(langStr) && that._inherit){
-            langStr = that._inherit.prototype.lang(str);
-        }
-        // We tried everything we could
+        // Get string
+        langStr = that.getLang(str);
         if(cm.isUndefined(langStr)){
             langStr = str;
         }
@@ -424,14 +420,52 @@ Mod['Langs'] = {
         }
         return langStr;
     },
-    'msg' : function() {
+    'message' : function(){
         var that = this;
         return that.lang.apply(that, arguments);
+    },
+    'msg' : function(){
+        var that = this;
+        return that.lang.apply(that, arguments);
+    },
+    'getLang' : function(str){
+        var that = this,
+            langStr;
+        if(cm.isUndefined(str) || cm.isEmpty(str)){
+            return;
+        }
+        // Try to get string from current controller params array
+        langStr = cm.objectPath(str, that.params.langs);
+        // Try to get string from current controller strings array
+        if(cm.isUndefined(langStr)){
+            langStr = cm.objectPath(str, that.strings);
+        }
+        // Try to get string from parent controller
+        if(cm.isUndefined(langStr) && that._inherit){
+            langStr = that._inherit.prototype.getMsg(str);
+        }
+        return langStr;
+    },
+    'getMessage' : function(){
+        var that = this;
+        return that.getLang.apply(that, arguments);
+    },
+    'getMsg' : function(){
+        var that = this;
+        return that.getLang.apply(that, arguments);
     },
     'langObject' : function(str){
         var that = this,
             o = that.lang(str);
         return cm.isObject(o) || cm.isArray(o) ? o : {};
+    },
+    'messageObject' : function(){
+        var that = this;
+        return that.langObject.apply(that, arguments);
+    },
+    'msgObject' : function(){
+        var that = this;
+        return that.langObject.apply(that, arguments);
     },
     'setLangs' : function(o){
         var that = this;
@@ -443,6 +477,14 @@ Mod['Langs'] = {
             }
         }
         return that;
+    },
+    'setMessages' : function(){
+        var that = this;
+        return that.setLangs.apply(that, arguments);
+    },
+    'setMsgs' : function(){
+        var that = this;
+        return that.setLangs.apply(that, arguments);
     }
 };
 
@@ -792,30 +834,33 @@ Mod['Structure'] = {
             that.build['params']['embedStructure'] = 'append';
         }
     },
-    'embedStructure' : function(node){
+    'embedStructure' : function(node, container){
         var that = this;
         switch(that.params['embedStructure']){
             case 'replace':
                 that.replaceStructure(node);
                 break;
             case 'append':
-                that.appendStructure(node, 'insertLast');
+            case 'last':
+                that.appendStructure(node, 'insertLast', container);
                 break;
+            case 'prepend':
             case 'first':
-                that.appendStructure(node, 'insertFirst');
+                that.appendStructure(node, 'insertFirst', container);
                 break;
         }
         return that;
     },
-    'appendStructure' : function(node, type){
+    'appendStructure' : function(node, type, container){
         var that = this;
-        var container = that.params['container'] || that.params['node'];
+        container = container || that.params['container'] || that.params['node'];
         container && cm[type](node, container);
         return that;
     },
-    'replaceStructure' : function(node){
+    'replaceStructure' : function(node, container){
         var that = this;
-        if(that.params['container']){
+        container = container || that.params['container'];
+        if(container){
             if(that.params['container'] === that.params['node']){
                 cm.insertBefore(node, that.params['node']);
             }else{
