@@ -664,7 +664,7 @@ function(params){
         };
         // Check access
         if(config['access']){
-            item['data'] = cm.objectPath(config['key'], row['data']);
+            item['data'] = cm.reducePath(config['key'], row['data']);
             item['text'] = cm.isEmpty(item['data'])? '' : item['data'];
             item['title']= cm.isEmpty(config['titleText'])? item['text'] : config['titleText'];
             // Structure

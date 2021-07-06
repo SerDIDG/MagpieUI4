@@ -2,12 +2,10 @@
 
 /* *** TOOLTIP *** */
 
-.com__tooltip {
-    &.com__ac-tooltip {
-        user-select: none;
+.com__ac-tooltip {
+    user-select: none;
 
-        > .inner > .scroll {
-            max-height: @ComAutocomplete-ListCount * (@CmFont-Base-LineHeight + @PtList-Indent + @PtList-PaddingY * 2) - @PtList-Indent;
-        }
+    > .inner > .scroll {
+        max-height: @ComAutocomplete-ListCount * (@CmFont-Base-LineHeight + @PtList-Indent + @PtList-PaddingY * 2) - @PtList-Indent;
     }
 }

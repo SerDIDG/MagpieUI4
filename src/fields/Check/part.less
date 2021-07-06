@@ -3,12 +3,12 @@
     line-height: @CmForm-FieldHeight;
 
     label {
-        @padding_calc: (@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2;
-        @padding: max(floor((@padding_calc)), 0px);
+        @padding_calc: ((@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2);
+        @padding: max(floor(@padding_calc), 0px);
         margin-right: @CmIndent-Medium;
         padding: @padding 0;
         cursor: pointer;
-        display: inline-block;
+        display: inline-flex;
         vertical-align: baseline;
         line-height: @CmFont-Base-LineHeight;
 
@@ -27,75 +27,42 @@
         @margin: max(floor((@margin_calc)), 0px);
 
         margin: @margin @CmForm-FieldInnerIndent @margin 0;
-        vertical-align: top;
         padding: 0;
         cursor: pointer;
+        align-self: flex-start;
 
-        &:checked + .unveil,
-        &:checked + .label + .unveil {
+        &:last-child {
+            margin-right: 0;
+        }
+
+        &:checked + .fields,
+        &:checked + .label + .fields {
             display: block;
         }
     }
 
     .label {
-        display: inline;
+        display: block;
+        flex: 1;
     }
 
-    > .fields {
-        &.unveil {
-            display: none;
-        }
-    }
-
-    &.pull-center {
-        text-align: center;
-    }
-
-    &.has-fields {
-        display: flex;
-
-        label {
-            display: block;
-            margin: 0;
-            padding: 0;
-        }
-
-        .label {
-            @padding_calc: (@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2;
-            @padding: max(round((@padding_calc)), 0px);
-            display: inline-block;
-            padding: @padding 0 @padding 0;
-        }
-
-        > .fields {
-            margin: 0 0 0 @CmIndent-XSmall;
-            flex: 1;
-        }
-    }
-
-    &.has-fields-box {
-        input[type="radio"],
-        input[type="checkbox"] {
-            @margin_calc: (@CmForm-FieldHeight - 13px) / 2;
-            @margin: max(floor((@margin_calc)), 0px);
-            margin-top: @margin;
-            margin-bottom: @margin;
-        }
+    .fields {
+        display: none;
+        flex: 1;
     }
 
     &.is-box {
         label {
-            display: block;
+            display: flex;
+            flex-wrap: wrap;
         }
+    }
 
-        input[type="radio"],
-        input[type="checkbox"] {
-            float: left;
-        }
-
-        .label {
-            overflow: hidden;
-            display: block;
+    &.is-fields-box {
+        .fields {
+            width: 100%;
+            margin-top: @CmForm-FieldInnerIndent;
+            flex: none;
         }
     }
 }

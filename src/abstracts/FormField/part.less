@@ -42,6 +42,38 @@
         }
     }
 
+    &.success {
+        > dt,
+        > .field__title {
+            color: @CmColor-Success-DarkDefault;
+        }
+
+        .pt__field__error {
+            color: @CmColor-Success-DarkDefault;
+        }
+
+        .input {
+            border-color: @CmColor-Success-DarkDefault;
+            background-color: @CmColor-Success-LightHighlight;
+        }
+    }
+
+    &.warning {
+        > dt,
+        > .field__title {
+            color: @CmColor-Warning-DarkDefault;
+        }
+
+        .pt__field__error {
+            color: @CmColor-Warning-DarkDefault;
+        }
+
+        .input {
+            border-color: @CmColor-Warning-DarkDefault;
+            background-color: @CmColor-Warning-LightHighlight;
+        }
+    }
+
     &.error,
     &.danger {
         > dt,
@@ -54,25 +86,8 @@
         }
 
         .input {
-            border: 1px solid @CmColor-Danger-DarkDefault;
+            border-color: @CmColor-Danger-DarkDefault;
             background-color: @CmColor-Danger-LightHighlight;
-        }
-    }
-
-    &.ok,
-    &.success {
-        > dt,
-        > .field__title {
-            color: @CmColor-Success-DarkDefault;
-        }
-
-        .pt__field__error {
-            color: @CmColor-Success-DarkDefault;
-        }
-
-        .input {
-            border: 1px solid @CmColor-Success-DarkDefault;
-            background-color: @CmColor-Success-LightHighlight;
         }
     }
 
@@ -210,14 +225,15 @@
         .cm__color__warning;
     }
 
+    &.error,
     &.danger {
         .cm__color__danger;
     }
 }
 
 ul.pt__field__hint {
-    @padding_calc: (@CmForm-FieldIndent - @CmFont-Base-LineHeightSmall) / 2;
-    @padding: max(min(round((@padding_calc)), 4px), 0px);
+    @padding_calc: round(((@CmForm-FieldIndent - @CmFont-Base-LineHeightSmall) / 2));
+    @padding: max(min(@padding_calc, 0px), 4px);
     margin: 0;
     padding: @padding 0;
     display: block;
@@ -267,6 +283,50 @@ ul.pt__field__hint {
     .pt__field__content--size-helper(@CmForm-FieldHeight, @CmInput-Padding, @CmBorder-Width, @CmFont-Base-LineHeight);
 }
 
+// /* *** FIELDSET ***/
+
+.pt__fieldset {
+    padding: @CmIndent-Medium;
+    margin: @CmForm-FieldIndent 0 0 0;
+    border: @CmBorder-Default;
+    border-radius: @CmBorder-Radius;
+
+    legend {
+        @indent_calc: (@CmFont-Base-LineHeight / 2);
+        @indent: round(@indent_calc);
+        margin-bottom: -@indent;
+        line-height: @CmFont-Base-LineHeight;
+    }
+
+    &:first-child {
+        margin: 0;
+    }
+
+    &.success {
+        border-color: @CmColor-Success-DarkDefault;
+
+        legend {
+            color: @CmColor-Success-DarkDefault;
+        }
+    }
+
+    &.warning {
+        border-color: @CmColor-Warning-DarkDefault;
+
+        legend {
+            color: @CmColor-Warning-DarkDefault;
+        }
+    }
+
+    &.error,
+    &.danger {
+        border-color: @CmColor-Danger-DarkDefault;
+
+        legend {
+            color: @CmColor-Danger-DarkDefault;
+        }
+    }
+}
 
 // /* *** MIXINS *** */
 

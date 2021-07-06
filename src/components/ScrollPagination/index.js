@@ -299,10 +299,10 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
 
     classProto.callbacks.filter = function(that, config, response){
         var data = [],
-            errorsItem = cm.objectPath(that.params['responseErrorsKey'], response),
-            dataItem = cm.objectPath(that.params['responseKey'], response),
-            countItem = cm.objectPath(that.params['responseCountKey'], response),
-            tokenItem = cm.objectPath(that.params['responseTokenKey'], response);
+            errorsItem = cm.reducePath(that.params['responseErrorsKey'], response),
+            dataItem = cm.reducePath(that.params['responseKey'], response),
+            countItem = cm.reducePath(that.params['responseCountKey'], response),
+            tokenItem = cm.reducePath(that.params['responseTokenKey'], response);
         if(cm.isEmpty(errorsItem)){
             if(!cm.isEmpty(dataItem)){
                 if(!that.params['responseHTML'] && that.params['perPage']){

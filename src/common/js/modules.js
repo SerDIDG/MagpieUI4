@@ -181,6 +181,7 @@ Mod['Params'] = {
         cm.forEach(that.params, function(item, key){
             switch(key){
                 case 'strings':
+                case 'messages':
                 case 'langs':
                     cm.isFunction(that.setLangs) && that.setLangs(item);
                     break;
@@ -218,9 +219,6 @@ Mod['Params'] = {
                         default:
                             if(/^cm._config./i.test(item)){
                                 that.params[key] = cm._config[item.replace('cm._config.', '')];
-                            }
-                            if(/^@LESS./i.test(item)){
-                                that.params[key] = window.LESS[item.replace('@LESS.', '')];
                             }
                             break;
                     }
@@ -435,10 +433,10 @@ Mod['Langs'] = {
             return;
         }
         // Try to get string from current controller params array
-        langStr = cm.objectPath(str, that.params.langs);
+        langStr = cm.reducePath(str, that.params.langs);
         // Try to get string from current controller strings array
         if(cm.isUndefined(langStr)){
-            langStr = cm.objectPath(str, that.strings);
+            langStr = cm.reducePath(str, that.strings);
         }
         // Try to get string from parent controller
         if(cm.isUndefined(langStr) && that._inherit){

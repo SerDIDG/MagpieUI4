@@ -69,7 +69,7 @@ function(params){
 
         if(that.params['container']){
             // Check Graceful Degradation, and turn it to mobile and old ie.
-            if(that.params['useGracefulDegradation'] && ((cm.is('IE') && cm.isVersion() < 9) || cm.isMobile())){
+            if(that.params['useGracefulDegradation'] && cm.isMobile){
                 isGracefulDegradation = true;
             }
             // Init misc
@@ -1056,6 +1056,6 @@ function(params){
         });
         return filteredAreas.length == 1 ? arr : results;
     };
-    
+
     init();
 });

@@ -51,7 +51,8 @@ cm.define('Com.DatePicker', {
             'targetEvent' : 'click',
             'hideOnReClick' : false,
             'className' : 'com__datepicker__tooltip',
-            'top' : cm._config.tooltipDown
+            'top' : cm._config.tooltipDown,
+            'scroll' : false
         }
     }
 },
@@ -166,7 +167,7 @@ function(params){
         // Time Select
         if(that.params['isDateTime']){
             nodes['timeHolder'] = cm.Node('div', {'class' : 'time-holder'},
-                cm.Node('dl', {'class' : 'form-box'},
+                cm.Node('dl', {'class' : 'pt__field is-box'},
                     cm.Node('dt', that.lang('Time')),
                     nodes['timeContainer'] = cm.Node('dd')
                 )

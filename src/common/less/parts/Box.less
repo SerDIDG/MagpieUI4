@@ -181,7 +181,7 @@
         left: 50%;
         z-index: 2;
         margin: -16px 0 0 -16px;
-        background: url("@{CmPath-Images}/parts/ajax-loader.gif");
+        background: url("@{CmCommon-PathImages}/parts/ajax-loader.gif");
     }
 }
 
@@ -390,6 +390,7 @@
 
 .pt__box-code {
     .cm__box;
+    width: 100%;
     min-height: @CmFont-Base-LineHeight + ((@PtBoxCode-PaddingY + @CmBorder-Width ) * 2);
     display: block;
     white-space: pre-wrap;
@@ -398,6 +399,7 @@
     border: @CmBorder-Width dashed @CmColor-Border;
     border-radius: @CmBorder-Radius;
     font-family: "Courier New", Courier, monospace;
+    resize: vertical;
 }
 
 /* ******* PART: BOX: ADAPTIVE ******* */

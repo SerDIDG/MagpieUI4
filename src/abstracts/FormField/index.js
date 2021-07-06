@@ -812,7 +812,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
 
     classProto.callbacks.filter = function(that, config, response){
         var data = [],
-            dataItem = cm.objectPath(that.params.responseKey, response);
+            dataItem = cm.reducePath(that.params.responseKey, response);
         if(dataItem && !cm.isEmpty(dataItem)){
             data = dataItem;
         }

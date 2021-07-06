@@ -144,34 +144,25 @@ cm.getConstructor('Com.TabsetHelper', function(classConstructor, className, clas
 
     /******* TABS *******/
 
+    classProto.processTabs = function(tabs, labels){
+        var that = this,
+            itemsToProcess = tabs.length > 0 ? tabs : labels;
+        cm.forEach(itemsToProcess, function(tab, key){
+            that.processTab(tab, labels[key]);
+        });
+    };
+
     classProto.processTab = function(tab, label){
         var that = this,
-            config = cm.merge(that.getNodeDataConfig(tab['container']), that.getNodeDataConfig(label['container'])),
+            config = cm.merge(
+                tab ? that.getNodeDataConfig(tab['container']) : null,
+                label ? that.getNodeDataConfig(label['container']) : null
+            ),
             item = cm.merge(config, {
                 'tab' : tab,
                 'label' : label
             });
         that.addTab(item);
-    };
-
-    classProto.processTabs = function(tabs, labels){
-        var that = this,
-            itemsToProcess = tabs.length ?  tabs : labels,
-            items = [],
-            label,
-            config,
-            item;
-        cm.forEach(itemsToProcess, function(tab, key){
-            label = labels[key];
-            config = cm.merge(that.getNodeDataConfig(tab['container']), that.getNodeDataConfig(label['container']));
-            item = cm.merge(config, {
-                'tab' : tab,
-                'label' : label
-            });
-            items.push(item);
-        });
-        that.addTabs(items);
-        return that;
     };
 
     classProto.renderTab = function(item){
@@ -524,7 +515,7 @@ cm.getConstructor('Com.TabsetHelper', function(classConstructor, className, clas
 
     classProto.callbacks.filter = function(that, params, item){
         var data,
-            dataItem = cm.objectSelector(that.params['responseKey'], params['response']);
+            dataItem = cm.reducePath(that.params['responseKey'], params['response']);
         if(dataItem && !cm.isEmpty(dataItem)){
             data = dataItem;
         }

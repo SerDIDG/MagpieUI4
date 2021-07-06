@@ -44,9 +44,7 @@ function(params){
     Com.MultipleInput.apply(that, arguments);
 });
 
-cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className, classProto){
-    var _inherit = classProto._inherit;
-
+cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className, classProto, classInherit){
     classProto.construct = function(){
         var that = this;
         // Bind context to methods
@@ -58,16 +56,7 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         that.addEvent('onValidateParamsEnd', that.validateParamsEndHandler);
         that.addEvent('onItemAddProcess', that.itemAddProcessHandler);
         // Call parent method
-        _inherit.prototype.construct.apply(that, arguments);
-        return that;
-    };
-
-    classProto.clear = function(){
-        var that = this;
-        that.params['showToolbar'] && cm.removeClass(that.nodes['toolbar']['browseHolder'], 'is-hidden');
-        // Call parent method
-        _inherit.prototype.clear.apply(that, arguments);
-        return that;
+        classInherit.prototype.construct.apply(that, arguments);
     };
 
     classProto.validateParamsEnd = function(){
@@ -90,13 +79,12 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         that.params['local'] = that.params['fileUploader'] ? false : that.params['local'];
         that.params['fileManager'] = that.params['fileUploader'] ? false : that.params['fileManager'];
         that.hasButtons = that.params['local'] || that.params['fileManager'] || that.params['fileUploader'];
-        return that;
     };
 
     classProto.renderViewModel = function(){
         var that = this;
         // Call parent method - renderViewModel
-        _inherit.prototype.renderViewModel.apply(that, arguments);
+        classInherit.prototype.renderViewModel.apply(that, arguments);
         // Init FilerReader
         cm.getConstructor('Com.FileReader', function(classObject, className){
             that.myComponents['reader'] = new classObject(that.params[className]);
@@ -144,7 +132,6 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
                 });
             });
         }
-        return that;
     };
 
     classProto.renderToolbarView = function(){
@@ -191,7 +178,6 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         item['controller'].addEvent('onClear', function(){
             that.removeItem(item);
         });
-        return that;
     };
 
     /* *** PROCESS FILES *** */
@@ -202,7 +188,6 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         cm.forEach(length, function(i){
             that.processFiles(e.target.files[i]);
         });
-        return that;
     };
 
     classProto.processFiles = function(data){
@@ -216,10 +201,17 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         }else if(!cm.isEmpty(data)){
             that.addItem({'value' : data}, true);
         }
-        return that;
     };
 
     /* *** PUBLIC *** */
+
+    classProto.clear = function(){
+        var that = this;
+        that.params['showToolbar'] && cm.removeClass(that.nodes['toolbar']['browseHolder'], 'is-hidden');
+        // Call parent method
+        classInherit.prototype.clear.apply(that, arguments);
+        return that;
+    };
 
     classProto.browse = function(){
         var that = this;

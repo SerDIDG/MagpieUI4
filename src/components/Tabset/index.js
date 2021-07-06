@@ -84,14 +84,6 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         that.params['tabsWidth'] = cm.getLESSVariable('ComTabset-Column-Width', that.params['tabsWidth'], true);
     };
 
-    classProto.onValidateParams = function(){
-        var that = this;
-        // Get tabs from nodes
-        if(cm.isNode(that.params['node'])){
-            that.collectTabs();
-        }
-    };
-
     classProto.onSetEvents = function(){
         var that = this;
         // Call parent method
@@ -176,16 +168,14 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
 
     /******* TABS *******/
 
-    classProto.collectTabs = function(){
-        var that = this;
-        cm.forEach(that.nodes['tabs'], function(item){
-            if(cm.isNode(item['container'])){
-                cm.removeClass(item['content'], 'active');
-                that.params['items'].push(
-                    cm.merge({'content' : item['container']}, that.getNodeDataConfig(item['container']))
-                )
-            }
-        });
+    classProto.processTab = function(tab){
+        var that = this,
+            config = that.getNodeDataConfig(tab['container']),
+            item = cm.merge(config, {
+                'content' : tab['container']
+            });
+        cm.removeClass(item['content'], 'active');
+        that.addTab(item);
     };
 
     classProto.renderTabView = function(item){
@@ -224,6 +214,9 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
             if(cm.isNode(item['image'])){
                 nodes['image'] = item['image'];
             }else if(!cm.isEmpty(item['image'])){
+                item['image'] = cm.strReplace(item['image'], {
+                    '%baseUrl%' : cm._baseUrl
+                });
                 nodes['image'] = cm.node('div', {'class' : 'image'},
                     cm.node('img', {'src' : item['image'], 'alt' : ''})
                 );

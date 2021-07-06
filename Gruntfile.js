@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         paths : {
             modules : 'node_modules',
             src : 'src',
-            build : 'build',
+            dist : 'dist',
             docs : 'docs',
             temp : 'temp'
         },
@@ -62,30 +62,30 @@ module.exports = function(grunt) {
                 force: true
             },
             scripts : [
-                '<%= paths.build %>/js/*',
-                '<%= paths.docs %>/build/js/*'
+                '<%= paths.dist %>/js/*',
+                '<%= paths.docs %>/dist/js/*'
             ],
             styles : [
-                '<%= paths.build %>/less/*',
-                '<%= paths.build %>/css/*',
-                '<%= paths.docs %>/build/less/*',
-                '<%= paths.docs %>/build/css/*'
+                '<%= paths.dist %>/less/*',
+                '<%= paths.dist %>/css/*',
+                '<%= paths.docs %>/dist/less/*',
+                '<%= paths.docs %>/dist/css/*'
             ],
             images : [
-                '<%= paths.build %>/img/*',
-                '<%= paths.docs %>/build/img/*'
+                '<%= paths.dist %>/img/*',
+                '<%= paths.docs %>/dist/img/*'
             ],
             fonts : [
-                '<%= paths.build %>/fonts/*',
-                '<%= paths.docs %>/build/fonts/*'
+                '<%= paths.dist %>/fonts/*',
+                '<%= paths.docs %>/dist/fonts/*'
             ],
             stuff : [
-                '<%= paths.docs %>/build/content/*',
-                '<%= paths.docs %>/build/stuff/*'
+                '<%= paths.docs %>/dist/content/*',
+                '<%= paths.docs %>/dist/stuff/*'
             ],
             libs : [
-                '<%= paths.build %>/libs/*',
-                '<%= paths.docs %>/build/libs/*'
+                '<%= paths.dist %>/libs/*',
+                '<%= paths.docs %>/dist/libs/*'
             ],
             temp : [
                 '<%= paths.temp %>/less',
@@ -101,8 +101,8 @@ module.exports = function(grunt) {
                 },
                 src: [
                     '<%= components.tinycolor.scripts %>',
-                    '<%= paths.src %>/common/js/config.js',
                     '<%= paths.src %>/common/js/polyfill.js',
+                    '<%= paths.src %>/common/js/config.js',
                     '<%= paths.src %>/common/js/common.js',
                     '<%= paths.src %>/common/js/modules.js',
                     '<%= paths.src %>/common/js/parts.js',
@@ -110,32 +110,43 @@ module.exports = function(grunt) {
                     '<%= paths.src %>/abstracts/Controller/**/*.js',
                     '<%= paths.src %>/abstracts/Container/**/*.js',
                     '<%= paths.src %>/abstracts/**/*.js',
+                    '<%= paths.src %>/components/Tooltip/**/*.js',
+                    '<%= paths.src %>/components/ScrollPagination/**/*.js',
+                    '<%= paths.src %>/components/Pagination/**/*.js',
                     '<%= paths.src %>/components/**/*.js',
+                    '<%= paths.src %>/fields/MultipleInput/**/*.js',
                     '<%= paths.src %>/fields/**/*.js',
-                    '!<%= paths.src %>/**/langs/*.js',
+                    '!<%= paths.src %>/**/strings/*.js',
                     '!<%= paths.src %>/common/js/init.js',
                     '<%= paths.src %>/common/js/init.js'
                 ],
-                dest: '<%= paths.build %>/js/<%= pkg.name %>.js'
+                dest: '<%= paths.dist %>/js/<%= pkg.name %>.js'
             },
-            scripts_langs: {
+            scripts_strings: {
                 files : [{
-                    src : '<%= paths.src %>/**/langs/ru.js',
-                    dest : '<%= paths.build %>/js/<%= pkg.name %>.ru.<%= pkg.version %>.js'
+                    src: [
+                        '<%= paths.src %>/common/**/strings/ru.js',
+                        '<%= paths.src %>/**/strings/ru.js'
+                    ],
+                    dest : '<%= paths.dist %>/js/<%= pkg.name %>.ru.js'
                 },{
-                    src : '<%= paths.src %>/**/langs/en.js',
-                    dest : '<%= paths.build %>/js/<%= pkg.name %>.en.<%= pkg.version %>.js'
+                    src: [
+                        '<%= paths.src %>/common/**/strings/en.js',
+                        '<%= paths.src %>/**/strings/en.js'
+                    ],
+                    dest : '<%= paths.dist %>/js/<%= pkg.name %>.en.js'
                 }]
             },
             scripts_docs : {
                 src : [
-                    '<%= paths.build %>/js/<%= pkg.name %>.js',
-                    '<%= paths.docs %>/build/js/<%= pkg.name %>.variables.js',
+                    '<%= paths.dist %>/js/<%= pkg.name %>.js',
+                    '<%= paths.dist %>/js/<%= pkg.name %>.en.js',
+                    '<%= paths.docs %>/dist/js/<%= pkg.name %>.variables.js',
                     '<%= paths.docs %>/src/js/common.js',
                     '<%= paths.docs %>/src/js/components/**/*.js',
                     '<%= paths.docs %>/src/js/components.js'
                 ],
-                dest : '<%= paths.docs %>/build/js/<%= pkg.name %>.js'
+                dest : '<%= paths.docs %>/dist/js/<%= pkg.name %>.js'
             },
             styles: {
                 options: {
@@ -144,7 +155,7 @@ module.exports = function(grunt) {
                 src: [
                     '<%= components.animatecss.styles %>',
                     '<%= components.codemirror.styles %>',
-                    '<%= paths.src %>/common/less/variables/**/.less',
+                    '<%= paths.src %>/common/less/variables/**/*.less',
                     '<%= paths.src %>/common/less/svg.less',
                     '<%= paths.src %>/common/less/mixins.less',
                     '<%= paths.src %>/common/less/common.less',
@@ -163,38 +174,39 @@ module.exports = function(grunt) {
                     '<%= paths.src %>/common/less/parts/**/*.less',
                     '<%= paths.src %>/common/less/layouts/**/*.less',
                     '<%= paths.src %>/abstracts/**/*.less',
+                    '<%= paths.src %>/components/Tooltip/**/*.less',
                     '<%= paths.src %>/components/**/*.less',
                     '<%= paths.src %>/fields/**/*.less'
                 ],
-                dest: '<%= paths.build %>/less/<%= pkg.name %>.less'
+                dest: '<%= paths.dist %>/less/<%= pkg.name %>.less'
             },
             styles_docs : {
                 src : [
-                    '<%= paths.build %>/less/<%= pkg.name %>.less',
+                    '<%= paths.dist %>/less/<%= pkg.name %>.less',
                     '<%= paths.docs %>/src/less/variables/*.less',
                     '<%= paths.docs %>/src/less/common.less'
                 ],
-                dest : '<%= paths.docs %>/build/less/<%= pkg.name %>.less'
+                dest : '<%= paths.docs %>/dist/less/<%= pkg.name %>.less'
             },
             variables: {
                 src: [
                     '<%= paths.src %>/**/variables/*.less',
                     '<%= paths.src %>/**/variables.less'
                 ],
-                dest: '<%= paths.build %>/less/<%= pkg.name %>.variables.less'
+                dest: '<%= paths.dist %>/less/<%= pkg.name %>.variables.less'
             },
             variables_docs : {
                 src : [
-                    '<%= paths.build %>/less/<%= pkg.name %>.variables.less',
+                    '<%= paths.dist %>/less/<%= pkg.name %>.variables.less',
                     '<%= paths.docs %>/src/less/variables/*.less'
                 ],
-                dest : '<%= paths.docs %>/build/less/<%= pkg.name %>.variables.less'
+                dest : '<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'
             },
             codemirror : {
                 src : [
                     '<%= components.codemirror.scripts %>'
                 ],
-                dest : '<%= paths.build %>/libs/codemirror_comp/codemirror.js'
+                dest : '<%= paths.dist %>/libs/codemirror_comp/codemirror.js'
             }
         },
 
@@ -222,12 +234,12 @@ module.exports = function(grunt) {
                 }
             },
             build : {
-                src : ['<%= paths.build %>/less/<%= pkg.name %>.variables.less'],
-                dest : '<%= paths.build %>/js/<%= pkg.name %>.variables.js'
+                src : ['<%= paths.dist %>/less/<%= pkg.name %>.variables.less'],
+                dest : '<%= paths.dist %>/js/<%= pkg.name %>.variables.js'
             },
             docs : {
-                src : ['<%= paths.docs %>/build/less/<%= pkg.name %>.variables.less'],
-                dest : '<%= paths.docs %>/build/js/<%= pkg.name %>.variables.js'
+                src : ['<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'],
+                dest : '<%= paths.docs %>/dist/js/<%= pkg.name %>.variables.js'
             }
         },
 
@@ -237,12 +249,12 @@ module.exports = function(grunt) {
                 strictUnits: false
             },
             build: {
-                src: ['<%= paths.build %>/less/<%= pkg.name %>.less'],
-                dest: '<%= paths.build %>/css/<%= pkg.name %>.css'
+                src: ['<%= paths.dist %>/less/<%= pkg.name %>.less'],
+                dest: '<%= paths.dist %>/css/<%= pkg.name %>.css'
             },
             docs: {
-                src: ['<%= paths.docs %>/build/less/<%= pkg.name %>.less'],
-                dest: '<%= paths.docs %>/build/css/<%= pkg.name %>.css'
+                src: ['<%= paths.docs %>/dist/less/<%= pkg.name %>.less'],
+                dest: '<%= paths.docs %>/dist/css/<%= pkg.name %>.css'
             }
         },
 
@@ -253,54 +265,54 @@ module.exports = function(grunt) {
                 }
             },
             scripts: {
-                src: ['<%= paths.build %>/js/<%= pkg.name %>.js'],
-                dest: '<%= paths.build %>/js/<%= pkg.name %>.js'
+                src: ['<%= paths.dist %>/js/<%= pkg.name %>.js'],
+                dest: '<%= paths.dist %>/js/<%= pkg.name %>.js'
             },
             scripts_docs: {
-                src: ['<%= paths.docs %>/build/js/<%= pkg.name %>.js'],
-                dest: '<%= paths.docs %>/build/js/<%= pkg.name %>.js'
+                src: ['<%= paths.docs %>/dist/js/<%= pkg.name %>.js'],
+                dest: '<%= paths.docs %>/dist/js/<%= pkg.name %>.js'
             },
             styles: {
-                src: ['<%= paths.build %>/less/<%= pkg.name %>.less'],
-                dest: '<%= paths.build %>/less/<%= pkg.name %>.less'
+                src: ['<%= paths.dist %>/less/<%= pkg.name %>.less'],
+                dest: '<%= paths.dist %>/less/<%= pkg.name %>.less'
             },
             styles_docs: {
-                src: ['<%= paths.docs %>/build/less/<%= pkg.name %>.less'],
-                dest: '<%= paths.docs %>/build/less/<%= pkg.name %>.less'
+                src: ['<%= paths.docs %>/dist/less/<%= pkg.name %>.less'],
+                dest: '<%= paths.docs %>/dist/less/<%= pkg.name %>.less'
             },
             variables: {
-                src: ['<%= paths.build %>/less/<%= pkg.name %>.variables.less'],
-                dest: '<%= paths.build %>/less/<%= pkg.name %>.variables.less'
+                src: ['<%= paths.dist %>/less/<%= pkg.name %>.variables.less'],
+                dest: '<%= paths.dist %>/less/<%= pkg.name %>.variables.less'
             },
             variables_docs: {
-                src: ['<%= paths.docs %>/build/less/<%= pkg.name %>.variables.less'],
-                dest: '<%= paths.docs %>/build/less/<%= pkg.name %>.variables.less'
+                src: ['<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'],
+                dest: '<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'
             }
         },
 
         uglify : {
             build : {
                 files: [{
-                    src: ['<%= paths.build %>/js/<%= pkg.name %>.js'],
-                    dest: '<%= paths.build %>/js/<%= pkg.name %>.min.js'
+                    src: ['<%= paths.dist %>/js/<%= pkg.name %>.js'],
+                    dest: '<%= paths.dist %>/js/<%= pkg.name %>.min.js'
                 },{
-                    src : '<%= paths.build %>/js/<%= pkg.name %>.ru.js',
-                    dest : '<%= paths.build %>/js/<%= pkg.name %>.ru.min.js'
+                    src : '<%= paths.dist %>/js/<%= pkg.name %>.ru.js',
+                    dest : '<%= paths.dist %>/js/<%= pkg.name %>.ru.min.js'
                 },{
-                    src : '<%= paths.build %>/js/<%= pkg.name %>.en.js',
-                    dest : '<%= paths.build %>/js/<%= pkg.name %>.en.min.js'
+                    src : '<%= paths.dist %>/js/<%= pkg.name %>.en.js',
+                    dest : '<%= paths.dist %>/js/<%= pkg.name %>.en.min.js'
                 }]
             },
             codemirror : {
-                src : ['<%= paths.build %>/libs/codemirror_comp/codemirror.js'],
-                dest : '<%= paths.build %>/libs/codemirror_comp/codemirror.min.js'
+                src : ['<%= paths.dist %>/libs/codemirror_comp/codemirror.js'],
+                dest : '<%= paths.dist %>/libs/codemirror_comp/codemirror.min.js'
             }
         },
 
         cssmin : {
             build : {
-                src : ['<%= paths.build %>/css/<%= pkg.name %>.css'],
-                dest : '<%= paths.build %>/css/<%= pkg.name %>.min.css'
+                src : ['<%= paths.dist %>/css/<%= pkg.name %>.css'],
+                dest : '<%= paths.dist %>/css/<%= pkg.name %>.min.css'
             }
         },
 
@@ -311,7 +323,7 @@ module.exports = function(grunt) {
                 },
                 files : [{
                     expand : true,
-                    cwd : '<%= paths.build %>/img/',
+                    cwd : '<%= paths.dist %>/img/',
                     src : [
                         '**/*.*',
                         '!animated/**/*.*'
@@ -327,32 +339,35 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: '<%= paths.build %>/img/',
+                    cwd: '<%= paths.dist %>/img/',
                     src: [
                         '**/*.{png,jpg}',
                         '!animated/**/*.*'
                     ],
-                    dest: '<%= paths.build %>/img/',
+                    dest: '<%= paths.dist %>/img/',
                     ext: '.webp'
                 }]
             }
         },
 
         copy : {
-            images : {
-                files : [{
-                    expand : true,
-                    cwd : '<%= paths.src %>/img/',
-                    src : ['**/*.*'],
-                    dest : '<%= paths.build %>/img/'
+            images: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= paths.src %>/',
+                    src: ['**/img/**/*.*'],
+                    dest : '<%= paths.dist %>/img/',
+                    rename: function(dest, src){
+                        return dest + src.replace('/img/', '/');
+                    }
                 }]
             },
             images_docs : {
                 files : [{
                     expand : true,
-                    cwd : '<%= paths.build %>/img/',
+                    cwd : '<%= paths.dist %>/img/',
                     src : ['**/*.*'],
-                    dest : '<%= paths.docs %>/build/img/<%= pkg.name %>/'
+                    dest : '<%= paths.docs %>/dist/img/<%= pkg.name %>/'
                 }]
             },
             images_docs_self : {
@@ -360,7 +375,7 @@ module.exports = function(grunt) {
                     expand : true,
                     cwd : '<%= paths.docs %>/src/img/',
                     src : ['**/*.*'],
-                    dest : '<%= paths.docs %>/build/img/'
+                    dest : '<%= paths.docs %>/dist/img/'
                 }]
             },
             images_optimize : {
@@ -368,23 +383,23 @@ module.exports = function(grunt) {
                     expand : true,
                     cwd : '<%= paths.temp %>/img/',
                     src : ['**/*.*'],
-                    dest : '<%= paths.build %>/img/'
+                    dest : '<%= paths.dist %>/img/'
                 }]
             },
             fonts : {
                 files: [{
                     expand : true,
-                    cwd : '<%= paths.src %>/fonts/',
+                    cwd : '<%= paths.src %>/common/fonts/',
                     src : ['**/*.*', '!**/*.json'],
-                    dest : '<%= paths.build %>/fonts/'
+                    dest : '<%= paths.dist %>/fonts/'
                 }]
             },
             fonts_docs : {
                 files : [{
                     expand : true,
-                    cwd : '<%= paths.build %>/fonts/',
+                    cwd : '<%= paths.dist %>/fonts/',
                     src : ['**/*.*'],
-                    dest : '<%= paths.docs %>/build/fonts/<%= pkg.name %>/'
+                    dest : '<%= paths.docs %>/dist/fonts/<%= pkg.name %>/'
                 }]
             },
             fonts_docs_self : {
@@ -392,7 +407,7 @@ module.exports = function(grunt) {
                     expand : true,
                     cwd : '<%= paths.docs %>/src/fonts/',
                     src : ['**/*.*'],
-                    dest : '<%= paths.docs %>/build/fonts/'
+                    dest : '<%= paths.docs %>/dist/fonts/'
                 }]
             },
             libs : {
@@ -400,20 +415,20 @@ module.exports = function(grunt) {
                     expand : true,
                     cwd : '<%= components.less.dist %>',
                     src : ['**/*.*'],
-                    dest : '<%= paths.build %>/libs/less/'
+                    dest : '<%= paths.dist %>/libs/less/'
                 },{
                     expand : true,
                     cwd : '<%= components.codemirror.dist %>',
                     src : ['**/*.*'],
-                    dest : '<%= paths.build %>/libs/codemirror/'
+                    dest : '<%= paths.dist %>/libs/codemirror/'
                 }]
             },
             libs_docs : {
                 files : [{
                     expand : true,
-                    cwd : '<%= paths.build %>/libs/',
+                    cwd : '<%= paths.dist %>/libs/',
                     src : ['**/*.*'],
-                    dest : '<%= paths.docs %>/build/libs/'
+                    dest : '<%= paths.docs %>/dist/libs/'
                 }]
             },
             stuff_docs : {
@@ -421,17 +436,17 @@ module.exports = function(grunt) {
                     expand: true,
                     cwd: '<%= paths.docs %>/src/',
                     src: ['*.*'],
-                    dest: '<%= paths.docs %>/build/'
+                    dest: '<%= paths.docs %>/dist/'
                 },{
                     expand: true,
                     cwd: '<%= paths.docs %>/src/content/',
                     src: ['**/*.*'],
-                    dest: '<%= paths.docs %>/build/content/'
+                    dest: '<%= paths.docs %>/dist/content/'
                 },{
                     expand: true,
                     cwd: '<%= paths.docs %>/src/stuff/',
                     src: ['**/*.*'],
-                    dest: '<%= paths.docs %>/build/stuff/'
+                    dest: '<%= paths.docs %>/dist/stuff/'
                 }]
             }
         },
@@ -439,29 +454,29 @@ module.exports = function(grunt) {
         watch : {
             scripts : {
                 files : [
-                    '<%= paths.src %>/js/**/*.js',
-                    '<%= paths.docs %>/src/js/**/*.js'
+                    '<%= paths.src %>/**/*.js',
+                    '<%= paths.docs %>/src/**/*.js'
                 ],
                 tasks : ['scripts']
             },
             styles : {
                 files : [
-                    '<%= paths.src %>/less/**/*.less',
-                    '<%= paths.docs %>/src/less/**/*.less'
+                    '<%= paths.src %>/**/*.less',
+                    '<%= paths.docs %>/src/**/*.less'
                 ],
                 tasks : ['styles']
             },
             images : {
                 files : [
-                    '<%= paths.src %>/img/**/*.*',
-                    '<%= paths.docs %>/src/img/**/*.*'
+                    '<%= paths.src %>/../img/**/*.*',
+                    '<%= paths.docs %>/src/../img/**/*.*'
                 ],
                 tasks : ['images']
             },
             fonts : {
                 files : [
-                    '<%= paths.src %>/fonts/**/*.*',
-                    '!<%= paths.src %>/fonts/**/*.json',
+                    '<%= paths.src %>/common/fonts/**/*.*',
+                    '!<%= paths.src %>/common/fonts/**/*.json',
                     '<%= paths.docs %>/src/fonts/**/*.*',
                     '!<%= paths.docs %>/src/fonts/**/*.json'
                 ],
@@ -483,12 +498,12 @@ module.exports = function(grunt) {
     grunt.registerTask('optimize', ['clean:temp', 'default', 'uglify:build', 'cssmin', 'imagemin', 'copy:images_optimize', 'clean:temp']);
     grunt.registerTask('watcher', ['watch']);
 
-    grunt.registerTask('scripts', ['concat:scripts', 'replace:scripts', 'concat:scripts_docs']);
-    grunt.registerTask('images', ['svgcss:build', 'copy:images', 'copy:images_docs', 'copy:images_docs_self']);
+    grunt.registerTask('scripts', ['concat:scripts', 'concat:scripts_strings', 'replace:scripts', 'concat:scripts_docs']);
+    grunt.registerTask('images', ['clean:images', 'svgcss', 'copy:images', 'copy:images_docs', 'copy:images_docs_self']);
     grunt.registerTask('styles', ['variables', 'concat:styles', 'replace:styles', 'concat:styles_docs', 'less:build', 'less:docs']);
     grunt.registerTask('fonts', ['copy:fonts', 'copy:fonts_docs', 'copy:fonts_docs_self']);
     grunt.registerTask('stuff', ['copy:stuff_docs']);
     grunt.registerTask('libs', ['concat:codemirror', 'uglify:codemirror', 'copy:libs', 'copy:libs_docs']);
     grunt.registerTask('variables', ['concat:variables', 'replace:variables', 'concat:variables_docs', 'lessvars']);
-    grunt.registerTask('pre', ['svgcss:build', 'variables']);
+    grunt.registerTask('pre', ['svgcss', 'variables']);
 };

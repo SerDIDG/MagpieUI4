@@ -1,5 +1,3 @@
-/* ******* COMPONENT: DATEPICKER ******* */
-
 .com__datepicker-input {
     @clear-button-indent: (@CmForm-FieldHeight + @CmForm-FieldInnerIndent);
 
@@ -42,32 +40,26 @@
 
 /* Tooltip */
 
-.com__tooltip {
-    &.com__datepicker__tooltip {
-        width: @ComDatePicker-TooltipWidth;
+.com__datepicker__tooltip {
+    width: @ComDatePicker-TooltipWidth;
 
-        > .inner > .scroll {
-            overflow: visible;
+    .time-holder {
+        padding: 0 0 @CmIndent-XXSmall;
+        margin: @CmIndent-XXSmall 0 0 0;
+        border-bottom: @CmBorder-Separator;
+        border-top: @CmBorder-Separator;
+
+        dl {
+            margin: 0;
         }
+    }
 
-        .time-holder {
-            padding: 0 0 @CmIndent-XXSmall;
-            margin: @CmIndent-XXSmall 0 0 0;
-            border-bottom: @CmBorder-Separator;
-            border-top: @CmBorder-Separator;
-
-            dl {
-                margin: 0;
-            }
-        }
-
-        .button.today {
-            margin: @CmIndent-XXSmall 0 0 0;
-        }
+    .button.today {
+        margin: @CmIndent-XXSmall 0 0 0;
     }
 }
 
-/* ******* COMPONENT: DATEPICKER: ADAPTIVE ******* */
+/* ******* ADAPTIVE ******* */
 
 @media only screen and (max-width: @CmScreen-Mobile) {
 

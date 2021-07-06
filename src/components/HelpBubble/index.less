@@ -51,16 +51,14 @@
     display: block;
 }
 
-.com__tooltip {
-    &.com__help-bubble__tooltip {
-        width: @CmUI-TooltipWidth;
+.com__help-bubble__tooltip {
+    width: @CmUI-TooltipWidth;
 
-        > .inner {
-            padding: @CmIndent-XSmall;
+    > .inner {
+        padding: @CmIndent-XSmall;
 
-            > .scroll {
-                max-height: ~'calc(100vh - (@{CmIndent-XSmall} * 2) - (@{CmBorder-BoxWidth} * 2))';
-            }
+        > .scroll {
+            max-height: ~'calc(100vh - (@{CmIndent-XSmall} * 2) - (@{CmBorder-BoxWidth} * 2))';
         }
     }
 }

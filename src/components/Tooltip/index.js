@@ -26,6 +26,7 @@ cm.define('Com.Tooltip', {
         'autoHideDelay' : 'cm._config.autoHideDelay',
         'hold' : false,                                 // After close hold content in specified node from 'holdTarget' parameter
         'holdTarget' : false,
+        'holdMethod' : 'append',
         'preventClickEvent' : false,                    // Prevent default click event on the target, requires setting value 'targetEvent' : 'click'
         'positionTarget' : false,                       // Override target node for calculation position and dimensions
         'top' : 0,                                      // Supported properties: targetHeight, selfHeight, screenHeight, number
@@ -59,7 +60,7 @@ cm.define('Com.Tooltip', {
 },
 function(params){
     var that = this;
-    
+
     that.nodes = {};
     that.animation = null;
     that.delayInterval = null;
@@ -107,7 +108,7 @@ function(params){
         // Add position style
         that.nodes['container'].style.position = that.params['position'];
         // Add theme css class
-        !cm.isEmpty(that.params['theme']) && cm.addClass(that.nodes['container'], that.params['theme']);
+        !cm.isEmpty(that.params['theme']) && cm.addClass(that.nodes['container'], ['com__tooltip', that.params['theme']].join('--'));
         !cm.isEmpty(that.params['animate']) && cm.addClass(that.nodes['container'], ['animate', that.params['animate']].join('--'));
         !cm.isEmpty(that.params['arrow']) && cm.addClass(that.nodes['container'], ['arrow', that.params['arrow']].join('--'));
         // Add css class
@@ -177,7 +178,11 @@ function(params){
         // Hold
         if(that.params['hold']){
             var holdTarget = that.params['holdTarget'] || that.params['target'];
-            cm.appendChild(that.nodes['container'], holdTarget);
+            if(that.params['holdMethod'] === 'prepend'){
+                cm.insertFirst(that.nodes['container'], holdTarget);
+            }else{
+                cm.insertLast(that.nodes['container'], holdTarget);
+            }
         }
         // Event
         switch(that.params['targetEvent']){
@@ -287,7 +292,11 @@ function(params){
         that.nodes['container'].style.display = 'none';
         if(that.params['hold']){
             var holdTarget = that.params['holdTarget'] || that.params['target'];
-            cm.appendChild(that.nodes['container'], holdTarget);
+            if(that.params['holdMethod'] === 'prepend'){
+                cm.insertFirst(that.nodes['container'], holdTarget);
+            }else{
+                cm.insertLast(that.nodes['container'], holdTarget);
+            }
         }else{
             cm.remove(that.nodes['container']);
         }

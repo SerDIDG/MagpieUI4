@@ -37,6 +37,7 @@ cm.isFileReader = (function(){return 'FileReader' in window;})();
 cm.isHistoryAPI = !!(window.history && history.pushState);
 cm.isLocalStorage = (function(){try{return 'localStorage' in window && window.localStorage !== null;}catch(e){return false;}})();
 cm.isSessionStorage = (function(){try{return 'sessionStorage' in window && window.sessionStorage !== null;}catch(e){return false;}})();
+cm.isMobile = (function(){return /Mobi|Android/i.test(navigator.userAgent) || typeof window.orientation !== 'undefined';})();
 cm.isCanvas = !!document.createElement("canvas").getContext;
 cm.hasBeacon = !!(navigator.sendBeacon);
 cm.hasPointerEvent = !!(window.PointerEvent);
@@ -367,16 +368,6 @@ cm.getLength = function(o){
     return keys.length;
 };
 
-cm.getCount = function(o){
-    var i = 0;
-    cm.forEach(o, function(item){
-        if(!cm.isUndefined(item)){
-            i++;
-        }
-    });
-    return i;
-};
-
 cm.arrayIndex = function(a, item){
     return Array.prototype.indexOf.call(a, item);
 };
@@ -412,7 +403,6 @@ cm.arrayFilter = function(a, items){
     });
 };
 
-// TODO: check is this ever needed
 cm.arraySort = function(a, key, dir, clone){
     var newA;
     if(!cm.isArray(a)){
@@ -554,7 +544,7 @@ cm.objectSelector = function(name, obj, apply){
     return findObj;
 };
 
-cm.reducePath = cm.objectPath = function(name, obj){
+cm.reducePath = function(name, obj){
     if(cm.isUndefined(obj) || cm.isUndefined(name)){
         return obj;
     }
@@ -648,7 +638,7 @@ cm.errorLog = function(o){
             'type' : 'error',
             'name' : '',
             'message' : '',
-            'langs' : {
+            'strings' : {
                 'error' : 'Error!',
                 'success' : 'Success!',
                 'attention' : 'Attention!',
@@ -656,7 +646,7 @@ cm.errorLog = function(o){
             }
         }, o),
         data = [
-            config['langs'][config['type']],
+            config['strings'][config['type']],
             config['name'],
             config['message']
         ],
@@ -1195,12 +1185,12 @@ cm.loadScript = function(o){
         'async' : true,
         'callback' : function(){}
     }, o);
-    var path = cm.objectPath(o['path'], window);
+    var path = cm.reducePath(o['path'], window);
     if(!cm.isEmpty(path)){
         o['callback'](path);
     }else{
         cm.addScript(o['src'], o['async'], function(){
-            path = cm.objectPath(o['path'], window);
+            path = cm.reducePath(o['path'], window);
             if(!cm.isEmpty(path)){
                 o['callback'](path);
             }else{
@@ -1940,30 +1930,6 @@ cm.toNumber = function(str){
     return parseInt(str.replace(/\s+/, ''));
 };
 
-cm.is = function(str){
-    if(cm.isUndefined(Com.UA)){
-        cm.log('Error. UA.js is not exists or not loaded. Method "cm.is()" returns false.');
-        return false;
-    }
-    return Com.UA.is(str);
-};
-
-cm.isVersion = function(){
-    if(cm.isUndefined(Com.UA)){
-        cm.log('Error. UA.js is not exists or not loaded. Method "cm.isVersion()" returns null.');
-        return null;
-    }
-    return Com.UA.isVersion();
-};
-
-cm.isMobile = function(){
-    if(cm.isUndefined(Com.UA)){
-        cm.log('Error. UA.js is not exists or not loaded. Method "cm.isMobile()" returns false.');
-        return false;
-    }
-    return Com.UA.isMobile();
-};
-
 cm.decode = (function(){
     var node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
     return function(text){
@@ -2094,7 +2060,7 @@ cm.addLeadZero = function(x){
     return x < 10 ? '0' + x : x;
 };
 
-cm.plural = cm.getNumberDeclension = function(number, titles /* ['найдена', 'найдено', 'найдены'] */){
+cm.plural = function(number, titles /* ['найдена', 'найдено', 'найдены'] */){
     if(!cm.isArray(titles)){
         return titles;
     }
@@ -2327,14 +2293,17 @@ cm.getWeeksInYear = function(year){
 
 /* ******* STYLES ******* */
 
-cm.addClass = function(node, str, useHack){
-    if(!cm.isNode(node) || cm.isEmpty(str)){
-        return null;
+cm.addClass = function(node, classes, useHack){
+    if(!cm.isNode(node) || cm.isEmpty(classes)){
+        return;
     }
     if(useHack){
         useHack = node.clientHeight;
     }
-    cm.forEach(str.toString().split(/\s+/), function(item){
+    if(cm.isString(classes) || cm.isNumber(classes)){
+        classes = classes.toString().split(/\s+/);
+    }
+    cm.forEach(classes, function(item){
         if(!cm.isEmpty(item)){
             node.classList.add(item);
         }
@@ -2342,14 +2311,17 @@ cm.addClass = function(node, str, useHack){
     return node;
 };
 
-cm.removeClass = function(node, str, useHack){
-    if(!cm.isNode(node) || cm.isEmpty(str)){
-        return null;
+cm.removeClass = function(node, classes, useHack){
+    if(!cm.isNode(node) || cm.isEmpty(classes)){
+        return;
     }
     if(useHack){
         useHack = node.clientHeight;
     }
-    cm.forEach(str.toString().split(/\s+/), function(item){
+    if(cm.isString(classes) || cm.isNumber(classes)){
+        classes = classes.toString().split(/\s+/);
+    }
+    cm.forEach(classes, function(item){
         if(!cm.isEmpty(item)){
             node.classList.remove(item);
         }
@@ -2359,15 +2331,17 @@ cm.removeClass = function(node, str, useHack){
 
 cm.replaceClass = function(node, oldClass, newClass, useHack){
     if(!cm.isNode(node)){
-        return null;
+        return;
     }
-    return cm.addClass(cm.removeClass(node, oldClass, useHack), newClass, useHack);
+    cm.removeClass(node, oldClass, useHack);
+    cm.addClass(node, newClass, useHack);
+    return node;
 };
 
 cm.hasClass = cm.isClass = function(node, cssClass){
     var classes;
     if(!cm.isNode(node)){
-        return false;
+        return;
     }
     if(node.classList){
         return node.classList.contains(cssClass);
@@ -2762,14 +2736,8 @@ cm.getCurrentStyle = function(obj, name, dimension){
             return obj['offset' + Name];
 
         case 'opacity':
-            if(cm.is('ie') && cm.isVersion() < 9){
-                var reg = /alpha\(opacity=(.*)\)/;
-                var res = reg.exec(obj.style.filter || cm.getCSSStyle(obj, 'filter'));
-                return (res) ? res[1] / 100 : 1;
-            }else{
-                var val = parseFloat(obj.style.opacity || cm.getCSSStyle(obj, 'opacity'));
-                return (!isNaN(val)) ? val : 1;
-            }
+            var val = parseFloat(obj.style.opacity || cm.getCSSStyle(obj, 'opacity'));
+            return (!isNaN(val)) ? val : 1;
 
         case 'color':
         case 'backgroundColor':
@@ -3747,7 +3715,7 @@ cm.ajax = function(o){
 
     var validate = function(){
         cm.hook.trigger('ajax.beforePrepare', config);
-        config['httpRequestObject'] = cm.createXmlHttpRequestObject();
+        config['httpRequestObject'] = new XMLHttpRequest();
         config['type'] = config['type'].toLowerCase();
         config['method'] = config['method'].toUpperCase();
         if(config['formData'] === true){
@@ -4074,109 +4042,6 @@ cm.formData2Obj = function(fd){
 
 cm.formData2URI = function(fd){
     return cm.obj2URI(cm.formData2Obj(fd));
-};
-
-cm.xml2arr = function(o){
-    o = o.nodeType === 9 ? cm.firstEl(o) : o;
-    if(o.nodeType === 3 || o.nodeType === 4){
-        //Need to be change
-        var n = cm.nextEl(o);
-        if(!n){
-            return o.nodeValue;
-        }
-        o = n;
-    }
-    if(o.nodeType === 1){
-        var res = {};
-        res[o.tagName] = {};
-        var els = o.childNodes;
-        for(var i = 0, ln = els.length; i < ln; i++){
-            var childs = arguments.callee(els[i]);
-            if(typeof(childs) === 'object'){
-                for(var key in childs){
-                    if(!res[o.tagName][key]){
-                        res[o.tagName][key] = childs[key];
-                    }else if(res[o.tagName][key]){
-                        if(!res[o.tagName][key].push){
-                            res[o.tagName][key] = [res[o.tagName][key], childs[key]];
-                        }else{
-                            res[o.tagName][key].push(childs[key]);
-                        }
-                    }
-                }
-            }else{
-                res[o.tagName] = childs;
-            }
-        }
-        res[o.tagName] = ln ? res[o.tagName] : '';
-        return res;
-    }
-    return null;
-};
-
-cm.responseInArray = function(xmldoc){
-    var response = xmldoc.getElementsByTagName('response')[0];
-    var data = [];
-    var els = response.childNodes;
-    for(var i = 0; els.length > i; i++){
-        if(els[i].nodeType !== 1){
-            continue;
-        }
-        var kids = els[i].childNodes;
-        var tmp = [];
-        for(var k = 0; kids.length > k; k++){
-            if(kids[k].nodeType === 1){
-                tmp[kids[k].tagName] = kids[k].firstChild ? kids[k].firstChild.nodeValue : '';
-            }
-        }
-        data.push(tmp);
-    }
-    return data;
-};
-
-cm.createXmlHttpRequestObject = function(){
-    var xmlHttp;
-    try{
-        xmlHttp = new XMLHttpRequest();
-    }catch(e){
-        var XmlHttpVersions = [
-            "MSXML2.XMLHTTP.6.0",
-            "MSXML2.XMLHTTP.5.0",
-            "MSXML2.XMLHTTP.4.0",
-            "MSXML2.XMLHTTP.3.0",
-            "MSXML2.XMLHTTP",
-            "Microsoft.XMLHTTP"
-        ];
-        cm.forEach(XmlHttpVersions, function(item){
-            try{
-                xmlHttp = new ActiveXObject(item);
-            }catch(e){}
-        });
-    }
-    if(!xmlHttp){
-        return null;
-    }
-    return xmlHttp;
-};
-
-/* ******* HASH ******* */
-
-cm.loadHashData = function(){
-    var hash = document.location.hash.replace('#', '').split('&');
-    window.userRequest = {};
-    hash.forEach(function(item){
-        window.userRequest[item.split('=')[0]] = item.split('=')[1];
-    });
-    return true;
-};
-
-cm.reloadHashData = function(){
-    var hash = '#';
-    cm.forEach(window.userRequest, function(item, key){
-        hash += key + '=' + item;
-    });
-    document.location.hash = hash;
-    return true;
 };
 
 /* ******* GRAPHICS ******* */
