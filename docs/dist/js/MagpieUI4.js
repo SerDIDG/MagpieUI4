@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.4 ************ */
+/*! ************ MagpieUI4 v4.0.5 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.4',
+    '_version': '4.0.5',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -33241,10 +33241,10 @@ cm._strings = {
 };
 
 cm.setStrings('Com.AbstractContainer', {
-	'title' : 'Container',
-	'close' : 'Close',
-	'save' : 'Save',
-	'help' : ''
+    'title': 'Container',
+    'close': 'Close',
+    'save': 'Save',
+    'help': '',
 });
 
 cm.setStrings('Com.AbstractFileManagerContainer', {
@@ -33274,14 +33274,14 @@ cm.setStrings('Com.CalendarEvents', {
 });
 
 cm.setStrings('Com.Dialog', {
-	'closeTitle' : 'Close',
-	'close' : '',
-	'helpTitle' : 'Help',
-	'help' : ''
+    'closeTitle': 'Close',
+    'close': '',
+    'helpTitle': 'Help',
+    'help': '',
 });
 
 cm.setStrings('Com.DialogContainer', {
-	'close' : 'Close'
+    'close': 'Close',
 });
 
 cm.setStrings('Com.FileDropzone', {

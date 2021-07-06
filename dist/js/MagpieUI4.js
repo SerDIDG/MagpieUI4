@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.4 ************ */
+/*! ************ MagpieUI4 v4.0.5 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.4',
+    '_version': '4.0.5',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,

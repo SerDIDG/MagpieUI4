@@ -13,10 +13,10 @@ cm._strings = {
 };
 
 cm.setStrings('Com.AbstractContainer', {
-	'title' : 'Container',
-	'close' : 'Close',
-	'save' : 'Save',
-	'help' : ''
+    'title': 'Container',
+    'close': 'Close',
+    'save': 'Save',
+    'help': '',
 });
 
 cm.setStrings('Com.AbstractFileManagerContainer', {
@@ -46,14 +46,14 @@ cm.setStrings('Com.CalendarEvents', {
 });
 
 cm.setStrings('Com.Dialog', {
-	'closeTitle' : 'Close',
-	'close' : '',
-	'helpTitle' : 'Help',
-	'help' : ''
+    'closeTitle': 'Close',
+    'close': '',
+    'helpTitle': 'Help',
+    'help': '',
 });
 
 cm.setStrings('Com.DialogContainer', {
-	'close' : 'Close'
+    'close': 'Close',
 });
 
 cm.setStrings('Com.FileDropzone', {
