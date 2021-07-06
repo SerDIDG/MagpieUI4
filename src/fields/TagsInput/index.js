@@ -282,7 +282,7 @@ function(params){
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('tags', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.TagsInput'
 });

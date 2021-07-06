@@ -304,7 +304,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('file', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.FileInput'
 });

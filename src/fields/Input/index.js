@@ -285,7 +285,7 @@ cm.getConstructor('Com.Input', function(classConstructor, className, classProto,
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('input', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -296,7 +296,7 @@ Com.FormFields.add('input', {
 });
 
 Com.FormFields.add('textarea', {
-    'node' : cm.node('textarea'),
+    'node' : cm.node('textarea', {'class' : 'input textarea'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -307,7 +307,7 @@ Com.FormFields.add('textarea', {
 });
 
 Com.FormFields.add('password', {
-    'node' : cm.node('input', {'type' : 'password'}),
+    'node' : cm.node('input', {'type' : 'password', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -318,7 +318,7 @@ Com.FormFields.add('password', {
 });
 
 Com.FormFields.add('email', {
-    'node' : cm.node('input', {'type' : 'email'}),
+    'node' : cm.node('input', {'type' : 'email', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -329,7 +329,7 @@ Com.FormFields.add('email', {
 });
 
 Com.FormFields.add('phone', {
-    'node' : cm.node('input', {'type' : 'phone'}),
+    'node' : cm.node('input', {'type' : 'phone', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -340,7 +340,7 @@ Com.FormFields.add('phone', {
 });
 
 Com.FormFields.add('number', {
-    'node' : cm.node('input', {'type' : 'number'}),
+    'node' : cm.node('input', {'type' : 'number', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',

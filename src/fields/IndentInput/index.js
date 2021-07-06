@@ -92,7 +92,7 @@ cm.getConstructor('Com.IndentInput', function(classConstructor, className, class
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('indent', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.IndentInput'
 });

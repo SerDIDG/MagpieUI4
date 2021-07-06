@@ -28,7 +28,7 @@ cm.getConstructor('Com.TintRange', function(classConstructor, className, classPr
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('tint-range', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.TintRange'
 });

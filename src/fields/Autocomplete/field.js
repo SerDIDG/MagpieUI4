@@ -114,7 +114,7 @@ cm.getConstructor('Com.AutocompleteField', function(classConstructor, className,
 });
 
 Com.FormFields.add('autocomplete-field', {
-    'node' : cm.node('select'),
+    'node' : cm.node('select', {'class' : 'input select'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.AutocompleteField'
 });

@@ -98,7 +98,7 @@ cm.getConstructor('Com.IntegerInput', function(classConstructor, className, clas
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('integer', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.IntegerInput'
 });

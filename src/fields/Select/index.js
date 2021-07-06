@@ -764,7 +764,7 @@ function(params){
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('select', {
-    'node' : cm.node('select'),
+    'node' : cm.node('select', {'class' : 'input select'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.Select'
 });

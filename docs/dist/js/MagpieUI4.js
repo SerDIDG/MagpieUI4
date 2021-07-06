@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.5 ************ */
+/*! ************ MagpieUI4 v4.0.6 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.5',
+    '_version': '4.0.6',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -16257,63 +16257,63 @@ function(params){
 });
 
 Com.FormFields.add('empty', {
-	'field' : false,
-	'fieldConstructor' : 'Com.AbstractFormField'
+    'field': false,
+    'fieldConstructor': 'Com.AbstractFormField',
 });
 
 Com.FormFields.add('buttons', {
-	'node' : cm.node('div', {'class' : 'pt__buttons pull-right'}),
-	'field' : false,
-	'system' : true,
-	'callbacks' : {
-		'render' : function(that){
-			var nodes = {};
-			nodes['container'] = that.params['node'];
-			nodes['inner'] = cm.node('div', {'class' : 'inner'});
-			cm.appendChild(nodes['inner'], nodes['container']);
-			return nodes;
-		},
-		'controller' : function(that){
-			var buttons = {},
-				node;
-			cm.forEach(that.params['options'], function(item){
-				node = cm.node('button', {'class' : 'button'}, item['text']);
-				switch(item['value']){
-					case 'submit':
-						node.type = 'submit';
-						cm.addClass(node, 'button-primary');
-						cm.addEvent(node, 'click', function(e){
-							cm.preventDefault(e);
-							that.form.send();
-						});
-						break;
+    'node': cm.node('div', {'class': 'pt__buttons pull-right'}),
+    'field': false,
+    'system': true,
+    'callbacks': {
+        'render': function(that) {
+            var nodes = {};
+            nodes['container'] = that.params['node'];
+            nodes['inner'] = cm.node('div', {'class': 'inner'});
+            cm.appendChild(nodes['inner'], nodes['container']);
+            return nodes;
+        },
+        'controller': function(that) {
+            var buttons = {},
+                node;
+            cm.forEach(that.params['options'], function(item) {
+                node = cm.node('button', {'class': 'button'}, item['text']);
+                switch (item['value']) {
+                    case 'submit':
+                        node.type = 'submit';
+                        cm.addClass(node, 'button-primary');
+                        cm.addEvent(node, 'click', function(e) {
+                            cm.preventDefault(e);
+                            that.form.send();
+                        });
+                        break;
 
-					case 'reset':
-						node.type = 'reset';
-						cm.addClass(node, 'button-secondary');
-						cm.addEvent(node, 'click', function(e){
-							cm.preventDefault(e);
-							that.form.reset();
-						});
-						break;
+                    case 'reset':
+                        node.type = 'reset';
+                        cm.addClass(node, 'button-secondary');
+                        cm.addEvent(node, 'click', function(e) {
+                            cm.preventDefault(e);
+                            that.form.reset();
+                        });
+                        break;
 
-					case 'clear':
-						cm.addClass(node, 'button-secondary');
-						cm.addEvent(node, 'click', function(e){
-							cm.preventDefault(e);
-							that.form.clear();
-						});
-						break;
+                    case 'clear':
+                        cm.addClass(node, 'button-secondary');
+                        cm.addEvent(node, 'click', function(e) {
+                            cm.preventDefault(e);
+                            that.form.clear();
+                        });
+                        break;
 
-					default:
-						break;
-				}
-				buttons[item['value']] = node;
-				that.params['node'].appendChild(node);
-			});
-			return buttons;
-		}
-	}
+                    default:
+                        break;
+                }
+                buttons[item['value']] = node;
+                that.params['node'].appendChild(node);
+            });
+            return buttons;
+        },
+    },
 });
 
 cm.define('Com.Form', {
@@ -26589,7 +26589,7 @@ cm.getConstructor('Com.AutocompleteField', function(classConstructor, className,
 });
 
 Com.FormFields.add('autocomplete-field', {
-    'node' : cm.node('select'),
+    'node' : cm.node('select', {'class' : 'input select'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.AutocompleteField'
 });
@@ -29103,7 +29103,7 @@ function(params){
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('date-picker', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.DatePicker'
 });
@@ -29414,7 +29414,7 @@ function(params){
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('date-select', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.DateSelect'
 });
@@ -29725,7 +29725,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('file', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.FileInput'
 });
@@ -30189,7 +30189,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('image', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.ImageInput'
 });
@@ -30288,7 +30288,7 @@ cm.getConstructor('Com.IndentInput', function(classConstructor, className, class
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('indent', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.IndentInput'
 });
@@ -30580,7 +30580,7 @@ cm.getConstructor('Com.Input', function(classConstructor, className, classProto,
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('input', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -30591,7 +30591,7 @@ Com.FormFields.add('input', {
 });
 
 Com.FormFields.add('textarea', {
-    'node' : cm.node('textarea'),
+    'node' : cm.node('textarea', {'class' : 'input textarea'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -30602,7 +30602,7 @@ Com.FormFields.add('textarea', {
 });
 
 Com.FormFields.add('password', {
-    'node' : cm.node('input', {'type' : 'password'}),
+    'node' : cm.node('input', {'type' : 'password', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -30613,7 +30613,7 @@ Com.FormFields.add('password', {
 });
 
 Com.FormFields.add('email', {
-    'node' : cm.node('input', {'type' : 'email'}),
+    'node' : cm.node('input', {'type' : 'email', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -30624,7 +30624,7 @@ Com.FormFields.add('email', {
 });
 
 Com.FormFields.add('phone', {
-    'node' : cm.node('input', {'type' : 'phone'}),
+    'node' : cm.node('input', {'type' : 'phone', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -30635,7 +30635,7 @@ Com.FormFields.add('phone', {
 });
 
 Com.FormFields.add('number', {
-    'node' : cm.node('input', {'type' : 'number'}),
+    'node' : cm.node('input', {'type' : 'number', 'class' : 'input'}),
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -30834,7 +30834,7 @@ cm.getConstructor('Com.IntegerInput', function(classConstructor, className, clas
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('integer', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.IntegerInput'
 });
@@ -30892,10 +30892,11 @@ cm.getConstructor('Com.OpacityRange', function(classConstructor, className, clas
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('opacity-range', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.OpacityRange'
 });
+
 cm.define('Com.PositionTools', {
     'extend' : 'Com.AbstractInput',
     'params' : {
@@ -31088,10 +31089,11 @@ cm.getConstructor('Com.Range', function(classConstructor, className, classProto,
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('range', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.Range'
 });
+
 cm.define('Com.RepeatTools', {
     'extend' : 'Com.AbstractInput',
     'params' : {
@@ -32056,7 +32058,7 @@ function(params){
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('select', {
-    'node' : cm.node('select'),
+    'node' : cm.node('select', {'class' : 'input select'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.Select'
 });
@@ -32517,7 +32519,7 @@ function(params){
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('tags', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.TagsInput'
 });
@@ -32813,10 +32815,11 @@ cm.getConstructor('Com.TintRange', function(classConstructor, className, classPr
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('tint-range', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.TintRange'
 });
+
 cm.define('Com.TwoSideMultiSelect', {
     'extend' : 'Com.AbstractInput',
     'params' : {

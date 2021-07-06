@@ -85,7 +85,7 @@ cm.getConstructor('Com.Range', function(classConstructor, className, classProto,
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('range', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.Range'
 });

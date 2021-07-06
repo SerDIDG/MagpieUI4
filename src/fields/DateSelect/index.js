@@ -304,7 +304,7 @@ function(params){
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('date-select', {
-    'node' : cm.node('input', {'type' : 'text'}),
+    'node' : cm.node('input', {'type' : 'text', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.DateSelect'
 });
