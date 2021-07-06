@@ -34,11 +34,9 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
         that.dragDropHandler = that.dragDrop.bind(that);
         that.showDropzoneHandler = that.showDropzone.bind(that);
         that.hideDropzoneHandler = that.hideDropzone.bind(that);
-        that.onGetLESSVariablesProcessHandler = that.onGetLESSVariablesProcess.bind(that);
         that.setEventsProcessHander = that.setEventsProcess.bind(that);
         that.unsetEventsProcessHander = that.unsetEventsProcess.bind(that);
         // Add events
-        that.addEvent('onGetLESSVariablesProcess', that.onGetLESSVariablesProcessHandler);
         that.addEvent('onSetEventsProcess', that.setEventsProcessHander);
         that.addEvent('onUnsetEventsProcess', that.unsetEventsProcessHander);
         // Call parent method
@@ -46,21 +44,21 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
     };
 
     classProto.validateParams = function(){
-        var that = this;
+        var that = this,
+            height,
+            duration;
+        if(!that.params['height']){
+            height = cm.getCSSVariable('--com-filedropzone--height');
+            that.params['height'] = !cm.isEmpty(height) ? parseFloat(height) : that.params['_height'];
+        }
+        if(!that.params['duration']){
+            duration = cm.getCSSVariable('--com-filedropzone--duration');
+            that.params['duration'] = !cm.isEmpty(duration) ? cm.parseTransitionDuration(duration) : that.params['_duration'];
+        }
         // Validate Language Strings
         that.setLangs({
             'drop' : !that.params['max'] || that.params['max'] > 1 ? that.lang('drop_multiple') : that.lang('drop_single')
         });
-    };
-
-    classProto.onGetLESSVariablesProcess = function(){
-        var that = this;
-        if(!that.params['height']){
-            that.params['height'] = cm.getLESSVariable('ComFileDropzone-Height', that.params['_height'], true);
-        }
-        if(!that.params['duration']){
-            that.params['duration'] = cm.getTransitionDurationFromLESS('ComFileDropzone-Duration', that.params['_duration']);
-        }
     };
 
     classProto.setEventsProcess = function(){

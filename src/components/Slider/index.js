@@ -88,7 +88,6 @@ function(params){
         that.destructHandler = that.destruct.bind(that);
         that.enableEditingHandler = that.enableEditing.bind(that);
         that.disableEditingHandler = that.disableEditing.bind(that);
-        getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         that.getDataNodes(that.params['node']);
@@ -103,11 +102,11 @@ function(params){
         that.triggerEvent('onRender');
     };
 
-    var getLESSVariables = function(){
-        that.params['time'] = cm.getTransitionDurationFromLESS('ComSlider-Duration', that.params['time']);
-    };
-
     var validateParams = function(){
+        var duration = cm.getCSSVariable('--com-slider--duration');
+        if(!cm.isEmpty(duration)){
+            that.params['time'] = cm.parseTransitionDuration(duration);
+        }
         if(cm.isNode(that.params['node'])){
             that.params['name'] = that.params['node'].getAttribute('name') || that.params['name'];
         }

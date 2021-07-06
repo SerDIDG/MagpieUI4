@@ -46,7 +46,6 @@ function(params){
     that.delayInterval = null;
 
     var init = function(){
-        getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         validateParams();
@@ -56,11 +55,11 @@ function(params){
         that.params['autoOpen'] && that.open();
     };
 
-    var getLESSVariables = function(){
-        that.params['duration'] = cm.getTransitionDurationFromLESS('PtOverlay-Duration', that.params['duration']);
-    };
-
     var validateParams = function(){
+        var duration = cm.getCSSVariable('--pt-overlay--duration');
+        if(!cm.isEmpty(duration)){
+            that.params['duration'] = cm.parseTransitionDuration(duration);
+        }
         that.params['position'] = cm.inArray(['static', 'relative', 'absolute', 'fixed'], that.params['position']) ? that.params['position'] : 'fixed';
     };
 

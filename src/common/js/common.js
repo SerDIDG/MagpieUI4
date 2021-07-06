@@ -3025,23 +3025,6 @@ cm.getSupportedStyle = (function(){
     }
 })();
 
-cm.getTransitionDurationFromRule = function(rule){
-    var openDurationRule = cm.getCSSRule(rule)[0],
-        openDurationProperty;
-    if(
-        openDurationRule
-        && (openDurationProperty = openDurationRule.style[cm.getSupportedStyle('transitionDuration')])
-    ){
-        return cm.parseTransitionDuration(openDurationProperty);
-    }
-    return 0;
-};
-
-cm.getTransitionDurationFromLESS = function(name, defaults){
-    var variable = cm.getLESSVariable(name, defaults, false);
-    return cm.parseTransitionDuration(variable);
-};
-
 cm.parseTransitionDuration = function(value){
     if(!cm.isEmpty(value)){
         value = value.toString();
@@ -3054,12 +3037,6 @@ cm.parseTransitionDuration = function(value){
         }
     }
     return 0;
-};
-
-cm.getLESSVariable = function(name, defaults, parse){
-    name = name.replace(/^@/, '');
-    var variable = window.LESS && window.LESS[name] ? window.LESS[name] : defaults;
-    return parse ? cm.styleToNumber(variable) : variable;
 };
 
 cm.createStyleSheet = function(){
@@ -3228,6 +3205,15 @@ cm.setCSSVariable = function(key, value, node){
         node.style.setProperty(key, value);
     }
     return node;
+};
+
+cm.getCSSVariable = function(key, node){
+    var styleObject;
+    node = !cm.isUndefined(node) ? node : document.documentElement;
+    if(cm.isNode(node)){
+        styleObject = cm.getStyleObject(node);
+        return styleObject.getPropertyValue(key);
+    }
 };
 
 /* ******* VALIDATORS ******* */

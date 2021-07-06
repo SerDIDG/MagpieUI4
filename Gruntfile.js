@@ -188,20 +188,6 @@ module.exports = function(grunt) {
                 ],
                 dest : '<%= paths.docs %>/dist/less/<%= pkg.name %>.less'
             },
-            variables: {
-                src: [
-                    '<%= paths.src %>/**/variables/*.less',
-                    '<%= paths.src %>/**/variables.less'
-                ],
-                dest: '<%= paths.dist %>/less/<%= pkg.name %>.variables.less'
-            },
-            variables_docs : {
-                src : [
-                    '<%= paths.dist %>/less/<%= pkg.name %>.variables.less',
-                    '<%= paths.docs %>/src/less/variables/*.less'
-                ],
-                dest : '<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'
-            },
             codemirror : {
                 src : [
                     '<%= components.codemirror.scripts %>'
@@ -223,23 +209,6 @@ module.exports = function(grunt) {
                     src: ['<%= paths.src %>/common/img/svg/*.svg'],
                     dest : '<%= paths.src %>/common/less/svg.less'
                 }]
-            }
-        },
-
-        lessvars: {
-            options: {
-                units : true,
-                format : function(vars){
-                    return 'window.LESS = ' + JSON.stringify(vars) + ';';
-                }
-            },
-            build : {
-                src : ['<%= paths.dist %>/less/<%= pkg.name %>.variables.less'],
-                dest : '<%= paths.dist %>/js/<%= pkg.name %>.variables.js'
-            },
-            docs : {
-                src : ['<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'],
-                dest : '<%= paths.docs %>/dist/js/<%= pkg.name %>.variables.js'
             }
         },
 
@@ -279,14 +248,6 @@ module.exports = function(grunt) {
             styles_docs: {
                 src: ['<%= paths.docs %>/dist/less/<%= pkg.name %>.less'],
                 dest: '<%= paths.docs %>/dist/less/<%= pkg.name %>.less'
-            },
-            variables: {
-                src: ['<%= paths.dist %>/less/<%= pkg.name %>.variables.less'],
-                dest: '<%= paths.dist %>/less/<%= pkg.name %>.variables.less'
-            },
-            variables_docs: {
-                src: ['<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'],
-                dest: '<%= paths.docs %>/dist/less/<%= pkg.name %>.variables.less'
             }
         },
 
@@ -500,10 +461,9 @@ module.exports = function(grunt) {
 
     grunt.registerTask('scripts', ['concat:scripts', 'concat:scripts_strings', 'replace:scripts', 'concat:scripts_docs']);
     grunt.registerTask('images', ['clean:images', 'svgcss', 'copy:images', 'copy:images_docs', 'copy:images_docs_self']);
-    grunt.registerTask('styles', ['variables', 'concat:styles', 'replace:styles', 'concat:styles_docs', 'less:build', 'less:docs']);
+    grunt.registerTask('styles', ['concat:styles', 'replace:styles', 'concat:styles_docs', 'less:build', 'less:docs']);
     grunt.registerTask('fonts', ['copy:fonts', 'copy:fonts_docs', 'copy:fonts_docs_self']);
     grunt.registerTask('stuff', ['copy:stuff_docs']);
     grunt.registerTask('libs', ['concat:codemirror', 'uglify:codemirror', 'copy:libs', 'copy:libs_docs']);
-    grunt.registerTask('variables', ['concat:variables', 'replace:variables', 'concat:variables_docs', 'lessvars']);
-    grunt.registerTask('pre', ['svgcss', 'variables']);
+    grunt.registerTask('pre', ['svgcss']);
 };

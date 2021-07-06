@@ -63,7 +63,7 @@ function(params){
     var init = function(){
         var areasNodes;
 
-        getLESSVariables();
+        validateParams();
         that.setParams(params);
         that.convertEvents(that.params['events']);
 
@@ -93,9 +93,15 @@ function(params){
         }
     };
 
-    var getLESSVariables = function(){
-        that.params['dropDuration'] = cm.getTransitionDurationFromLESS('PtDnD-DropDuration', that.params['dropDuration']);
-        that.params['moveDuration'] = cm.getTransitionDurationFromLESS('PtDnD-MoveDuration', that.params['moveDuration']);
+    var validateParams = function(){
+        var dropDuration = cm.getCSSVariable('--pt-dnd--drop-duration'),
+            moveDuration = cm.getCSSVariable('--pt-dnd--move-duration');
+        if(!cm.isEmpty(dropDuration)){
+            that.params['dropDuration'] = cm.parseTransitionDuration(dropDuration);
+        }
+        if(!cm.isEmpty(moveDuration)){
+            that.params['moveDuration'] = cm.parseTransitionDuration(moveDuration);
+        }
     };
 
     var initArea = function(node, params){

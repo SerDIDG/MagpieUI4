@@ -78,10 +78,16 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         that.windowClickHandler = that.windowClick.bind(that);
     };
 
-    classProto.onGetLESSVariablesProcess = function(){
-        var that = this;
-        that.params['animateDuration'] = cm.getTransitionDurationFromLESS('ComTabset-Duration', that.params['animateDuration']);
-        that.params['tabsWidth'] = cm.getLESSVariable('ComTabset-Column-Width', that.params['tabsWidth'], true);
+    classProto.onValidateParams = function(){
+        var that = this,
+            duration = cm.getCSSVariable('--com-tabset--duration'),
+            tabsWidth = cm.getCSSVariable('--com-tabset--column-width');
+        if(!cm.isEmpty(duration)){
+            that.params['animateDuration'] = cm.parseTransitionDuration(duration);
+        }
+        if(!cm.isEmpty(tabsWidth)){
+            that.params['tabsWidth'] = parseFloat(tabsWidth);
+        }
     };
 
     classProto.onSetEvents = function(){

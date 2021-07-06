@@ -104,16 +104,17 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
         that.params['autoSend'] && that.set(that.params['startPage']);
     };
 
-    classProto.getLESSVariables = function(){
-        var that = this;
-        that.params['animateDuration'] = cm.getTransitionDurationFromLESS('ComPagination-Duration', that.params['animateDuration']);
-    };
-
     classProto.validateParams = function(){
-        var that = this;
+        var that = this,
+            animateDuration;
         that.triggerEvent('onValidateParamsStart');
         that.triggerEvent('onValidateParams');
         that.triggerEvent('onValidateParamsProcess');
+        // CSS variables
+        animateDuration = cm.getCSSVariable('--com-pagination--duration');
+        if(!cm.isEmpty(animateDuration)){
+            that.params['animateDuration'] = cm.parseTransitionDuration(animateDuration);
+        }
         // If URL parameter exists, use ajax data
         if(!cm.isEmpty(that.params['request']['url'])){
             that.isRequest = true;

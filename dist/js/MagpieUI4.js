@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.2 ************ */
+/*! ************ MagpieUI4 v4.0.3 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.2',
+    '_version': '4.0.3',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -4684,23 +4684,6 @@ cm.getSupportedStyle = (function(){
     }
 })();
 
-cm.getTransitionDurationFromRule = function(rule){
-    var openDurationRule = cm.getCSSRule(rule)[0],
-        openDurationProperty;
-    if(
-        openDurationRule
-        && (openDurationProperty = openDurationRule.style[cm.getSupportedStyle('transitionDuration')])
-    ){
-        return cm.parseTransitionDuration(openDurationProperty);
-    }
-    return 0;
-};
-
-cm.getTransitionDurationFromLESS = function(name, defaults){
-    var variable = cm.getLESSVariable(name, defaults, false);
-    return cm.parseTransitionDuration(variable);
-};
-
 cm.parseTransitionDuration = function(value){
     if(!cm.isEmpty(value)){
         value = value.toString();
@@ -4713,12 +4696,6 @@ cm.parseTransitionDuration = function(value){
         }
     }
     return 0;
-};
-
-cm.getLESSVariable = function(name, defaults, parse){
-    name = name.replace(/^@/, '');
-    var variable = window.LESS && window.LESS[name] ? window.LESS[name] : defaults;
-    return parse ? cm.styleToNumber(variable) : variable;
 };
 
 cm.createStyleSheet = function(){
@@ -4887,6 +4864,15 @@ cm.setCSSVariable = function(key, value, node){
         node.style.setProperty(key, value);
     }
     return node;
+};
+
+cm.getCSSVariable = function(key, node){
+    var styleObject;
+    node = !cm.isUndefined(node) ? node : document.documentElement;
+    if(cm.isNode(node)){
+        styleObject = cm.getStyleObject(node);
+        return styleObject.getPropertyValue(key);
+    }
 };
 
 /* ******* VALIDATORS ******* */
@@ -7121,10 +7107,6 @@ cm.define('Com.AbstractController', {
         'onConstructEnd',
         'onInitComponentsStart',
         'onInitComponentsEnd',
-        'onGetLESSVariables',
-        'onGetLESSVariablesStart',
-        'onGetLESSVariablesProcess',
-        'onGetLESSVariablesEnd',
         'onValidateParams',
         'onValidateParamsStart',
         'onValidateParamsProcess',
@@ -7200,7 +7182,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         that.triggerEvent('onConstructStart');
         that.renderComponent();
         that.initComponents();
-        that.getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         that.params['getDataNodes'] && that.getDataNodes(that.params['node']);
@@ -7292,15 +7273,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         var that = this;
         that.triggerEvent('onInitComponentsStart');
         that.triggerEvent('onInitComponentsEnd');
-        return that;
-    };
-
-    classProto.getLESSVariables = function(){
-        var that = this;
-        that.triggerEvent('onGetLESSVariablesStart');
-        that.triggerEvent('onGetLESSVariables');
-        that.triggerEvent('onGetLESSVariablesProcess');
-        that.triggerEvent('onGetLESSVariablesEnd');
         return that;
     };
 
@@ -7419,6 +7391,7 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         return that;
     };
 });
+
 cm.define('Com.AbstractContainer', {
     'extend' : 'Com.AbstractController',
     'events' : [
@@ -11246,16 +11219,17 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
         that.params['autoSend'] && that.set(that.params['startPage']);
     };
 
-    classProto.getLESSVariables = function(){
-        var that = this;
-        that.params['animateDuration'] = cm.getTransitionDurationFromLESS('ComPagination-Duration', that.params['animateDuration']);
-    };
-
     classProto.validateParams = function(){
-        var that = this;
+        var that = this,
+            animateDuration;
         that.triggerEvent('onValidateParamsStart');
         that.triggerEvent('onValidateParams');
         that.triggerEvent('onValidateParamsProcess');
+        // CSS variables
+        animateDuration = cm.getCSSVariable('--com-pagination--duration');
+        if(!cm.isEmpty(animateDuration)){
+            that.params['animateDuration'] = cm.parseTransitionDuration(animateDuration);
+        }
         // If URL parameter exists, use ajax data
         if(!cm.isEmpty(that.params['request']['url'])){
             that.isRequest = true;
@@ -13792,7 +13766,6 @@ function(params){
     };
 
     var init = function(){
-        getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         that.getDataConfig(that.params['content']);
@@ -13806,11 +13779,11 @@ function(params){
         that.params['autoOpen'] && open();
     };
 
-    var getLESSVariables = function(){
-        that.params['duration'] = cm.getTransitionDurationFromLESS('ComDialog-Duration', that.params['duration']);
-    };
-
     var validateParams = function(){
+        var duration = cm.getCSSVariable('--com-dialog--duration');
+        if(!cm.isEmpty(duration)){
+            that.params['duration'] = cm.parseTransitionDuration(duration);
+        }
         if(that.params['openTime'] !== undefined && that.params['openTime'] !== null){
             that.params['duration'] = that.params['openTime'];
         }
@@ -14375,7 +14348,7 @@ function(params){
     var init = function(){
         var areasNodes;
 
-        getLESSVariables();
+        validateParams();
         that.setParams(params);
         that.convertEvents(that.params['events']);
 
@@ -14405,9 +14378,15 @@ function(params){
         }
     };
 
-    var getLESSVariables = function(){
-        that.params['dropDuration'] = cm.getTransitionDurationFromLESS('PtDnD-DropDuration', that.params['dropDuration']);
-        that.params['moveDuration'] = cm.getTransitionDurationFromLESS('PtDnD-MoveDuration', that.params['moveDuration']);
+    var validateParams = function(){
+        var dropDuration = cm.getCSSVariable('--pt-dnd--drop-duration'),
+            moveDuration = cm.getCSSVariable('--pt-dnd--move-duration');
+        if(!cm.isEmpty(dropDuration)){
+            that.params['dropDuration'] = cm.parseTransitionDuration(dropDuration);
+        }
+        if(!cm.isEmpty(moveDuration)){
+            that.params['moveDuration'] = cm.parseTransitionDuration(moveDuration);
+        }
     };
 
     var initArea = function(node, params){
@@ -15640,11 +15619,9 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
         that.dragDropHandler = that.dragDrop.bind(that);
         that.showDropzoneHandler = that.showDropzone.bind(that);
         that.hideDropzoneHandler = that.hideDropzone.bind(that);
-        that.onGetLESSVariablesProcessHandler = that.onGetLESSVariablesProcess.bind(that);
         that.setEventsProcessHander = that.setEventsProcess.bind(that);
         that.unsetEventsProcessHander = that.unsetEventsProcess.bind(that);
         // Add events
-        that.addEvent('onGetLESSVariablesProcess', that.onGetLESSVariablesProcessHandler);
         that.addEvent('onSetEventsProcess', that.setEventsProcessHander);
         that.addEvent('onUnsetEventsProcess', that.unsetEventsProcessHander);
         // Call parent method
@@ -15652,21 +15629,21 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
     };
 
     classProto.validateParams = function(){
-        var that = this;
+        var that = this,
+            height,
+            duration;
+        if(!that.params['height']){
+            height = cm.getCSSVariable('--com-filedropzone--height');
+            that.params['height'] = !cm.isEmpty(height) ? parseFloat(height) : that.params['_height'];
+        }
+        if(!that.params['duration']){
+            duration = cm.getCSSVariable('--com-filedropzone--duration');
+            that.params['duration'] = !cm.isEmpty(duration) ? cm.parseTransitionDuration(duration) : that.params['_duration'];
+        }
         // Validate Language Strings
         that.setLangs({
             'drop' : !that.params['max'] || that.params['max'] > 1 ? that.lang('drop_multiple') : that.lang('drop_single')
         });
-    };
-
-    classProto.onGetLESSVariablesProcess = function(){
-        var that = this;
-        if(!that.params['height']){
-            that.params['height'] = cm.getLESSVariable('ComFileDropzone-Height', that.params['_height'], true);
-        }
-        if(!that.params['duration']){
-            that.params['duration'] = cm.getTransitionDurationFromLESS('ComFileDropzone-Duration', that.params['_duration']);
-        }
     };
 
     classProto.setEventsProcess = function(){
@@ -21307,7 +21284,6 @@ function(params){
     that.delayInterval = null;
 
     var init = function(){
-        getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         validateParams();
@@ -21317,11 +21293,11 @@ function(params){
         that.params['autoOpen'] && that.open();
     };
 
-    var getLESSVariables = function(){
-        that.params['duration'] = cm.getTransitionDurationFromLESS('PtOverlay-Duration', that.params['duration']);
-    };
-
     var validateParams = function(){
+        var duration = cm.getCSSVariable('--pt-overlay--duration');
+        if(!cm.isEmpty(duration)){
+            that.params['duration'] = cm.parseTransitionDuration(duration);
+        }
         that.params['position'] = cm.inArray(['static', 'relative', 'absolute', 'fixed'], that.params['position']) ? that.params['position'] : 'fixed';
     };
 
@@ -23294,7 +23270,6 @@ function(params){
         that.destructHandler = that.destruct.bind(that);
         that.enableEditingHandler = that.enableEditing.bind(that);
         that.disableEditingHandler = that.disableEditing.bind(that);
-        getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         that.getDataNodes(that.params['node']);
@@ -23309,11 +23284,11 @@ function(params){
         that.triggerEvent('onRender');
     };
 
-    var getLESSVariables = function(){
-        that.params['time'] = cm.getTransitionDurationFromLESS('ComSlider-Duration', that.params['time']);
-    };
-
     var validateParams = function(){
+        var duration = cm.getCSSVariable('--com-slider--duration');
+        if(!cm.isEmpty(duration)){
+            that.params['time'] = cm.parseTransitionDuration(duration);
+        }
         if(cm.isNode(that.params['node'])){
             that.params['name'] = that.params['node'].getAttribute('name') || that.params['name'];
         }
@@ -25125,10 +25100,16 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         that.windowClickHandler = that.windowClick.bind(that);
     };
 
-    classProto.onGetLESSVariablesProcess = function(){
-        var that = this;
-        that.params['animateDuration'] = cm.getTransitionDurationFromLESS('ComTabset-Duration', that.params['animateDuration']);
-        that.params['tabsWidth'] = cm.getLESSVariable('ComTabset-Column-Width', that.params['tabsWidth'], true);
+    classProto.onValidateParams = function(){
+        var that = this,
+            duration = cm.getCSSVariable('--com-tabset--duration'),
+            tabsWidth = cm.getCSSVariable('--com-tabset--column-width');
+        if(!cm.isEmpty(duration)){
+            that.params['animateDuration'] = cm.parseTransitionDuration(duration);
+        }
+        if(!cm.isEmpty(tabsWidth)){
+            that.params['tabsWidth'] = parseFloat(tabsWidth);
+        }
     };
 
     classProto.onSetEvents = function(){

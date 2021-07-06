@@ -95,7 +95,6 @@ function(params){
     };
 
     var init = function(){
-        getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         that.getDataConfig(that.params['content']);
@@ -109,11 +108,11 @@ function(params){
         that.params['autoOpen'] && open();
     };
 
-    var getLESSVariables = function(){
-        that.params['duration'] = cm.getTransitionDurationFromLESS('ComDialog-Duration', that.params['duration']);
-    };
-
     var validateParams = function(){
+        var duration = cm.getCSSVariable('--com-dialog--duration');
+        if(!cm.isEmpty(duration)){
+            that.params['duration'] = cm.parseTransitionDuration(duration);
+        }
         if(that.params['openTime'] !== undefined && that.params['openTime'] !== null){
             that.params['duration'] = that.params['openTime'];
         }

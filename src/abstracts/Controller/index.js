@@ -17,10 +17,6 @@ cm.define('Com.AbstractController', {
         'onConstructEnd',
         'onInitComponentsStart',
         'onInitComponentsEnd',
-        'onGetLESSVariables',
-        'onGetLESSVariablesStart',
-        'onGetLESSVariablesProcess',
-        'onGetLESSVariablesEnd',
         'onValidateParams',
         'onValidateParamsStart',
         'onValidateParamsProcess',
@@ -96,7 +92,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         that.triggerEvent('onConstructStart');
         that.renderComponent();
         that.initComponents();
-        that.getLESSVariables();
         that.setParams(params);
         that.convertEvents(that.params['events']);
         that.params['getDataNodes'] && that.getDataNodes(that.params['node']);
@@ -188,15 +183,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         var that = this;
         that.triggerEvent('onInitComponentsStart');
         that.triggerEvent('onInitComponentsEnd');
-        return that;
-    };
-
-    classProto.getLESSVariables = function(){
-        var that = this;
-        that.triggerEvent('onGetLESSVariablesStart');
-        that.triggerEvent('onGetLESSVariables');
-        that.triggerEvent('onGetLESSVariablesProcess');
-        that.triggerEvent('onGetLESSVariablesEnd');
         return that;
     };
 
