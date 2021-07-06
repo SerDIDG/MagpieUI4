@@ -779,7 +779,7 @@ function(params){
         item['nodes']['inner'].appendChild(
             item['nodes']['node'] = cm.node('div', {'class' : config['class']})
         );
-        cm.addClass(item['nodes']['node'], 'icon linked inline');
+        cm.addClass(item['nodes']['node'], 'icon linked display-inline');
     };
 
     var renderCellURL = function(config, row, item){
@@ -829,7 +829,7 @@ function(params){
             cm.node('ul',
                 item['nodes']['componentNode'] = cm.node('li', {'class' : 'com__menu', 'data-node' : 'ComMenu:{}:button'},
                     cm.node('a', {'class' : 'label'}, that.lang('actions')),
-                    cm.node('span', {'class' : 'cm-i__chevron-down xx-small inline'}),
+                    cm.node('span', {'class' : 'cm-i__chevron-down xx-small display-inline'}),
                     cm.node('div', {'class' : 'pt__menu', 'data-node' : 'ComMenu.target'},
                         item['nodes']['itemsList'] = item['nodes']['actionsList'] = cm.node('ul', {'class' : 'pt__menu-dropdown'})
                     )

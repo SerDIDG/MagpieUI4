@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.3 ************ */
+/*! ************ MagpieUI4 v4.0.4 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.3',
+    '_version': '4.0.4',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -19352,7 +19352,7 @@ function(params){
         item['nodes']['inner'].appendChild(
             item['nodes']['node'] = cm.node('div', {'class' : config['class']})
         );
-        cm.addClass(item['nodes']['node'], 'icon linked inline');
+        cm.addClass(item['nodes']['node'], 'icon linked display-inline');
     };
 
     var renderCellURL = function(config, row, item){
@@ -19402,7 +19402,7 @@ function(params){
             cm.node('ul',
                 item['nodes']['componentNode'] = cm.node('li', {'class' : 'com__menu', 'data-node' : 'ComMenu:{}:button'},
                     cm.node('a', {'class' : 'label'}, that.lang('actions')),
-                    cm.node('span', {'class' : 'cm-i__chevron-down xx-small inline'}),
+                    cm.node('span', {'class' : 'cm-i__chevron-down xx-small display-inline'}),
                     cm.node('div', {'class' : 'pt__menu', 'data-node' : 'ComMenu.target'},
                         item['nodes']['itemsList'] = item['nodes']['actionsList'] = cm.node('ul', {'class' : 'pt__menu-dropdown'})
                     )
@@ -27476,7 +27476,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
 /* ****** FORM FIELD COMPONENT ******* */
 
 Com.FormFields.add('autocomplete', {
-    'node' : cm.node('input', {'type' : 'search', 'autocomplete' : 'none'}),
+    'node' : cm.node('input', {'type' : 'search', 'autocomplete' : 'none', 'class' : 'input'}),
     'fieldConstructor' : 'Com.AbstractFormField',
     'constructor' : 'Com.Autocomplete'
 });
