@@ -3660,7 +3660,6 @@ cm.ajax = function(o){
             'url' : '',
             'variables' : {},
             'variablesMap' : {},
-            'formData'  : false,                                     // TODO: Deprecated, use paramsType: 'form-data'
             'headers' : {
                 'Content-Type' : 'application/x-www-form-urlencoded',
                 'X-Requested-With' : 'XMLHttpRequest'

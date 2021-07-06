@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.6 ************ */
+/*! ************ MagpieUI4 v4.0.7 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.6',
+    '_version': '4.0.7',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -5319,7 +5319,6 @@ cm.ajax = function(o){
             'url' : '',
             'variables' : {},
             'variablesMap' : {},
-            'formData'  : false,                                     // TODO: Deprecated, use paramsType: 'form-data'
             'headers' : {
                 'Content-Type' : 'application/x-www-form-urlencoded',
                 'X-Requested-With' : 'XMLHttpRequest'
@@ -16088,9 +16087,7 @@ cm.define('Com.FormField', {
 		'options' : [],
 		'className' : '',                   // is-box
 		'constructor' : false,
-		'constructorParams' : {
-			'formData' : true
-		},
+		'constructorParams' : {},
 		'Com.HelpBubble' : {
 			'renderStructure' : true
 		}
@@ -31314,7 +31311,6 @@ cm.define('Com.Select', {
         'onBlur'
     ],
     'params' : {
-        'select' : null,                        // Deprecated, use 'node' parameter instead.
         'node' : null,                          // Html select node to decorate.
         'container' : null,                     // Component container that is required in case content is rendered without available select.
         'name' : '',
@@ -31369,7 +31365,6 @@ function(params){
     var init = function(){
         that.destructHandler = that.destruct.bind(that);
         that.setParams(params);
-        preValidateParams();
         that.convertEvents(that.params['events']);
         that.getDataConfig(that.params['node']);
         validateParams();
@@ -31400,12 +31395,6 @@ function(params){
         that.triggerEvent('onRender', active);
     };
 
-    var preValidateParams = function(){
-        if(cm.isNode(that.params['select'])){
-            that.params['node'] = that.params['select'];
-        }
-    };
-
     var validateParams = function(){
         that.triggerEvent('onValidateParamsStart');
         if(cm.isNode(that.params['node'])){
@@ -31414,7 +31403,6 @@ function(params){
             that.params['title'] = that.params['node'].getAttribute('title') || that.params['title'];
             that.params['name'] = that.params['node'].getAttribute('name') || that.params['name'];
             that.params['disabled'] = that.params['node'].disabled || that.params['node'].readOnly || that.params['disabled'];
-            that.params['className'] = that.params['node'].className || that.params['className'];
             that.params['tabindex'] = that.params['node'].getAttribute('tabindex') || that.params['tabindex'];
             that.params['id'] = that.params['node'].id || that.params['id'];
         }
@@ -31458,19 +31446,6 @@ function(params){
         // Tabindex
         if(that.params['tabindex']){
             nodes['container'].setAttribute('tabindex', that.params['tabindex']);
-        }
-        // ID
-        if(that.params['id']){
-            nodes['container'].id = that.params['id'];
-        }
-        // Data attributes
-        if(cm.isNode(that.params['node'])){
-            cm.forEach(that.params['node'].attributes, function(item){
-                if(/^data-(?!node|element)/.test(item.name)){
-                    nodes['hidden'].setAttribute(item.name, item.value);
-                    nodes['container'].setAttribute(item.name, item.value);
-                }
-            });
         }
         // Set hidden input attributes
         if(that.params['name']){

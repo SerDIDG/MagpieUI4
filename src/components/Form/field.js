@@ -44,9 +44,7 @@ cm.define('Com.FormField', {
 		'options' : [],
 		'className' : '',                   // is-box
 		'constructor' : false,
-		'constructorParams' : {
-			'formData' : true
-		},
+		'constructorParams' : {},
 		'Com.HelpBubble' : {
 			'renderStructure' : true
 		}
