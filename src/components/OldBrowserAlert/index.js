@@ -46,7 +46,7 @@ function(params){
                     '%minimum_version%' : version
                 });
                 // Render window
-                if(!that.params['remember'] || (that.params['remember'] && !that.storageRead('isShow'))){
+                if(!that.params['remember'] || (that.params['remember'] && !that.storageGet('isShow'))){
                     render();
                 }
             }
@@ -81,7 +81,7 @@ function(params){
                 'events' : {
                     'onClose' : function(){
                         if(that.params['remember']){
-                            that.storageWrite('isShow', true);
+                            that.storageSet('isShow', true);
                         }
                     }
                 }

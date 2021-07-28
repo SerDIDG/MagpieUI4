@@ -53,8 +53,8 @@ function(params){
         that.isRightCollapsed = cm.isClass(that.params['node'], 'is-sidebar-right-collapsed');
         // Check storage
         if(that.params['remember']){
-            storageLeftCollapsed = that.storageRead('isLeftCollapsed');
-            storageRightCollapsed = that.storageRead('isRightCollapsed');
+            storageLeftCollapsed = that.storageGet('isLeftCollapsed');
+            storageRightCollapsed = that.storageGet('isRightCollapsed');
             that.isLeftCollapsed = storageLeftCollapsed !== null ? storageLeftCollapsed : that.isLeftCollapsed;
             that.isRightCollapsed = storageRightCollapsed !== null ? storageRightCollapsed : that.isRightCollapsed;
         }
@@ -104,7 +104,7 @@ function(params){
         isImmediately && cm.removeClass(that.params['node'], 'is-immediately');
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isLeftCollapsed', true);
+            that.storageSet('isLeftCollapsed', true);
         }
         that.triggerEvent('onCollapseLeft');
         return that;
@@ -119,7 +119,7 @@ function(params){
         }, 5);
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isLeftCollapsed', false);
+            that.storageSet('isLeftCollapsed', false);
         }
         that.triggerEvent('onExpandLeft');
         return that;
@@ -134,7 +134,7 @@ function(params){
         }, 5);
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isRightCollapsed', true);
+            that.storageSet('isRightCollapsed', true);
         }
         that.triggerEvent('onCollapseRight');
         return that;
@@ -147,7 +147,7 @@ function(params){
         isImmediately && cm.removeClass(that.params['node'], 'is-immediately');
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isRightCollapsed', false);
+            that.storageSet('isRightCollapsed', false);
         }
         that.triggerEvent('onExpandRight');
         return that;

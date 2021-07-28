@@ -569,20 +569,21 @@ cm.fillDataMap = function(map, data){
     return items;
 };
 
-cm.objectFillVariables = function(o, map, replaceKeys){
+cm.objectFillVariables = function(o, map, skipEmpty, replaceKeys){
     var newO = cm.isArray(o) ? [] : {},
         newKey;
     replaceKeys = !cm.isUndefined(replaceKeys) ? replaceKeys : true;
+    skipEmpty = !cm.isUndefined(skipEmpty) ? skipEmpty : false;
     cm.forEach(o, function(value, key){
         if(cm.isString(key)){
-            newKey = replaceKeys ? cm.fillVariables(key, map) : key;
+            newKey = replaceKeys ? cm.fillVariables(key, map, skipEmpty) : key;
         }else{
             newKey = key;
         }
         if(cm.isObject(value)){
-            newO[newKey] = cm.objectFillVariables(value, map, replaceKeys);
+            newO[newKey] = cm.objectFillVariables(value, map, skipEmpty, replaceKeys);
         }else if(cm.isString(value)){
-            newO[newKey] = cm.fillVariables(value, map);
+            newO[newKey] = cm.fillVariables(value, map, skipEmpty);
         }else{
             newO[newKey] = value;
         }
@@ -1271,7 +1272,10 @@ cm.node = cm.Node = function(){
         i = 0;
     if(cm.isObject(args[1])){
         cm.forEach(args[1], function(value, key){
-            if(cm.isObject(value)){
+            if(cm.isUndefined(value)){
+                return;
+            }
+            if(cm.isObject(value) && key !== 'class'){
                 value = JSON.stringify(value);
             }
             switch(key){
@@ -1279,7 +1283,7 @@ cm.node = cm.Node = function(){
                     el.style.cssText = value;
                     break;
                 case 'class':
-                    el.className = value;
+                    cm.addClass(el, value);
                     break;
                 case 'innerHTML':
                     el.innerHTML = value;
@@ -1983,14 +1987,15 @@ cm.strReplace = function(str, map){
     return str;
 };
 
-cm.fillVariables = function(value, data){
+cm.fillVariables = function(value, data, skipEmpty){
     var tests;
+    skipEmpty = !cm.isUndefined(skipEmpty) ? skipEmpty : false;
     return value.replace(/[{%](\w+)[%}]/g, function(math, p1){
         tests = [
             cm.reducePath(p1, data),
             cm.reducePath('%' + p1 + '%', data),
             cm.reducePath('{' + p1 + '}', data),
-            ''
+            skipEmpty ? math : ''
         ];
         return tests.find(function(item){
             return !cm.isUndefined(item);
@@ -3677,25 +3682,37 @@ cm.ajax = function(o){
             'handler' : false
         }, o),
         successStatuses = [200, 201, 202, 204],
-        vars = cm._getVariables(),
+        variables = cm._getVariables(),
         response,
         callbackName,
         callbackSuccessName,
+        callbackSuccessEmitted,
         callbackErrorName,
+        callbackErrorEmitted,
         scriptNode,
         returnObject;
 
     var init = function(){
-        validate();
         if(config['type'] === 'jsonp'){
-            returnObject = {
-                'abort' : abortJSONP
-            };
+            validateJSONP();
+            validate();
+            returnObject = {'abort' : abortJSONP};
             sendJSONP();
         }else{
+            validate();
             returnObject = config['httpRequestObject'];
             send();
         }
+    };
+
+    var validateJSONP = function(){
+        // Generate unique callback name
+        callbackName = ['cmAjaxJSONP', Date.now()].join('__');
+        callbackSuccessName = [callbackName, 'Success'].join('__');
+        callbackErrorName = [callbackName, 'Error'].join('__');
+        // Add variables
+        variables['%callback%'] = callbackSuccessName;
+        variables['%25callback%25'] = callbackSuccessName;
     };
 
     var validate = function(){
@@ -3708,7 +3725,7 @@ cm.ajax = function(o){
         }
         // Process variables
         if(!cm.isEmpty(config['variablesMap'])){
-            config['_originVariables'] = config['variables'];
+            config['_originVariables'] = cm.clone(config['variables']);
             config['variables'] = cm.fillDataMap(config['variablesMap'], config['variables']);
         }
         // Process params object
@@ -3725,8 +3742,8 @@ cm.ajax = function(o){
             config['uriParams'] = cm.obj2URI(config['uriParams'], config['uriConfig']);
         }
         // Process request route
-        config['url'] = cm.fillVariables(config['url'], config['variables']);
-        config['url'] = cm.strReplace(config['url'], vars);
+        config['url'] = cm.strReplace(config['url'], variables);
+        config['url'] = cm.fillVariables(config['url'], config['variables'], true);
         if(!cm.isEmpty(config['uriParams'])){
             config['url'] = [config['url'], config['uriParams']].join('?');
         }else if(!cm.isEmpty(config['params']) && !cm.inArray(['POST', 'PUT', 'PATCH'], config['method'])){
@@ -3737,8 +3754,8 @@ cm.ajax = function(o){
 
     var processParams = function(data){
         if(cm.isObject(data)){
-            data = cm.objectFillVariables(data, config['variables']);
-            data = cm.objectReplace(data, vars);
+            data = cm.objectReplace(data, variables);
+            data = cm.objectFillVariables(data, config['variables'], true);
             if(config['paramsType'] === 'json'){
                 config['headers']['Content-Type'] = 'application/json';
                 data = cm.stringifyJSON(data);
@@ -3830,29 +3847,24 @@ cm.ajax = function(o){
     };
 
     var sendJSONP = function(){
-        // Generate unique callback name
-        callbackName = ['cmAjaxJSONP', Date.now()].join('__');
-        callbackSuccessName = [callbackName, 'Success'].join('__');
-        callbackErrorName = [callbackName, 'Error'].join('__');
         // Generate events
         window[callbackSuccessName] = function(){
-            successHandler.apply(successHandler, arguments);
-            removeJSONP();
+            if(!callbackSuccessEmitted){
+                callbackSuccessEmitted = true;
+                successHandler.apply(successHandler, arguments);
+                removeJSONP();
+            }
         };
         window[callbackErrorName] = function(){
-            errorHandler.apply(errorHandler, arguments);
-            removeJSONP();
+            if(!callbackErrorEmitted){
+                callbackErrorEmitted = true;
+                errorHandler.apply(errorHandler, arguments);
+                removeJSONP();
+            }
         };
         // Prepare url and attach events
         scriptNode = cm.Node('script', {'type' : 'application/javascript'});
-        if(/%callback%|%25callback%25/.test(config['url'])){
-            config['url'] = cm.strReplace(config['url'], {
-                '%callback%' : callbackSuccessName,
-                '%25callback%25' : callbackSuccessName
-            });
-        }else{
-            cm.addEvent(scriptNode, 'load', window[callbackSuccessName]);
-        }
+        cm.addEvent(scriptNode, 'load', window[callbackSuccessName]);
         cm.addEvent(scriptNode, 'error', window[callbackErrorName]);
         // Embed
         config['onStart']();

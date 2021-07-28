@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.7 ************ */
+/*! ************ MagpieUI4 v4.0.8 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.7',
+    '_version': '4.0.8',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -2228,20 +2228,21 @@ cm.fillDataMap = function(map, data){
     return items;
 };
 
-cm.objectFillVariables = function(o, map, replaceKeys){
+cm.objectFillVariables = function(o, map, skipEmpty, replaceKeys){
     var newO = cm.isArray(o) ? [] : {},
         newKey;
     replaceKeys = !cm.isUndefined(replaceKeys) ? replaceKeys : true;
+    skipEmpty = !cm.isUndefined(skipEmpty) ? skipEmpty : false;
     cm.forEach(o, function(value, key){
         if(cm.isString(key)){
-            newKey = replaceKeys ? cm.fillVariables(key, map) : key;
+            newKey = replaceKeys ? cm.fillVariables(key, map, skipEmpty) : key;
         }else{
             newKey = key;
         }
         if(cm.isObject(value)){
-            newO[newKey] = cm.objectFillVariables(value, map, replaceKeys);
+            newO[newKey] = cm.objectFillVariables(value, map, skipEmpty, replaceKeys);
         }else if(cm.isString(value)){
-            newO[newKey] = cm.fillVariables(value, map);
+            newO[newKey] = cm.fillVariables(value, map, skipEmpty);
         }else{
             newO[newKey] = value;
         }
@@ -2930,7 +2931,10 @@ cm.node = cm.Node = function(){
         i = 0;
     if(cm.isObject(args[1])){
         cm.forEach(args[1], function(value, key){
-            if(cm.isObject(value)){
+            if(cm.isUndefined(value)){
+                return;
+            }
+            if(cm.isObject(value) && key !== 'class'){
                 value = JSON.stringify(value);
             }
             switch(key){
@@ -2938,7 +2942,7 @@ cm.node = cm.Node = function(){
                     el.style.cssText = value;
                     break;
                 case 'class':
-                    el.className = value;
+                    cm.addClass(el, value);
                     break;
                 case 'innerHTML':
                     el.innerHTML = value;
@@ -3642,14 +3646,15 @@ cm.strReplace = function(str, map){
     return str;
 };
 
-cm.fillVariables = function(value, data){
+cm.fillVariables = function(value, data, skipEmpty){
     var tests;
+    skipEmpty = !cm.isUndefined(skipEmpty) ? skipEmpty : false;
     return value.replace(/[{%](\w+)[%}]/g, function(math, p1){
         tests = [
             cm.reducePath(p1, data),
             cm.reducePath('%' + p1 + '%', data),
             cm.reducePath('{' + p1 + '}', data),
-            ''
+            skipEmpty ? math : ''
         ];
         return tests.find(function(item){
             return !cm.isUndefined(item);
@@ -5336,25 +5341,37 @@ cm.ajax = function(o){
             'handler' : false
         }, o),
         successStatuses = [200, 201, 202, 204],
-        vars = cm._getVariables(),
+        variables = cm._getVariables(),
         response,
         callbackName,
         callbackSuccessName,
+        callbackSuccessEmitted,
         callbackErrorName,
+        callbackErrorEmitted,
         scriptNode,
         returnObject;
 
     var init = function(){
-        validate();
         if(config['type'] === 'jsonp'){
-            returnObject = {
-                'abort' : abortJSONP
-            };
+            validateJSONP();
+            validate();
+            returnObject = {'abort' : abortJSONP};
             sendJSONP();
         }else{
+            validate();
             returnObject = config['httpRequestObject'];
             send();
         }
+    };
+
+    var validateJSONP = function(){
+        // Generate unique callback name
+        callbackName = ['cmAjaxJSONP', Date.now()].join('__');
+        callbackSuccessName = [callbackName, 'Success'].join('__');
+        callbackErrorName = [callbackName, 'Error'].join('__');
+        // Add variables
+        variables['%callback%'] = callbackSuccessName;
+        variables['%25callback%25'] = callbackSuccessName;
     };
 
     var validate = function(){
@@ -5367,7 +5384,7 @@ cm.ajax = function(o){
         }
         // Process variables
         if(!cm.isEmpty(config['variablesMap'])){
-            config['_originVariables'] = config['variables'];
+            config['_originVariables'] = cm.clone(config['variables']);
             config['variables'] = cm.fillDataMap(config['variablesMap'], config['variables']);
         }
         // Process params object
@@ -5384,8 +5401,8 @@ cm.ajax = function(o){
             config['uriParams'] = cm.obj2URI(config['uriParams'], config['uriConfig']);
         }
         // Process request route
-        config['url'] = cm.fillVariables(config['url'], config['variables']);
-        config['url'] = cm.strReplace(config['url'], vars);
+        config['url'] = cm.strReplace(config['url'], variables);
+        config['url'] = cm.fillVariables(config['url'], config['variables'], true);
         if(!cm.isEmpty(config['uriParams'])){
             config['url'] = [config['url'], config['uriParams']].join('?');
         }else if(!cm.isEmpty(config['params']) && !cm.inArray(['POST', 'PUT', 'PATCH'], config['method'])){
@@ -5396,8 +5413,8 @@ cm.ajax = function(o){
 
     var processParams = function(data){
         if(cm.isObject(data)){
-            data = cm.objectFillVariables(data, config['variables']);
-            data = cm.objectReplace(data, vars);
+            data = cm.objectReplace(data, variables);
+            data = cm.objectFillVariables(data, config['variables'], true);
             if(config['paramsType'] === 'json'){
                 config['headers']['Content-Type'] = 'application/json';
                 data = cm.stringifyJSON(data);
@@ -5489,29 +5506,24 @@ cm.ajax = function(o){
     };
 
     var sendJSONP = function(){
-        // Generate unique callback name
-        callbackName = ['cmAjaxJSONP', Date.now()].join('__');
-        callbackSuccessName = [callbackName, 'Success'].join('__');
-        callbackErrorName = [callbackName, 'Error'].join('__');
         // Generate events
         window[callbackSuccessName] = function(){
-            successHandler.apply(successHandler, arguments);
-            removeJSONP();
+            if(!callbackSuccessEmitted){
+                callbackSuccessEmitted = true;
+                successHandler.apply(successHandler, arguments);
+                removeJSONP();
+            }
         };
         window[callbackErrorName] = function(){
-            errorHandler.apply(errorHandler, arguments);
-            removeJSONP();
+            if(!callbackErrorEmitted){
+                callbackErrorEmitted = true;
+                errorHandler.apply(errorHandler, arguments);
+                removeJSONP();
+            }
         };
         // Prepare url and attach events
         scriptNode = cm.Node('script', {'type' : 'application/javascript'});
-        if(/%callback%|%25callback%25/.test(config['url'])){
-            config['url'] = cm.strReplace(config['url'], {
-                '%callback%' : callbackSuccessName,
-                '%25callback%25' : callbackSuccessName
-            });
-        }else{
-            cm.addEvent(scriptNode, 'load', window[callbackSuccessName]);
-        }
+        cm.addEvent(scriptNode, 'load', window[callbackSuccessName]);
         cm.addEvent(scriptNode, 'error', window[callbackErrorName]);
         // Embed
         config['onStart']();
@@ -6539,7 +6551,7 @@ Mod['Storage'] = {
             that.build['params']['name'] = '';
         }
     },
-    'storageRead' : function(key, session){
+    'storageGet' : function(key, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -6561,7 +6573,7 @@ Mod['Storage'] = {
         }
         return storage[that.params['name']][key];
     },
-    'storageReadAll' : function(session){
+    'storageGetAll' : function(session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -6583,7 +6595,7 @@ Mod['Storage'] = {
         }
         return storage[that.params['name']];
     },
-    'storageWrite' : function(key, value, session){
+    'storageSet' : function(key, value, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -6603,7 +6615,7 @@ Mod['Storage'] = {
         cm[method](that._className, JSON.stringify(storage));
         return storage[that.params['name']];
     },
-    'storageWriteAll' : function(data, session){
+    'storageSetAll' : function(data, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -6620,7 +6632,7 @@ Mod['Storage'] = {
         cm[method](that._className, JSON.stringify(storage));
         return storage[that.params['name']];
     },
-    'storageClear' : function(key, session){
+    'storageRemove' : function(key, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -8044,6 +8056,7 @@ cm.define('Com.AbstractFormField', {
         'value' : null,
         'defaultValue' : null,
         'dataValue' : null,
+        'noValue' : null,
         'isOptionValue' : false,
         'setHiddenValue' : true,
         'minLength' : 0,
@@ -8159,6 +8172,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         that.params.constructorParams.options = !cm.isEmpty(that.params.options) ? that.params.options : that.params.constructorParams.options;
         that.params.constructorParams.value = !cm.isEmpty(that.params.dataValue) ? that.params.dataValue : that.params.value;
         that.params.constructorParams.defaultValue = that.params.defaultValue;
+        that.params.constructorParams.noValue = that.params.noValue;
         that.params.constructorParams.required = that.params.required;
         that.params.constructorParams.validate = that.params.validate;
         that.params.constructorParams.disabled = that.params.disabled;
@@ -8301,7 +8315,13 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             case 'select' :
                 cm.forEach(options, function(item){
                     item.disabled = !cm.isUndefined(item.disabled) ? item.disabled : false;
-                    option = cm.node('option', {'value' : item.value, 'disabled' : item.disabled, 'innerHTML' : item.text});
+                    item.hidden = !cm.isUndefined(item.hidden) ? item.hidden : false;
+                    option = cm.node('option', {
+                        'value' : item.value,
+                        'disabled' : item.disabled,
+                        'hidden' : item.hidden,
+                        'innerHTML' : item.text
+                    });
                     cm.appendChild(option, that.nodes.content.input);
                 });
                 cm.setSelect(that.nodes.content.input, that.params.value);
@@ -10465,7 +10485,7 @@ cm.define('Com.ScrollPagination', {
         'scrollIndent' : 'Math.max(%scrollHeight% / 2, 600)',       // Variables: %blockHeight%.
         'disabled' : false,
         'data' : [],                                                // Static data
-        'count' : 0,
+        'count' : null,
         'perPage' : 0,                                              // 0 - render all data in one page
         'startPage' : 1,                                            // Start page
         'startPageToken' : '',
@@ -10532,7 +10552,8 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
         that.currentPage = null;
         that.previousPage = null;
         that.nextPage = null;
-        that.pageCount = 0;
+        that.itemCount = null;
+        that.pageCount = null;
         // Binds
         that.keyDownEventHandler = that.keyDownEvent.bind(that);
         that.setHandler = that.set.bind(that);
@@ -10561,11 +10582,8 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
         }else{
             that.params['showLoader'] = false;
         }
-        if(that.params['pageCount'] === 0 && that.params['perPage'] && that.params['count']){
-            that.pageCount = Math.ceil(that.params['count'] / that.params['perPage']);
-        }else{
-            that.pageCount = that.params['pageCount'];
-        }
+        that.itemCount = that.params['count'];
+        that.setPageCount();
         // Set start page token
         that.setToken(that.params['startPage'], that.params['startPageToken']);
         // Set next page token
@@ -10748,13 +10766,13 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
                     data = dataItem;
                 }
             }
-            if(countItem){
+            if(!cm.isEmpty(countItem)){
                 that.setCount(countItem);
             }
-            if(tokenItem){
+            if(!cm.isEmpty(tokenItem)){
                 that.setToken(that.nextPage, tokenItem);
             }
-            if(that.params['useToken'] && !tokenItem){
+            if(that.params['useToken'] && cm.isEmpty(tokenItem)){
                 that.callbacks.finalize(that);
             }
         }
@@ -10883,7 +10901,7 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
         that.loaderDelay && clearTimeout(that.loaderDelay);
         cm.addClass(that.nodes['loader'], 'is-hidden');
         // Check pages count
-        if(that.pageCount > 0 && that.pageCount === that.currentPage){
+        if(that.itemCount === 0 || (that.pageCount > 0 && that.pageCount === that.currentPage)){
             that.callbacks.finalize(that);
         }
         // Show / Hide Load More Button
@@ -10941,7 +10959,8 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
         that.currentPage = null;
         that.previousPage = null;
         that.nextPage = null;
-        that.pageCount = 0;
+        that.itemCount = null;
+        that.pageCount = null;
         that.isFinalize = false;
         // Set new parameters
         if(!cm.isEmpty(params)){
@@ -10995,20 +11014,26 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
 
     classProto.setCount = function(count){
         var that = this;
-        if(!cm.isUndefined(count)){
-            count = parseInt(count.toString());
+        if(cm.isString(count)){
+            count = parseInt(count);
         }
-        if(cm.isNumber(count) && count !== that.params['count']){
-            that.params['count'] = count;
-            if(that.params['pageCount'] === 0 && that.params['count'] && that.params['perPage']){
-                that.pageCount = Math.ceil(that.params['count'] / that.params['perPage']);
-            }else{
-                that.pageCount = that.params['pageCount'];
-            }
-            if(that.pageCount > 0 && that.pageCount === that.currentPage){
+        if(cm.isNumber(count) && count !== that.itemCount){
+            that.itemCount = count;
+            that.setPageCount();
+            if(that.itemCount === 0 || (that.pageCount > 0 && that.pageCount === that.currentPage)){
                 that.callbacks.finalize(that);
             }
             that.triggerEvent('onSetCount', count);
+        }
+        return that;
+    };
+
+    classProto.setPageCount = function(){
+        var that = this;
+        if(that.params['pageCount'] === 0 && that.itemCount && that.params['perPage']){
+            that.pageCount = Math.ceil(that.itemCount / that.params['perPage']);
+        }else{
+            that.pageCount = that.params['pageCount'];
         }
         return that;
     };
@@ -12332,8 +12357,8 @@ function(params){
         that.isRightCollapsed = cm.isClass(that.params['node'], 'is-sidebar-right-collapsed');
         // Check storage
         if(that.params['remember']){
-            storageLeftCollapsed = that.storageRead('isLeftCollapsed');
-            storageRightCollapsed = that.storageRead('isRightCollapsed');
+            storageLeftCollapsed = that.storageGet('isLeftCollapsed');
+            storageRightCollapsed = that.storageGet('isRightCollapsed');
             that.isLeftCollapsed = storageLeftCollapsed !== null ? storageLeftCollapsed : that.isLeftCollapsed;
             that.isRightCollapsed = storageRightCollapsed !== null ? storageRightCollapsed : that.isRightCollapsed;
         }
@@ -12383,7 +12408,7 @@ function(params){
         isImmediately && cm.removeClass(that.params['node'], 'is-immediately');
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isLeftCollapsed', true);
+            that.storageSet('isLeftCollapsed', true);
         }
         that.triggerEvent('onCollapseLeft');
         return that;
@@ -12398,7 +12423,7 @@ function(params){
         }, 5);
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isLeftCollapsed', false);
+            that.storageSet('isLeftCollapsed', false);
         }
         that.triggerEvent('onExpandLeft');
         return that;
@@ -12413,7 +12438,7 @@ function(params){
         }, 5);
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isRightCollapsed', true);
+            that.storageSet('isRightCollapsed', true);
         }
         that.triggerEvent('onCollapseRight');
         return that;
@@ -12426,7 +12451,7 @@ function(params){
         isImmediately && cm.removeClass(that.params['node'], 'is-immediately');
         // Write storage
         if(that.params['remember']){
-            that.storageWrite('isRightCollapsed', false);
+            that.storageSet('isRightCollapsed', false);
         }
         that.triggerEvent('onExpandRight');
         return that;
@@ -21181,7 +21206,7 @@ function(params){
                     '%minimum_version%' : version
                 });
                 // Render window
-                if(!that.params['remember'] || (that.params['remember'] && !that.storageRead('isShow'))){
+                if(!that.params['remember'] || (that.params['remember'] && !that.storageGet('isShow'))){
                     render();
                 }
             }
@@ -21216,7 +21241,7 @@ function(params){
                 'events' : {
                     'onClose' : function(){
                         if(that.params['remember']){
-                            that.storageWrite('isShow', true);
+                            that.storageSet('isShow', true);
                         }
                     }
                 }
@@ -21258,6 +21283,7 @@ cm.define('Com.Overlay', {
         'position' : 'fixed',
         'lazy' : false,
         'delay' : 'cm._config.lazyDelay',
+        'content' : null,
         'showSpinner' : true,
         'showContent' : true,
         'autoOpen' : true,
@@ -21309,6 +21335,8 @@ function(params){
         cm.addClass(that.nodes['container'], ['transition', that.params['transition']].join('-'));
         // Set position
         that.nodes['container'].style.position = that.params['position'];
+        // Set content
+        !cm.isEmpty(that.params['content']) && that.setContent(that.params['content']);
         // Show spinner
         that.params['showSpinner'] && that.showSpinner();
         // Show content
@@ -21450,8 +21478,14 @@ function(params){
     };
 
     that.setContent = function(node){
-        if(cm.isNode(node)){
-            that.nodes['content'].appendChild(node);
+        if(cm.isEmpty(node)){
+            cm.clearNode(that.nodes['content']);
+        }else{
+            if(!cm.isNode(node)){
+                node = node.toString();
+                node = cm.node('div', {'innerHTML' : node});
+            }
+            cm.appendChild(node, that.nodes['content']);
         }
         return that;
     };
@@ -22390,7 +22424,9 @@ cm.getConstructor('Com.Request', function(classConstructor, className, classProt
 cm.define('Com.Router', {
     'extend' : 'Com.AbstractController',
     'events' : [
-        'onChange'
+        'onChangeStart',
+        'onChange',
+        'onChangeEnd'
     ],
     'params' : {
         'renderStructure' : false,
@@ -22491,12 +22527,12 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             hash = window.location.hash.slice(1);
         }
         // Check hash
-        that.current['hash'] = hash;
-        that.current['state']['hash'] = hash;
-        that.current['href'] = !cm.isEmpty(hash) ? [that.current['location'], that.current['hash']].join('#') : that.current['location'];
-        that.current['state']['href'] = that.current['href'];
+        that.current.hash = hash;
+        that.current.state.hash = hash;
+        that.current.href = !cm.isEmpty(hash) ? [that.current.location, that.current.hash].join('#') : that.current.location;
+        that.current.state.href = that.current.href;
         // Restore route state after somebody change hash
-        window.history.replaceState(that.current['state'], '', that.current['state']['href']);
+        window.history.replaceState(that.current.state, '', that.current.state.href);
     };
 
     /* *** PROCESS ROUTE *** */
@@ -22515,7 +22551,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             state;
         // Validate state
         if(cm.isEmpty(route)){
-            route = that.current['route'];
+            route = that.current.route;
         }
         state = {
             'route' : route,
@@ -22528,172 +22564,168 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             }, params)
         };
         // Check hash
-        state['href'] = !cm.isEmpty(state['hash']) ? [state['location'], state['hash']].join('#') : state['location'];
+        state.href = !cm.isEmpty(state.hash) ? [state.location, state.hash].join('#') : state.location;
         // Check data storage
-        state['data'] = that.getStorageData(state['route'], state, state['params']['data']);
+        state.data = that.getStorageData(state.route, state, state.params.data);
         // Set scroll
         cm.setBodyScrollTop(0);
         // Set Window URL
-        if(state.params['replaceState']){
-            window.history.replaceState(state, '', state['location']);
-        }else if(state.params['pushState']){
-            window.history.pushState(state, '', state['location']);
+        if(state.params.replaceState){
+            window.history.replaceState(state, '', state.location);
+        }else if(state.params.pushState){
+            window.history.pushState(state, '', state.location);
         }
         // Process route
         that.processRoute(state);
         // Process hash
-        if(!cm.isEmpty(state['hash'])){
-            window.location.hash = state['hash'];
+        if(!cm.isEmpty(state.hash)){
+            window.location.hash = state.hash;
         }
     };
 
     classProto.processRoute = function(state){
         var that = this,
-            route,
-            matchRouteRedirect,
-            matchRouteData,
-            matchRoutesData = [];
+            matchedRouteData,
+            routeItem;
         // Destruct old route
         that.destructRoute(that.current);
         // Match route
-        cm.forEach(that.routes, function(item, route){
-            var isMatch = state['route'].match(item['regexp']),
-                hasAccess = that.checkRoleAccess(item['access']),
-                routeData;
-            if(isMatch){
-                item = cm.clone(item);
-                routeData = {
-                    'hasAccess' : hasAccess,
-                    'roure': route,
-                    'item' : item,
-                    'captures' : isMatch
-                };
-                if(hasAccess){
-                    matchRouteData = routeData;
-                }else{
-                    matchRoutesData.push(routeData);
-                    state['match'].push(item);
-                }
-            }
-        });
-        // Try to find route redirects if exists
-        if(!matchRouteData){
-            cm.forEach(matchRoutesData, function(routeData){
-                var redirect = that.getRouteRedirect(routeData.item);
-                if(redirect){
-                    matchRouteData = routeData;
-                    matchRouteRedirect = redirect;
-                }
-            });
-        }else{
-            matchRouteRedirect = that.getRouteRedirect(matchRouteData.item);
-        }
-        // If routes and redirects does not found - process error route
-        if(!matchRouteData){
-            matchRouteData = {
+        matchedRouteData = that.getStateMatchedRoute(state);
+        // Is not found matched route
+        if(cm.isEmpty(matchedRouteData)){
+            matchedRouteData = {
                 'hasAccess' : true,
                 'route' : 'error',
                 'item' : that.get('error')
             };
         }
         // Process route
-        route = cm.merge(matchRouteData.item, state);
-        route.state = state;
-        // Map found captures
-        if(matchRouteData.captures){
-            route.captures = that.mapCaptures(route.map, matchRouteData.captures);
+        routeItem = cm.merge(matchedRouteData.item, state);
+        routeItem.state = state;
+        if(matchedRouteData.match){
+            routeItem.captures = that.mapCaptures(routeItem.map, matchedRouteData.match);
         }
         // Handle route redirect or route
-        if(matchRouteRedirect){
-            if(cm.isArray(matchRouteRedirect)){
-                that.redirect.apply(that, matchRouteRedirect);
+        if(!cm.isEmpty(matchedRouteData.redirect)){
+            if(cm.isArray(matchedRouteData.redirect)){
+                that.redirect.apply(that, matchedRouteData.redirect);
             }else{
-                that.redirect(matchRouteRedirect, route.hash, {
-                    'urlParams' : route['urlParams'],
-                    'captures' : route['captures'],
-                    'data' : route['data']
+                that.redirect(matchedRouteData.redirect, null, {
+                    'urlParams' : routeItem.urlParams,
+                    'captures' : routeItem.captures,
+                    'data' : routeItem.data
                 });
             }
         }else{
-            that.constructRoute(route);
+            that.constructRoute(routeItem);
         }
     };
 
-    classProto.destructRoute = function(route){
+    classProto.getStateMatchedRoute = function(state){
+        var that = this,
+            match,
+            routeData,
+            mathedRouteData;
+        // Match routes
+        cm.forEach(that.routes, function(routeItem, route){
+            match = state.route.match(routeItem.regexp);
+            if(match){
+                routeItem = cm.clone(routeItem);
+                state.match.push(routeItem);
+                routeData = {
+                    'roure': route,
+                    'item' : routeItem,
+                    'match' : match,
+                    'redirect' : that.getRouteRedirect(routeItem),
+                    'access' : that.checkRouteAccess(routeItem)
+                };
+                if(routeData.redirect || routeData.access){
+                    mathedRouteData = routeData
+                }
+            }
+        });
+        return mathedRouteData;
+    };
+
+    classProto.destructRoute = function(routeItem){
         var that = this;
         // Export
-        that.previous = route;
+        that.previous = routeItem;
         // Callbacks
-        if(route){
-            if(route['constructor']){
-                route['controller'] && route['controller'].destruct && route['controller'].destruct();
+        if(routeItem){
+            if(routeItem.constructor){
+                routeItem.controller && routeItem.controller.destruct && routeItem.controller.destruct();
             }else{
-                route['onDestruct'](route);
-                route['callback'](route);
+                routeItem.onDestruct(routeItem);
+                routeItem.callback(routeItem);
             }
         }
         return that;
     };
 
-    classProto.constructRoute = function(route){
-        var that = this, constructor, constructorParams;
+    classProto.constructRoute = function(routeItem){
+        var that = this,
+            constructor,
+            constructorParams;
+        that.triggerEvent('onChangeStart', routeItem);
         // Export
-        that.current = route;
+        that.current = routeItem;
         // Callbacks
-        if(!cm.isEmpty(route['constructor'])){
-            if(cm.isObject(route['constructor'])){
-                cm.forEach(route['constructor'], function(item, key){
+        if(!cm.isEmpty(routeItem.constructor)){
+            if(cm.isObject(routeItem.constructor)){
+                cm.forEach(routeItem.constructor, function(item, key){
                     if(that.checkRoleAccess(key)){
                         constructor = item;
                     }
                 });
             }else{
-                constructor = route['constructor'];
+                constructor = routeItem.constructor;
             }
-            if(cm.isObject(route['constructorParams'])){
-                cm.forEach(route['constructorParams'], function(item, key){
+            if(cm.isObject(routeItem.constructorParams)){
+                cm.forEach(routeItem.constructorParams, function(item, key){
                     if(that.checkRoleAccess(key)){
                         constructorParams = item;
                     }
                 });
             }else{
-                constructorParams = route['constructorParams'];
+                constructorParams = routeItem.constructorParams;
             }
         }
         if(constructor){
             cm.getConstructor(constructor, function(classConstructor){
-                route['controller'] = new classConstructor(
+                routeItem.controller = new classConstructor(
                     cm.merge(constructorParams, {
-                        'container' : that.params['container'],
-                        'route' : route
+                        'container' : that.params.container,
+                        'route' : routeItem
                     })
                 );
-                route['controller'].triggerEvent('onConstructComplete');
+                routeItem.controller.triggerEvent('onConstructComplete');
             });
         }else{
-            route['onConstruct'](route);
-            route['callback'](route);
+            routeItem.onConstruct(routeItem);
+            routeItem.callback(routeItem);
         }
-        that.triggerEvent('onChange', route);
+        that.triggerEvent('onChange', routeItem);
+        that.triggerEvent('onChangeEnd', routeItem);
         return that;
     };
 
-    classProto.getRouteRedirect = function(route){
+    classProto.getRouteRedirect = function(routeItem){
         var that = this,
             routeRedirect;
-        if(!cm.isEmpty(route.redirectTo)){
-            if(cm.isObject(route.redirectTo)){
-                cm.forEach(route.redirectTo, function(item, role){
+        if(!cm.isEmpty(routeItem.redirectTo)){
+            if(cm.isObject(routeItem.redirectTo)){
+                cm.forEach(routeItem.redirectTo, function(item, role){
                     if(that.checkRoleAccess(role)){
                         routeRedirect = item;
                     }
                 });
             }else{
-                routeRedirect = route.redirectTo;
+                routeRedirect = routeItem.redirectTo;
             }
         }
         if(cm.isFunction(routeRedirect)){
-            routeRedirect = routeRedirect(route);
+            routeRedirect = routeRedirect(routeItem);
         }
         return routeRedirect;
     };
@@ -22779,9 +22811,8 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
     };
 
     classProto.checkRouteAccess = function(route){
-        var that = this,
-            item = that.get(route);
-        return item ? that.checkRoleAccess(item['access']) : false;
+        var that = this;
+        return route ? that.checkRoleAccess(route.access) : false;
     };
 
     classProto.checkRoleAccess = function(role){
@@ -22794,7 +22825,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             data = {};
         // Get default route data
         if(routeItem){
-            data = cm.merge(data, routeItem['data']);
+            data = cm.merge(data, routeItem.data);
         }
         // Check data storage
         if(that.dataStorage[route]){
@@ -22810,7 +22841,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
 
     classProto.embed = function(node){
         var that = this;
-        that.params['container'] = node;
+        that.params.container = node;
     };
 
     classProto.add = function(route, params){
@@ -22821,7 +22852,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
                 'originRoute' : route,
                 'name' : null,
                 'access' : 'all',
-                'pattern' : '([\\s\\S]+?)',
+                'pattern' : '([^\\/]+?)',
                 'regexp' : null,
                 'map' : [],
                 'captures' : {},
@@ -22838,13 +22869,13 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
                 'onDestruct' : function(){}
             }, params);
         // RegExp
-        item['regexp'] = new RegExp('^' + route.replace(/({\w+})/g, item['pattern']) + '$');
-        item['map'] = that.getMap(route);
+        item.regexp = new RegExp('^' + route.replace(/({\w+})/g, item.pattern) + '$');
+        item.map = that.getMap(route);
         // Binds
-        if(cm.isString(item['name'])){
-            that.routesBinds[item['name']] = route;
-        }else if(cm.isArray(item['name'])){
-            cm.forEach(item['name'], function(name){
+        if(cm.isString(item.name)){
+            that.routesBinds[item.name] = route;
+        }else if(cm.isArray(item.name)){
+            cm.forEach(item.name, function(name){
                 that.routesBinds[name] = route;
             });
         }
@@ -22866,11 +22897,11 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             item = that.get(route);
         // Check route type
         if(item){
-            if(item['type'] === 'external'){
-                route = item['href'];
+            if(item.type === 'external'){
+                route = item.href;
                 return that.prepareExternalHref(route, hash, urlParams);
             }else{
-                route = item['route'];
+                route = item.route;
             }
         }
         // Fill url params
@@ -22882,7 +22913,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             route = '/' + route;
         }
         // Add lead point if not exists
-        if(that.params['addLeadPoint'] && !/^\./.test(route)){
+        if(that.params.addLeadPoint && !/^\./.test(route)){
             route = '.' + route;
         }
         // Add hash
@@ -22917,19 +22948,29 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
         return that.previous;
     };
 
+    classProto.checkAccess = function(route){
+        var that = this,
+            item = that.get(route);
+        return that.checkRouteAccess(item);
+    };
+
     classProto.set = function(route, hash, params){
-        var that = this;
-        if(that.routesBinds[route]){
-            route = that.routesBinds[route];
-        }
-        that.trigger(route, hash, params);
+        var that = this,
+            urlParams = !cm.isEmpty(params.urlParams) ? params.urlParams : params.captures,
+            href = that.getURL(route, hash, urlParams);
+        // Important to override push / replace state params in this case
+        params = cm.merge(params, {
+            'pushState' : false,
+            'replaceState' : true
+        });
+        that.setURL(href, hash, params);
         return that;
     };
 
     classProto.setURL = function(route, hash, params){
         var that = this;
         route = that.prepareRoute(route);
-        that.trigger(route[0], hash || route[1], params);
+        that.pushRoute(route[0], hash || route[1], params);
         return that;
     };
 
@@ -22950,12 +22991,23 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             item = that.routes[route];
             // Process state
             state = cm.clone(item);
-            state['params'] = cm.merge(state['params'], params);
-            state['data'] = that.getStorageData(state['route'], state, params['data']);
+            state.params = cm.merge(state.params, params);
+            state.data = that.getStorageData(state.route, state, params.data);
             // Process route
             that.destructRoute(that.current);
             that.constructRoute(state);
         }
+        return that;
+    };
+
+    classProto.redirect = function(route, hash, params){
+        var that = this;
+        // Override push / replace state
+        params = cm.merge(params, {
+            'pushState' : false,
+            'replaceState' : true
+        });
+        that.set(route, hash, params);
         return that;
     };
 
@@ -22967,10 +23019,10 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
         }
         if(that.routes[route]){
             item = that.routes[route];
-            if(cm.isString(item['name'])){
-                delete that.routesBinds[item['name']];
-            }else if(cm.isArray(item['name'])){
-                cm.forEach(item['name'], function(name){
+            if(cm.isString(item.name)){
+                delete that.routesBinds[item.name];
+            }else if(cm.isArray(item.name)){
+                cm.forEach(item.name, function(name){
                     delete that.routesBinds[name];
                 })
             }
@@ -22979,28 +23031,9 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
         return that;
     };
 
-    classProto.trigger = function(route, hash, params){
-        var that = this;
-        that.pushRoute(route, hash, params);
-        return that;
-    };
-
-    classProto.redirect = function(route, hash, params){
-        var that = this,
-            urlParams = !cm.isEmpty(params['urlParams']) ? params['urlParams'] : params['captures'],
-            href = that.getURL(route, hash, urlParams);
-        // Important to override push / replace state params in this case
-        params = cm.merge(params, {
-            'pushState' : false,
-            'replaceState' : true
-        });
-        that.setURL(href, hash, params);
-        return that;
-    };
-
     classProto.start = function(route, hash, params){
         var that = this;
-        route = !cm.isUndefined(route) ? route : that.params['route'];
+        route = !cm.isUndefined(route) ? route : that.params.route;
         params = cm.merge({
             'pushState' : false,
             'replaceState' : true
@@ -25516,7 +25549,7 @@ function(params){
         that.isCollapsed = cm.isClass(that.nodes['container'], 'is-hide') || !cm.isClass(that.nodes['container'], 'is-show');
         // Check storage
         if(that.params['remember']){
-            storageCollapsed = that.storageRead('isCollapsed');
+            storageCollapsed = that.storageGet('isCollapsed');
             that.isCollapsed = storageCollapsed !== null ? storageCollapsed : that.isCollapsed;
         }
         // Trigger collapse event
@@ -25586,7 +25619,7 @@ function(params){
             that.triggerEvent('onShowStart');
             // Write storage
             if(that.params['remember']){
-                that.storageWrite('isCollapsed', false);
+                that.storageSet('isCollapsed', false);
             }
             cm.replaceClass(that.nodes['container'], 'is-hide', 'is-show');
             // Set title
@@ -25631,7 +25664,7 @@ function(params){
             that.triggerEvent('onHideStart');
             // Write storage
             if(that.params['remember']){
-                that.storageWrite('isCollapsed', true);
+                that.storageSet('isCollapsed', true);
             }
             cm.replaceClass(that.nodes['container'], 'is-show', 'is-hide');
             // Set title
@@ -27801,7 +27834,8 @@ cm.define('Com.Check', {
         'controllerEvents' : true,
         'type' : 'checkbox',
         'multiple' : false,
-        'inline' : false
+        'inline' : false,
+        'noValue' : null
     }
 },
 function(params){
@@ -27912,7 +27946,8 @@ cm.getConstructor('Com.Check', function(classConstructor, className, classProto,
         }else{
             inputContainer = that.renderInput({
                 'text' : that.params['placeholder'],
-                'value' : that.params['value']
+                'value' : that.params['value'],
+                'noValue' : that.params['noValue']
             });
             cm.appendChild(inputContainer, nodes['container']);
         }
@@ -27927,7 +27962,8 @@ cm.getConstructor('Com.Check', function(classConstructor, className, classProto,
         item = cm.merge({
             'nodes' : nodes,
             'text' : '',
-            'value' : null
+            'value' : null,
+            'noValue' : null
         }, item);
         // Structure
         nodes['container'] = cm.node('label',
@@ -27977,7 +28013,7 @@ cm.getConstructor('Com.Check', function(classConstructor, className, classProto,
             if(item['input'].checked){
                 value = !cm.isEmpty(item['value']) ? item['value'] : true;
             }else{
-                value = false;
+                value = !cm.isEmpty(item['noValue']) ? item['noValue'] : false;
             }
         }
         that.set(value, triggerEvents);
@@ -27997,7 +28033,7 @@ cm.getConstructor('Com.Check', function(classConstructor, className, classProto,
                 });
             }
         }else{
-            that.hidden[0]['input'].checked = !(cm.isEmpty(value) || value === 0 || value === '0' || value === false);
+            that.hidden[0]['input'].checked = that.testInputValue(value, null, that.params['noValue']);
         }
     };
 
@@ -28014,8 +28050,14 @@ cm.getConstructor('Com.Check', function(classConstructor, className, classProto,
                 });
             }
         }else{
-            that.inputs[0]['input'].checked = !(cm.isEmpty(value) || value === 0 || value === '0' || value === false);
+            that.inputs[0]['input'].checked = that.testInputValue(value, null, that.params['noValue']);
         }
+    };
+
+    classProto.testInputValue = function(value, yesValue, noValue){
+        // TODO: Check all variants
+        return (!cm.isEmpty(yesValue) && value === yesValue)
+            || !(cm.isEmpty(value) || value === 0 || value === '0' || value === false || value === noValue);
     };
 });
 
@@ -31578,29 +31620,39 @@ function(params){
     /* *** COLLECTORS *** */
 
     var collectSelectOptions = function(){
-        var myChildes = that.params['node'].childNodes;
-        cm.forEach(myChildes, function(myChild, i){
-            if(cm.isElementNode(myChild)){
-                if(myChild.tagName.toLowerCase() === 'optgroup'){
-                    var myOptionsNodes = myChild.querySelectorAll('option');
-                    var myOptions = [];
-                    cm.forEach(myOptionsNodes, function(optionNode){
-                        myOptions.push({
-                            'value' : optionNode.value,
-                            'text' : optionNode.innerHTML,
-                            'className' : optionNode.className
-                        });
-                    });
-                    renderGroup(myChild.getAttribute('label'), myOptions);
-                }else if(myChild.tagName.toLowerCase() === 'option'){
+        var nodes = that.params['node'].childNodes,
+            nodeTagName,
+            options;
+        cm.forEach(nodes, function(node, i){
+            if(cm.isElementNode(node)){
+                nodeTagName = node.tagName.toLowerCase();
+                if(nodeTagName === 'optgroup'){
+                    options = collectSelectGroupOptions(node);
+                    renderGroup(node.label, options);
+                }else if(nodeTagName === 'option'){
                     renderOption({
-                        'value' : myChild.value,
-                        'text' : myChild.innerHTML,
-                        'className' : myChild.className
+                        'value' : node.value,
+                        'text' : node.innerHTML,
+                        'className' : node.className,
+                        'hidden' : node.hidden,
+                        'disabled' : node.disabled
                     });
                 }
             }
         });
+    };
+
+    var collectSelectGroupOptions = function(node){
+        var optionNodes = node.querySelectorAll('option'),
+            options = [];
+        cm.forEach(optionNodes, function(optionNode){
+            options.push({
+                'value' : optionNode.value,
+                'text' : optionNode.innerHTML,
+                'className' : optionNode.className
+            });
+        });
+        return options;
     };
 
     /* *** GROUPS *** */
@@ -31636,10 +31688,6 @@ function(params){
     /* *** OPTIONS *** */
 
     var renderOption = function(item, group){
-        // Check for exists
-        if(options[item['value']]){
-            removeOption(options[item['value']]);
-        }
         // Config
         item = cm.merge({
             'hidden' : false,
@@ -31651,6 +31699,10 @@ function(params){
             'className' : '',
             'group': null
         }, item);
+        // Check for existing option
+        if(options[item['value']]){
+            removeOption(options[item['value']]);
+        }
         // Add link to group
         item['group'] = group;
         // Structure

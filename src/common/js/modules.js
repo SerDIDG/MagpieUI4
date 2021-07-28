@@ -595,7 +595,7 @@ Mod['Storage'] = {
             that.build['params']['name'] = '';
         }
     },
-    'storageRead' : function(key, session){
+    'storageGet' : function(key, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -617,7 +617,7 @@ Mod['Storage'] = {
         }
         return storage[that.params['name']][key];
     },
-    'storageReadAll' : function(session){
+    'storageGetAll' : function(session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -639,7 +639,7 @@ Mod['Storage'] = {
         }
         return storage[that.params['name']];
     },
-    'storageWrite' : function(key, value, session){
+    'storageSet' : function(key, value, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -659,7 +659,7 @@ Mod['Storage'] = {
         cm[method](that._className, JSON.stringify(storage));
         return storage[that.params['name']];
     },
-    'storageWriteAll' : function(data, session){
+    'storageSetAll' : function(data, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};
@@ -676,7 +676,7 @@ Mod['Storage'] = {
         cm[method](that._className, JSON.stringify(storage));
         return storage[that.params['name']];
     },
-    'storageClear' : function(key, session){
+    'storageRemove' : function(key, session){
         var that = this,
             method = session ? 'sessionStorageGet' : 'storageGet',
             storage = JSON.parse(cm[method](that._className)) || {};

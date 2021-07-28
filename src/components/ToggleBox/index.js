@@ -103,7 +103,7 @@ function(params){
         that.isCollapsed = cm.isClass(that.nodes['container'], 'is-hide') || !cm.isClass(that.nodes['container'], 'is-show');
         // Check storage
         if(that.params['remember']){
-            storageCollapsed = that.storageRead('isCollapsed');
+            storageCollapsed = that.storageGet('isCollapsed');
             that.isCollapsed = storageCollapsed !== null ? storageCollapsed : that.isCollapsed;
         }
         // Trigger collapse event
@@ -173,7 +173,7 @@ function(params){
             that.triggerEvent('onShowStart');
             // Write storage
             if(that.params['remember']){
-                that.storageWrite('isCollapsed', false);
+                that.storageSet('isCollapsed', false);
             }
             cm.replaceClass(that.nodes['container'], 'is-hide', 'is-show');
             // Set title
@@ -218,7 +218,7 @@ function(params){
             that.triggerEvent('onHideStart');
             // Write storage
             if(that.params['remember']){
-                that.storageWrite('isCollapsed', true);
+                that.storageSet('isCollapsed', true);
             }
             cm.replaceClass(that.nodes['container'], 'is-show', 'is-hide');
             // Set title
