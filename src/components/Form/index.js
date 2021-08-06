@@ -2,7 +2,7 @@ cm.define('Com.Form', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes',
         'Storage',
@@ -369,7 +369,7 @@ function(params){
                 && (fieldParams.required || fieldParams.validate)
                 && cm.isFunction(field.controller.validate);
             if(isFieldValidatable && !field.controller.validate(options)){
-                data.message = that.lang('form_error');
+                data.message = that.message('form_error');
                 data.valid = false;
             }
         });
@@ -567,7 +567,7 @@ function(params){
     that.callbacks.success = function(that, data){
         if(that.params.showNotifications && that.params.showSuccessNotification){
             that.callbacks.renderNotification(that, {
-                'label' : that.lang('success_message'),
+                'label' : that.message('success_message'),
                 'type' : 'success'
             });
         }
@@ -592,7 +592,7 @@ function(params){
 
     that.callbacks.renderError = function(that, errors, message){
         var hasMessage = !cm.isEmpty(message) && cm.isString(message),
-            label = hasMessage ? message : that.lang('form_error'),
+            label = hasMessage ? message : that.message('form_error'),
             messages;
         // Clear old errors messages
         that.callbacks.clearError(that);
@@ -617,7 +617,7 @@ function(params){
         }else{
             if(that.params.showNotifications){
                 that.callbacks.renderNotification(that, {
-                    'label' : that.lang('server_error'),
+                    'label' : that.message('server_error'),
                     'type' : 'danger'
                 });
             }

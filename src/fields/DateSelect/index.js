@@ -2,7 +2,7 @@ cm.define('Com.DateSelect', {
     'modules' : [
         'Params',
         'DataConfig',
-        'Langs',
+        'Messages',
         'Events',
         'Structure',
         'Stack'
@@ -13,7 +13,7 @@ cm.define('Com.DateSelect', {
     ],
     'params' : {
         'input' : null,                                 // Deprecated, use 'node' parameter instead.
-        'node' : cm.Node('input', {'type' : 'text'}),
+        'node' : cm.node('input', {'type' : 'text'}),
         'name' : '',
         'embedStructure' : 'replace',
         'container' : null,
@@ -78,11 +78,11 @@ function(params){
 
     var render = function(){
         // Structure
-        nodes['container'] = cm.Node('div', {'class' : 'com__dateselect'},
-            nodes['hidden'] = cm.Node('input', {'type' : 'hidden'}),
-            cm.Node('div', {'class' : 'pt__toolbar bottom'},
-                cm.Node('div', {'class' : 'inner clear'},
-                    nodes['fields'] = cm.Node('ul', {'class' : 'group'})
+        nodes['container'] = cm.node('div', {'class' : 'com__dateselect'},
+            nodes['hidden'] = cm.node('input', {'type' : 'hidden'}),
+            cm.node('div', {'class' : 'pt__toolbar bottom'},
+                cm.node('div', {'class' : 'inner clear'},
+                    nodes['fields'] = cm.node('ul', {'class' : 'group'})
                 )
             )
         );
@@ -113,12 +113,12 @@ function(params){
 
     var renderYearField = function(){
         // Structure
-        nodes['year'] = cm.Node('li', {'class' : 'is-field'});
+        nodes['year'] = cm.node('li', {'class' : 'is-field'});
         cm.addClass(nodes['year'], that.params['fieldSizes']['year']);
         cm.appendChild(nodes['year'], nodes['fields']);
         // Render component
         var data = [
-            {'value' : '0000', 'text' : that.lang('Year')}
+            {'value' : '0000', 'text' : that.message('Year')}
         ], i;
         for(i = that.params['endYear']; i >= that.params['startYear']; i--){
             data.push({'value' : i, 'text' : i});
@@ -139,14 +139,14 @@ function(params){
 
     var renderMonthField = function(){
         // Structure
-        nodes['month'] = cm.Node('li', {'class' : 'is-field'});
+        nodes['month'] = cm.node('li', {'class' : 'is-field'});
         cm.addClass(nodes['month'], that.params['fieldSizes']['month']);
         cm.appendChild(nodes['month'], nodes['fields']);
         // Render component
         var data = [
-            {'value' : '00', 'text' : that.lang('Month')}
+            {'value' : '00', 'text' : that.message('Month')}
         ];
-        cm.forEach(that.lang('months'), function(month, i){
+        cm.forEach(that.message('months'), function(month, i){
             data.push({'value' : cm.addLeadZero(parseInt(i + 1)), 'text' : month});
         });
         components['month'] = new Com.Select({
@@ -165,12 +165,12 @@ function(params){
 
     var renderDayField = function(){
         // Structure
-        nodes['day'] = cm.Node('li', {'class' : 'is-field'});
+        nodes['day'] = cm.node('li', {'class' : 'is-field'});
         cm.addClass(nodes['day'], that.params['fieldSizes']['day']);
         cm.appendChild(nodes['day'], nodes['fields']);
         // Render component
         var data = [
-            {'value' : '00', 'text' : that.lang('Day')}
+            {'value' : '00', 'text' : that.message('Day')}
         ], i;
         for(i = 1; i <= 31; i++){
             data.push({'value' : cm.addLeadZero(i), 'text' : i});

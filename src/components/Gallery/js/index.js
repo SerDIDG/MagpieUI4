@@ -2,7 +2,7 @@ cm.define('Com.Gallery', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes'
     ],
@@ -15,8 +15,8 @@ cm.define('Com.Gallery', {
         'onItemSet'
     ],
     'params' : {
-        'container' : cm.Node('div'),
-        'node' : cm.Node('div'),
+        'container' : cm.node('div'),
+        'node' : cm.node('div'),
         'data' : [],
         'duration' : 500,
         'showCaption' : true,
@@ -70,30 +70,30 @@ function(params){
 
     var render = function(){
         // Structure
-        that.nodes['container'] = cm.Node('div', {'class' : 'com__gallery'},
-            that.nodes['holder'] = cm.Node('div', {'class' : 'holder'}),
-            that.nodes['bar'] = cm.Node('div', {'class' : 'com__gallery-controls is-full'},
-                cm.Node('div', {'class' : 'inner'},
-                    that.nodes['prev'] = cm.Node('div', {'class' : 'bar-arrow prev'},
-                        cm.Node('div', {'class' : that.params['icons']['prev']})
+        that.nodes['container'] = cm.node('div', {'class' : 'com__gallery'},
+            that.nodes['holder'] = cm.node('div', {'class' : 'holder'}),
+            that.nodes['bar'] = cm.node('div', {'class' : 'com__gallery-controls is-full'},
+                cm.node('div', {'class' : 'inner'},
+                    that.nodes['prev'] = cm.node('div', {'class' : 'bar-arrow prev'},
+                        cm.node('div', {'class' : that.params['icons']['prev']})
                     ),
-                    that.nodes['next'] = cm.Node('div', {'class' : 'bar-arrow next'},
-                        cm.Node('div', {'class' : that.params['icons']['next']})
+                    that.nodes['next'] = cm.node('div', {'class' : 'bar-arrow next'},
+                        cm.node('div', {'class' : that.params['icons']['next']})
                     ),
-                    that.nodes['zoom'] = cm.Node('div', {'class' : 'bar-zoom'},
-                        cm.Node('div', {'class' : that.params['icons']['zoom']})
+                    that.nodes['zoom'] = cm.node('div', {'class' : 'bar-zoom'},
+                        cm.node('div', {'class' : that.params['icons']['zoom']})
                     )
                 )
             ),
-            that.nodes['loader'] = cm.Node('div', {'class' : 'loader'},
-                cm.Node('div', {'class' : 'bg'}),
-                cm.Node('div', {'class' : 'icon small loader centered'})
+            that.nodes['loader'] = cm.node('div', {'class' : 'loader'},
+                cm.node('div', {'class' : 'bg'}),
+                cm.node('div', {'class' : 'icon small loader centered'})
             )
         );
         // Arrow titles
         if(that.params['showArrowTitles']){
-            that.nodes['next'].setAttribute('title', that.lang('Next'));
-            that.nodes['prev'].setAttribute('title', that.lang('Previous'));
+            that.nodes['next'].setAttribute('title', that.message('Next'));
+            that.nodes['prev'].setAttribute('title', that.message('Previous'));
         }
         // Zoom
         if(that.params['zoom']){
@@ -154,24 +154,24 @@ function(params){
         if(!item['link']){
             item['link'] = cm.node('a');
         }
-        item['nodes']['container'] = cm.Node('div', {'class' : 'pt__image is-centered'},
-            item['nodes']['inner'] = cm.Node('div', {'class' : 'inner'})
+        item['nodes']['container'] = cm.node('div', {'class' : 'pt__image is-centered'},
+            item['nodes']['inner'] = cm.node('div', {'class' : 'inner'})
         );
         // Render by type
         if(item['type'] === 'image'){
             item['nodes']['inner'].appendChild(
-                item['nodes']['content'] = cm.Node('img', {'class' : 'descr', 'alt' : item['title'], 'title' : item['title']})
+                item['nodes']['content'] = cm.node('img', {'class' : 'descr', 'alt' : item['title'], 'title' : item['title']})
             );
         }else{
             item['nodes']['inner'].appendChild(
-                item['nodes']['content'] = cm.Node('iframe', {'class' : 'descr', 'allowfullscreen' : true})
+                item['nodes']['content'] = cm.node('iframe', {'class' : 'descr', 'allowfullscreen' : true})
             );
         }
         // Caption
         if(that.params['showCaption'] && !cm.isEmpty(item['title'] && item['type'] === 'image')){
             item['nodes']['inner'].appendChild(
-                cm.Node('div', {'class' : 'title'},
-                    cm.Node('div', {'class' : 'inner'}, item['title'])
+                cm.node('div', {'class' : 'title'},
+                    cm.node('div', {'class' : 'inner'}, item['title'])
                 )
             );
         }

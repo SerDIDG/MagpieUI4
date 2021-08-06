@@ -2,7 +2,7 @@ cm.define('Com.Palette', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Stack'
@@ -70,28 +70,28 @@ function(params){
                         that.nodes['paletteCanvas'] = cm.node('canvas', {'width' : '100%', 'height' : '100%'})
                     )
                 ),
-                cm.node('div', {'class' : 'b-range', 'title' : that.lang('hue')},
+                cm.node('div', {'class' : 'b-range', 'title' : that.message('hue')},
                     that.nodes['tintZone'] = cm.node('div', {'class' : 'inner'})
                 ),
-                cm.node('div', {'class' : 'b-range b-opacity', 'title' : that.lang('opacity')},
+                cm.node('div', {'class' : 'b-range b-opacity', 'title' : that.message('opacity')},
                     that.nodes['opacityZone'] = cm.node('div', {'class' : 'inner'})
                 ),
                 cm.node('div', {'class' : 'b-stuff'},
                     cm.node('div', {'class' : 'inner'},
                         cm.node('div', {'class' : 'b-preview-color'},
-                            cm.node('div', {'class' : 'b-title'}, that.lang('new')),
+                            cm.node('div', {'class' : 'b-title'}, that.message('new')),
                             cm.node('div', {'class' : 'b-colors'},
                                 that.nodes['previewNew'] = cm.node('div', {'class' : 'b-color'}),
                                 that.nodes['previewPrev'] = cm.node('div', {'class' : 'b-color'})
                             ),
-                            cm.node('div', {'class' : 'b-title'}, that.lang('previous'))
+                            cm.node('div', {'class' : 'b-title'}, that.message('previous'))
                         ),
                         cm.node('div', {'class' : 'b-bottom'},
                             cm.node('div', {'class' : 'b-preview-inputs'},
-                                that.nodes['inputHEX'] = cm.node('input', {'type' : 'text', 'class' : 'input', 'title' : that.lang('hex')})
+                                that.nodes['inputHEX'] = cm.node('input', {'type' : 'text', 'class' : 'input', 'title' : that.message('hex')})
                             ),
                             cm.node('div', {'class' : 'b-buttons'},
-                                that.nodes['buttonSelect'] = cm.node('div', {'class' : 'button button-primary is-wide'}, that.lang('select'))
+                                that.nodes['buttonSelect'] = cm.node('div', {'class' : 'button button-primary is-wide'}, that.message('select'))
                             )
                         )
                     )

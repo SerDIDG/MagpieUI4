@@ -3,7 +3,7 @@ cm._config.displayDateFormatCase = 'genitive';
 cm._config.displayDateFormat = '%j %F %Y';
 cm._config.displayDateTimeFormat = '%j %F %Y в %H:%i';
 
-cm._strings = {
+cm._messages = {
 	'common' : {
 		'server_error' : 'Произошла непредвиденная ошибка. Пожалуйста, повторите попытку позже.'
 	},

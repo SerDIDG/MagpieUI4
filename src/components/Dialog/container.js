@@ -14,7 +14,7 @@ cm.define('Com.DialogContainer', {
             'autoOpen' : false
         }
     },
-    'strings' : {
+    'messages' : {
         'close' : 'Close'
     }
 },

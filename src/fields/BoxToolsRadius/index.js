@@ -36,7 +36,7 @@ cm.getConstructor('Com.BoxToolsRadius', function(classConstructor, className, cl
             ),
             cm.node('div', {'class' : 'b-line'},
                 cm.node('div', {'class' : 'b-link-container'},
-                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.lang('link')},
+                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.message('link')},
                         cm.node('div', {'class' : 'icon'})
                     )
                 )

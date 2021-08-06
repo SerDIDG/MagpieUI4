@@ -1,4 +1,4 @@
-cm.setStrings('Com.ScrollPagination', {
+cm.setMessages('Com.ScrollPagination', {
 	'load_more' : 'Load More',
-	'server_error' : cm._strings.common['server_error']
+	'server_error' : cm._messages.common['server_error']
 });

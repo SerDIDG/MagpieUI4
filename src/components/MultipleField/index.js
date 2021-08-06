@@ -93,7 +93,7 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
         // Structure
         nodes['container'] = cm.node('div', {'class' : 'com__multiple-field__toolbar'},
             nodes['content'] = cm.node('div', {'class' : 'com__multiple-field__item'},
-                nodes['add'] = cm.node('div', {'class' : that.params['icons']['add'], 'title' : that.lang('add')})
+                nodes['add'] = cm.node('div', {'class' : that.params['icons']['add'], 'title' : that.message('add')})
             )
         );
         // Add button events
@@ -306,7 +306,7 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
             that.renderItemTemplate(that.params['template'], item);
             // Controls
             if(that.params['showControls'] && item['showControls']){
-                item['remove'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.lang('remove'), 'data-node' : 'remove'});
+                item['remove'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.message('remove'), 'data-node' : 'remove'});
                 cm.appendChild(item['remove'], item['container']);
             }
             // Sortable

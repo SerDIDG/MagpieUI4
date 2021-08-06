@@ -2,7 +2,7 @@ cm.define('Com.Autocomplete', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'Storage',
         'Callbacks',
@@ -780,7 +780,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'content'},
                     cm.node('span', {'class' : 'icon small cm-ia__spinner'}),
-                    cm.node('span', {'innerHTML' : that.lang('loader', {'%query%' : params['query']})})
+                    cm.node('span', {'innerHTML' : that.message('loader', {'%query%' : params['query']})})
                 )
             )
         );
@@ -849,7 +849,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'content'},
                     cm.node('span', {'class' : 'icon small add'}),
-                    cm.node('span', {'innerHTML' : that.lang('suggestion', {'%query%' : params['query']})})
+                    cm.node('span', {'innerHTML' : that.message('suggestion', {'%query%' : params['query']})})
                 )
             )
         );

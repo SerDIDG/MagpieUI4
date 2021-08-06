@@ -378,7 +378,7 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
     classProto.callbacks.renderError = function(that, page){
         if(that.params['responseHTML']){
             page['container'].appendChild(
-                cm.node('div', {'class' : 'cm__empty'}, that.lang('server_error'))
+                cm.node('div', {'class' : 'cm__empty'}, that.message('server_error'))
             );
         }
         that.triggerEvent('onPageRenderError', page);
@@ -476,7 +476,7 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
         // Previous page buttons
         that.callbacks.renderBarArrow(that, item, {
             'text' : '<',
-            'title' : that.lang('prev'),
+            'title' : that.message('prev'),
             'className' : 'prev',
             'callback' : that.prevHanlder
         });
@@ -510,7 +510,7 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
         // Next page buttons
         that.callbacks.renderBarArrow(that, item, {
             'text' : '>',
-            'title' : that.lang('next'),
+            'title' : that.message('next'),
             'className' : 'next',
             'callback' : that.nextHanlder
         });

@@ -1,4 +1,4 @@
-cm.setStrings('Com.AbstractContainer', {
+cm.setMessages('Com.AbstractContainer', {
     'title': 'Container',
     'close': 'Close',
     'save': 'Save',

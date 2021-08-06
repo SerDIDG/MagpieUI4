@@ -1,4 +1,4 @@
-cm.setStrings('Com.FileInput', {
+cm.setMessages('Com.FileInput', {
 	'browse' : 'Обзор',
 	'browse_local' : 'Выьрать Локально',
 	'browse_filemanager' : 'Выбрать в Файловом Архиве',
@@ -6,7 +6,7 @@ cm.setStrings('Com.FileInput', {
 	'open' : 'Открыть'
 });
 
-cm.setStrings('Com.MultipleFileInput', {
+cm.setMessages('Com.MultipleFileInput', {
 	'browse' : 'Обзор',
 	'browse_local' : 'Выьрать Локально',
 	'browse_filemanager' : 'Выбрать в Файловом Архиве'

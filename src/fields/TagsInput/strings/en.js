@@ -1,4 +1,4 @@
-cm.setStrings('Com.TagsInput', {
+cm.setMessages('Com.TagsInput', {
 	'tags' : 'Tags',
 	'add' : 'Add',
 	'remove' : 'Remove',

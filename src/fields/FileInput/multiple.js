@@ -63,9 +63,9 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         var that = this;
         that.isMultiple = !that.params['max'] || that.params['max'] > 1;
         // Validate Language Strings
-        that.setLangs({
-            '_browse_local' : that.params['fileManager'] ? that.lang('browse_local') : that.lang('browse'),
-            '_browse_filemanager' : that.params['local'] ? that.lang('browse_filemanager') : that.lang('browse')
+        that.setMessages({
+            '_browse_local' : that.params['fileManager'] ? that.message('browse_local') : that.message('browse'),
+            '_browse_filemanager' : that.params['local'] ? that.message('browse_filemanager') : that.message('browse')
         });
         // Components parameters
         that.params['dropzoneParams']['max'] = that.params['max'];
@@ -147,7 +147,7 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         // Render Browse Buttons
         if(that.params['local']){
             nodes['browseLocal'] = cm.node('div', {'class' : 'browse-button'},
-                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_local')),
+                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_local')),
                 cm.node('div', {'class' : 'inner'},
                     nodes['input'] = cm.node('input', {'type' : 'file'})
                 )
@@ -156,11 +156,11 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
             cm.insertFirst(nodes['browseLocal'], nodes['contentInner']);
         }
         if(that.params['fileManager']){
-            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_filemanager'));
+            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_filemanager'));
             cm.insertFirst(nodes['browseFileManager'], nodes['contentInner']);
         }
         if(that.params['fileUploader']){
-            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('browse'));
+            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('browse'));
             cm.insertFirst(nodes['browseFileUploader'], nodes['contentInner']);
         }
         if(!that.hasButtons){

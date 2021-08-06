@@ -1,4 +1,4 @@
-cm.setStrings('Com.TimeSelect', {
+cm.setMessages('Com.TimeSelect', {
 	'separator' : ':',
 	'Hours' : 'HH',
 	'Minutes' : 'MM',

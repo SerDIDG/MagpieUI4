@@ -1,4 +1,4 @@
-cm.setStrings('Com.MultipleField', {
+cm.setMessages('Com.MultipleField', {
 	'add' : 'Add',
 	'remove' : 'Remove'
 });

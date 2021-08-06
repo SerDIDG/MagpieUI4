@@ -75,7 +75,7 @@ cm.getConstructor('Com.GridlistFilter', function(classConstructor, className, cl
         // Structure
         that.triggerEvent('onRenderContentStart');
         nodes['container'] = cm.node('div', {'class' : 'pt__input'},
-            nodes['input'] = cm.node('input', {'type' : 'search', 'class' : 'input', 'autocomplete' : 'off', 'placeholder' : that.lang('placeholder')}),
+            nodes['input'] = cm.node('input', {'type' : 'search', 'class' : 'input', 'autocomplete' : 'off', 'placeholder' : that.message('placeholder')}),
             nodes['icon'] = cm.node('div', {'class' : 'icon icon svg__search'})
         );
         that.triggerEvent('onRenderContent');

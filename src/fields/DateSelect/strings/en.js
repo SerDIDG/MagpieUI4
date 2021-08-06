@@ -1,5 +1,5 @@
-cm.setStrings('Com.DateSelect', {
-	'months' : cm._strings.months,
+cm.setMessages('Com.DateSelect', {
+	'months' : cm._messages.months,
 	'Day' : 'Day',
 	'Month' : 'Month',
 	'Year' : 'Year'

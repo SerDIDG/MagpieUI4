@@ -104,6 +104,7 @@ module.exports = function(grunt) {
                     '<%= paths.src %>/common/js/polyfill.js',
                     '<%= paths.src %>/common/js/config.js',
                     '<%= paths.src %>/common/js/common.js',
+                    '<%= paths.src %>/common/js/define.js',
                     '<%= paths.src %>/common/js/modules.js',
                     '<%= paths.src %>/common/js/parts.js',
                     '<%= paths.src %>/common/js/**/*.js',

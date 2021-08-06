@@ -1,4 +1,4 @@
-cm.setStrings('Com.ScaleTools', {
+cm.setMessages('Com.ScaleTools', {
 	'auto' : 'Auto',
 	'contain' : 'Contain',
 	'cover' : 'Cover',

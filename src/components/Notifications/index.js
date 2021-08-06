@@ -57,7 +57,7 @@ cm.getConstructor('Com.Notifications', function(classConstructor, className, cla
         }, item);
         // Structure
         item['nodes']['container'] = cm.node('li', {'class' : item['type']},
-            item['nodes']['close'] = cm.node('div', {'class' : that.params['icon'], 'title' : that.lang('close')}),
+            item['nodes']['close'] = cm.node('div', {'class' : that.params['icon'], 'title' : that.message('close')}),
             item['nodes']['descr'] = cm.node('div', {'class' : 'descr'}),
             item['nodes']['messages'] = cm.node('div', {'class' : 'messages'},
                 item['nodes']['messagesList'] = cm.node('ul')
@@ -71,7 +71,7 @@ cm.getConstructor('Com.Notifications', function(classConstructor, className, cla
         // Messages
         if(!cm.isEmpty(item['messages'])){
             // Button
-            item['nodes']['button'] = cm.node('a', {'class' : 'more'}, that.lang('more'));
+            item['nodes']['button'] = cm.node('a', {'class' : 'more'}, that.message('more'));
             cm.insertFirst(item['nodes']['button'], item['nodes']['descr']);
             // List
             cm.forEach(item['messages'], function(message){

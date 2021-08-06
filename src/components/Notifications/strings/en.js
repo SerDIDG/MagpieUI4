@@ -1,4 +1,4 @@
-cm.setStrings('Com.Notifications', {
+cm.setMessages('Com.Notifications', {
 	'close' : 'Close',
 	'more' : 'Read more'
 });

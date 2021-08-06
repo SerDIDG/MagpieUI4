@@ -62,16 +62,16 @@
                                 {'type' : 'empty', 'width' : '150', 'title' : 'Custom nodes', 'onRender' : function(gridlist, data){
                                     //cm.log(data);
                                     data['nodes']['inner'].appendChild(
-                                        cm.Node('div', {'class' : 'pt__links'},
-                                            cm.Node('ul',
-                                                cm.Node('li',
-                                                    cm.Node('a', 'Add')
+                                        cm.node('div', {'class' : 'pt__links'},
+                                            cm.node('ul',
+                                                cm.node('li',
+                                                    cm.node('a', 'Add')
                                                 ),
-                                                cm.Node('li',
-                                                    cm.Node('a', 'Edit')
+                                                cm.node('li',
+                                                    cm.node('a', 'Edit')
                                                 ),
-                                                cm.Node('li',
-                                                    cm.Node('a', 'Remove')
+                                                cm.node('li',
+                                                    cm.node('a', 'Remove')
                                                 )
                                             )
                                         )
@@ -446,7 +446,7 @@ cm.getConstructor('Com.Gridlist', function(classConstructor){
         </dl>
         <dl>
             <dt>
-                <code><b>childsBy</b></code>
+                <code><b>childrenBy</b></code>
             </dt>
             <dd><code>Boolean</code>. Render child rows after parent, (WIP - doesn't work checking / uncheking rows and statuses for now). Default: <code>false</code>.</dd>
         </dl>

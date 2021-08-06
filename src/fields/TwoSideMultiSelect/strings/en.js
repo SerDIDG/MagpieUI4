@@ -1,4 +1,4 @@
-cm.setStrings('Com.TwoSideMultiSelect', {
+cm.setMessages('Com.TwoSideMultiSelect', {
 	'firstLabel' : 'Left:',
 	'secondLabel' : 'Right:',
 	'add' : '>>',

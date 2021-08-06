@@ -2,7 +2,7 @@ cm.define('Com.Draggable', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig'
     ],
     'events' : [

@@ -574,7 +574,7 @@ cm.getConstructor('Com.TabsetHelper', function(classConstructor, className, clas
         if(that.params['responseHTML']){
             cm.clearNode(item['tab']['inner']);
             item['tab']['inner'].appendChild(
-                cm.node('div', {'class' : 'cm__empty'}, that.lang('server_error'))
+                cm.node('div', {'class' : 'cm__empty'}, that.message('server_error'))
             );
         }
     };

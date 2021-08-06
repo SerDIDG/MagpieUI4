@@ -66,9 +66,9 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
     classProto.onValidateParamsEnd = function(){
         var that = this;
         // Validate Language Strings
-        that.setLangs({
-            '_browse_local' : that.params['fileManager'] ? that.lang('browse_local') : that.lang('browse'),
-            '_browse_filemanager' : that.params['local'] ? that.lang('browse_filemanager') : that.lang('browse')
+        that.setMessages({
+            '_browse_local' : that.params['fileManager'] ? that.message('browse_local') : that.message('browse'),
+            '_browse_filemanager' : that.params['local'] ? that.message('browse_filemanager') : that.message('browse')
         });
         // Dropzone
         that.params['dropzone'] = !that.params['local'] ? false : that.params['dropzone'];
@@ -162,7 +162,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
                 nodes['content'] = cm.node('div', {'class' : 'com__file-input__holder'},
                     cm.node('div', {'class' : 'pt__file-line'},
                         nodes['buttonsInner'] = cm.node('div', {'class' : 'inner'},
-                            nodes['clear'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('remove')),
+                            nodes['clear'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('remove')),
                             nodes['label'] = cm.node('div', {'class' : 'label'}),
                             nodes['placeholder'] = cm.node('div', {'class' : 'label label-placeholder', 'innerHTML' : that.params['placeholder']})
                         )
@@ -177,7 +177,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
         // Render Browse Buttons
         if(that.params['local']){
             nodes['browseLocal'] = cm.node('div', {'class' : 'browse-button'},
-                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_local')),
+                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_local')),
                 cm.node('div', {'class' : 'inner'},
                     nodes['input'] = cm.node('input', {'type' : 'file'})
                 )
@@ -186,11 +186,11 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
             cm.insertFirst(nodes['browseLocal'], nodes['buttonsInner']);
         }
         if(that.params['fileManager']){
-            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_filemanager'));
+            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_filemanager'));
             cm.insertFirst(nodes['browseFileManager'], nodes['buttonsInner']);
         }
         if(that.params['fileUploader']){
-            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('browse'));
+            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('browse'));
             cm.insertFirst(nodes['browseFileUploader'], nodes['buttonsInner']);
         }
         // Events
@@ -274,7 +274,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
             cm.removeClass(that.nodes['content']['label'], 'is-hidden');
             if(that.params['showFilename']){
                 if(that.params['showLink']){
-                    that.nodes['content']['link'] = cm.node('a', {'target' : '_blank', 'href' : that.value['url'], 'title' : that.lang('open')}, that.value['name']);
+                    that.nodes['content']['link'] = cm.node('a', {'target' : '_blank', 'href' : that.value['url'], 'title' : that.message('open')}, that.value['name']);
                 }else{
                     that.nodes['content']['link'] = cm.textNode(that.value['name']);
                 }

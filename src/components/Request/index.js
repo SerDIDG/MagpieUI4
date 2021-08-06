@@ -2,7 +2,7 @@ cm.define('Com.Request', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Stack',
         'Structure'
     ],
@@ -415,7 +415,7 @@ cm.getConstructor('Com.Request', function(classConstructor, className, classProt
             temporary,
             node;
         if(that.params.responseHTML){
-            node = cm.node('div', {'class' : 'cm__empty'}, that.lang('server_error'));
+            node = cm.node('div', {'class' : 'cm__empty'}, that.message('server_error'));
             // Append
             if(cm.isNode(that.params.responseContainer)){
                 that.triggerEvent('onContentRenderStart', node);

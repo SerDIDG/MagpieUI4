@@ -97,7 +97,7 @@
             <dt>
                 <code><b>node</b></code>
             </dt>
-            <dd><code>HTML Node</code>. Html node that contains tabs. Default: <code>cm.Node('div')</code>.</dd>
+            <dd><code>HTML Node</code>. Html node that contains tabs. Default: <code>cm.node('div')</code>.</dd>
         </dl>
         <dl>
             <dt>
@@ -164,7 +164,7 @@ new Com.Tabset({
     'tabs' : [{
         'id' : 'foo',
         'title' : 'Foo',
-        'content' : cm.Node('li'),
+        'content' : cm.node('li'),
         'onShow' : function(tabset, tab){},
         'onHide' : function(tabset, tab){}
     }]
@@ -226,7 +226,7 @@ new Com.Tabset({
 tabset.addTab({
     'id' : 'foo',
     'title' : 'Foo',
-    'content' : cm.Node('li'),
+    'content' : cm.node('li'),
     'onShow' : function(tabset, tab){},
     'onHide' : function(tabset, tab){}
 });</textarea>

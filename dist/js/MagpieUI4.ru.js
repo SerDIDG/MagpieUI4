@@ -3,7 +3,7 @@ cm._config.displayDateFormatCase = 'genitive';
 cm._config.displayDateFormat = '%j %F %Y';
 cm._config.displayDateTimeFormat = '%j %F %Y в %H:%i';
 
-cm._strings = {
+cm._messages = {
 	'common' : {
 		'server_error' : 'Произошла непредвиденная ошибка. Пожалуйста, повторите попытку позже.'
 	},
@@ -15,49 +15,49 @@ cm._strings = {
 	'daysAbbr' : ['В', 'П', 'В', 'С', 'Ч', 'П', 'С']
 };
 
-cm.setStrings('Com.AbstractContainer', {
+cm.setMessages('Com.AbstractContainer', {
     'title': 'Контейнер',
     'close': 'Закрыть',
     'save': 'Сохранить',
     'help': '',
 });
 
-cm.setStrings('Com.AbstractFormField', {
+cm.setMessages('Com.AbstractFormField', {
 	'required' : 'Пожалуйста, заполните поле выше.',
 	'too_short' : 'Значение должно содержать минимум %count% символов.',
 	'too_long' : 'Значение не должно быть больше %count% символов.',
 	'*' : '*'
 });
 
-cm.setStrings('Com.Calendar', {
-	'months' : cm._strings.months['nominative'],
-	'days' : cm._strings.days,
-	'daysAbbr' : cm._strings.daysAbbr
+cm.setMessages('Com.Calendar', {
+	'months' : cm._messages.months['nominative'],
+	'days' : cm._messages.days,
+	'daysAbbr' : cm._messages.daysAbbr
 });
 
-cm.setStrings('Com.Dialog', {
+cm.setMessages('Com.Dialog', {
     'closeTitle': 'Закрыть',
     'close': '',
     'helpTitle': 'Помощь',
     'help': '',
 });
 
-cm.setStrings('Com.DialogContainer', {
+cm.setMessages('Com.DialogContainer', {
     'close': 'Закрыть',
 });
 
-cm.setStrings('Com.FileDropzone', {
+cm.setMessages('Com.FileDropzone', {
 	'drop_single' : 'загрузить файл',
 	'drop_multiple' : 'загрузить файлы'
 });
 
-cm.setStrings('Com.Form', {
+cm.setMessages('Com.Form', {
 	'form_error' : 'Пожалуйста, корректно заполните все необходимые поля.',
-	'server_error' : cm._strings.common['server_error'],
+	'server_error' : cm._messages.common['server_error'],
 	'success_message' : 'Форма успешно отправлена!'
 });
 
-cm.setStrings('Com.Gridlist', {
+cm.setMessages('Com.Gridlist', {
 	'counter' : 'Количество: ',
 	'check_all' : 'Выделить все',
 	'uncheck_all' : 'Отменить выделение',
@@ -65,40 +65,40 @@ cm.setStrings('Com.Gridlist', {
 	'actions' : 'Действия'
 });
 
-cm.setStrings('Com.GridlistFilter', {
+cm.setMessages('Com.GridlistFilter', {
 	'placeholder' : 'Впишите текст для поиска...'
 });
 
-cm.setStrings('Com.MultipleField', {
+cm.setMessages('Com.MultipleField', {
 	'add' : 'Добавить',
 	'remove' : 'Удалить'
 });
 
-cm.setStrings('Com.Notifications', {
+cm.setMessages('Com.Notifications', {
 	'close' : 'Закрыть',
 	'more' : 'Подробнее'
 });
 
-cm.setStrings('Com.Pagination', {
+cm.setMessages('Com.Pagination', {
 	'prev' : 'Предыдущая',
 	'next' : 'Следующая',
-	'server_error' : cm._strings.common['server_error']
+	'server_error' : cm._messages.common['server_error']
 });
 
-cm.setStrings('Com.ScrollPagination', {
+cm.setMessages('Com.ScrollPagination', {
 	'load_more' : 'Загрузить ещё',
-	'server_error' : cm._strings.common['server_error']
+	'server_error' : cm._messages.common['server_error']
 });
 
-cm.setStrings('Com.Autocomplete', {
+cm.setMessages('Com.Autocomplete', {
 	'loader' : 'Поиск <b>«%query%»</b>…',
 	'suggestion' : 'Добавить <b>«%query%»</b>?'
 });
 
-cm.setStrings('Com.DatePicker', {
-	'months' : cm._strings.months['genitive'],
-	'days' : cm._strings.days,
-	'daysAbbr' : cm._strings.daysAbbr,
+cm.setMessages('Com.DatePicker', {
+	'months' : cm._messages.months['genitive'],
+	'days' : cm._messages.days,
+	'daysAbbr' : cm._messages.daysAbbr,
 	'Clear date' : 'Очистить дату',
 	'Today' : 'Сегодня',
 	'Now' : 'Сейчас',
@@ -109,14 +109,14 @@ cm.setParams('Com.DatePicker', {
 	'startWeekDay': 1
 });
 
-cm.setStrings('Com.DateSelect', {
-	'months' : cm._strings.months['nominative'],
+cm.setMessages('Com.DateSelect', {
+	'months' : cm._messages.months['nominative'],
 	'Day' : 'День',
 	'Month' : 'Месяц',
 	'Year' : 'Год'
 });
 
-cm.setStrings('Com.FileInput', {
+cm.setMessages('Com.FileInput', {
 	'browse' : 'Обзор',
 	'browse_local' : 'Выьрать Локально',
 	'browse_filemanager' : 'Выбрать в Файловом Архиве',
@@ -124,20 +124,20 @@ cm.setStrings('Com.FileInput', {
 	'open' : 'Открыть'
 });
 
-cm.setStrings('Com.MultipleFileInput', {
+cm.setMessages('Com.MultipleFileInput', {
 	'browse' : 'Обзор',
 	'browse_local' : 'Выьрать Локально',
 	'browse_filemanager' : 'Выбрать в Файловом Архиве'
 });
 
-cm.setStrings('Com.ImageInput', {
+cm.setMessages('Com.ImageInput', {
 	'preview' : 'Просмотр',
 	'edit' : 'Редактировать',
 	'remove' : 'Удалить',
 	'browse' : 'Обзор'
 });
 
-cm.setStrings('Com.TagsInput', {
+cm.setMessages('Com.TagsInput', {
 	'tags' : 'Метки',
 	'add' : 'Добавить',
 	'remove' : 'Удалить',

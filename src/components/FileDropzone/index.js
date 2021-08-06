@@ -56,8 +56,8 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
             that.params['duration'] = !cm.isEmpty(duration) ? cm.parseTransitionDuration(duration) : that.params['_duration'];
         }
         // Validate Language Strings
-        that.setLangs({
-            'drop' : !that.params['max'] || that.params['max'] > 1 ? that.lang('drop_multiple') : that.lang('drop_single')
+        that.setMessages({
+            'drop' : !that.params['max'] || that.params['max'] > 1 ? that.message('drop_multiple') : that.message('drop_single')
         });
     };
 
@@ -79,7 +79,7 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
         that.nodes['container'] = cm.node('div', {'class' : 'com__file-dropzone'},
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'title'},
-                    cm.node('div', {'class' : 'label'}, that.lang('drop')),
+                    cm.node('div', {'class' : 'label'}, that.message('drop')),
                     cm.node('div', {'class' : 'icon cm-i cm-i__circle-arrow-down'})
                 )
             )

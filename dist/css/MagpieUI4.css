@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/*! ************ MagpieUI4 v4.0.8 ************ */
+/*! ************ MagpieUI4 v4.0.9 ************ */
 /*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -4278,8 +4278,8 @@ span.CodeMirror-selectedtext {
 }
 @font-face {
   font-family: 'Magpie-UI-Glyphs';
-  src: url('../fonts/Magpie-UI-Glyphs.eot?4.0.8');
-  src: url('../fonts/Magpie-UI-Glyphs.eot?#iefix4.0.8') format('embedded-opentype'), url('../fonts/Magpie-UI-Glyphs.woff?4.0.8') format('woff'), url('../fonts/Magpie-UI-Glyphs.ttf?4.0.8') format('truetype'), url('../fonts/Magpie-UI-Glyphs.svg?4.0.8#Magpie-UI-Glyphs') format('svg');
+  src: url('../fonts/Magpie-UI-Glyphs.eot?4.0.9');
+  src: url('../fonts/Magpie-UI-Glyphs.eot?#iefix4.0.9') format('embedded-opentype'), url('../fonts/Magpie-UI-Glyphs.woff?4.0.9') format('woff'), url('../fonts/Magpie-UI-Glyphs.ttf?4.0.9') format('truetype'), url('../fonts/Magpie-UI-Glyphs.svg?4.0.9#Magpie-UI-Glyphs') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -15386,51 +15386,6 @@ ul.pt__field__hint li:before {
 .com__notifications > ul > li.notice > .close,
 .com__notifications > ul > li.warning > .close {
   border-color: #d2a323;
-}
-/* ******* COMPONENTS: OLD BROWSERS ALERT ******* */
-.com__oldbrowser-alert .b-descr {
-  margin: 0 0 32px;
-}
-.com__oldbrowser-alert .b-descr p {
-  margin: 0;
-}
-.com__oldbrowser-alert .b-browsers {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  text-align: left;
-  font-size: 0;
-  margin: 0 0 40px;
-  white-space: nowrap;
-  text-align: center;
-}
-.com__oldbrowser-alert .b-browsers > li {
-  margin: 0;
-  padding: 0;
-}
-.com__oldbrowser-alert .b-browsers > li {
-  display: inline-block;
-  vertical-align: top;
-}
-.com__oldbrowser-alert .b-browsers.pull-left {
-  text-align: left;
-}
-.com__oldbrowser-alert .b-browsers.pull-center {
-  text-align: center;
-}
-.com__oldbrowser-alert .b-browsers.pull-right {
-  text-align: right;
-}
-.ie6 .com__oldbrowser-alert .b-browsers > li,
-.ie7 .com__oldbrowser-alert .b-browsers > li {
-  display: inline;
-  zoom: 1;
-}
-.com__oldbrowser-alert .b-browsers > li > a {
-  display: block;
-}
-.com__oldbrowser-alert .btn-wrap {
-  margin-top: 0;
 }
 /* ******* PARTS: OVERLAY ******* */
 .pt__overlay {

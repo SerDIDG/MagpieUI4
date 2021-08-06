@@ -70,7 +70,7 @@ cm.getConstructor('Com.RepeatTools', function(classConstructor, className, class
             'nodes' : {}
         }, item);
         // Structure
-        item['nodes']['container'] = cm.node('div', {'class' : 'option__item', 'title' : that.lang(item['name'])},
+        item['nodes']['container'] = cm.node('div', {'class' : 'option__item', 'title' : that.message(item['name'])},
             item['nodes']['icon'] = cm.node('div', {'class' : [item['iconType'], item['icon']].join(' ')})
         );
         cm.appendChild(item['nodes']['container'], that.nodes['content']['inner']);

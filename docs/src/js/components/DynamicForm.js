@@ -11,7 +11,7 @@ cm.define('Docs.DynamicForm', {
         'onRender'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'formName' : 'dynamic'
     }

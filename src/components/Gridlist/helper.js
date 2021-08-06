@@ -2,7 +2,7 @@ cm.define('Com.GridlistHelper', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes',
         'Stack'
@@ -17,7 +17,7 @@ cm.define('Com.GridlistHelper', {
         'disableEditable'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'isEditing' : true,
         'customEvents' : true,

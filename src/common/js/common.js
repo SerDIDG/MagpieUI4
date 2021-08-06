@@ -54,14 +54,6 @@ cm._getVariables = function(){
 
 /* ******* OBJECTS AND ARRAYS ******* */
 
-cm.top = (function(){
-    try {
-        return window.top.cm;
-    }catch(e){
-        return window.cm;
-    }
-})();
-
 cm.isType = function(o, types){
     if(cm.isString(types)){
         return Object.prototype.toString.call(o) === '[object ' + types +']';
@@ -635,11 +627,14 @@ cm.log = (function(){
 })();
 
 cm.errorLog = function(o){
+    if ( !cm._debug ) {
+        return;
+    }
     var config = cm.merge({
             'type' : 'error',
             'name' : '',
             'message' : '',
-            'strings' : {
+            'messages' : {
                 'error' : 'Error!',
                 'success' : 'Success!',
                 'attention' : 'Attention!',
@@ -647,7 +642,7 @@ cm.errorLog = function(o){
             }
         }, o),
         data = [
-            config['strings'][config['type']],
+            config['messages'][config['type']],
             config['name'],
             config['message']
         ],
@@ -1184,26 +1179,26 @@ cm.loadScript = function(o){
         'path' : '',
         'src' : '',
         'async' : true,
-        'callback' : function(){}
+        'callback' : () => {}
     }, o);
-    var path = cm.reducePath(o['path'], window);
+    let path = cm.reducePath(o['path'], window);
     if(!cm.isEmpty(path)){
         o['callback'](path);
-    }else{
-        cm.addScript(o['src'], o['async'], function(){
-            path = cm.reducePath(o['path'], window);
-            if(!cm.isEmpty(path)){
-                o['callback'](path);
-            }else{
-                cm.errorLog({
-                    'type' : 'error',
-                    'name' : 'cm.loadScript',
-                    'message' : [o['path'], 'does not loaded.'].join(' ')
-                });
-                o['callback'](null);
-            }
-        });
+        return;
     }
+    cm.addScript(o['src'], o['async'], () => {
+        let path = cm.reducePath(o['path'], window);
+        if(!cm.isEmpty(path)){
+            o['callback'](path);
+        }else{
+            cm.errorLog({
+                'type' : 'error',
+                'name' : 'cm.loadScript',
+                'message' : `${o.path} does not loaded.`
+            });
+            o['callback'](null);
+        }
+    });
 };
 
 cm.getEl = function(str){
@@ -1216,13 +1211,13 @@ cm.getByClass = function(str, node){
 };
 
 cm.getByAttr = function(attr, value, element){
-    var p = element || document;
-    return p.querySelectorAll('[' + attr + '="' + value + '"]');
+    const node = element || document;
+    return node.querySelectorAll(`[${attr}="${value}"]`);
 };
 
 cm.getByName = function(name, node){
     if(cm.isNode(node)){
-        return node.querySelectorAll('[name="' + name + '"]');
+        return node.querySelectorAll(`[name="${name}"]`);
     }else{
         return document.getElementsByName(name);
     }
@@ -1239,10 +1234,6 @@ cm.getParentByTagName = function(tagName, node){
         }
     }while(el = el.parentNode);
     return null;
-};
-
-cm.getIFrameDOM = function(o){
-    return o.contentDocument || o.document;
 };
 
 cm.getDocumentHead = function(){
@@ -1266,7 +1257,7 @@ cm.getNodeOffsetIndex = function(node){
     return i;
 };
 
-cm.node = cm.Node = function(){
+cm.node = function(){
     var args = arguments,
         el = document.createElement(args[0]),
         i = 0;
@@ -1379,15 +1370,15 @@ cm.getTextValue = cm.getTxtVal = function(o){
 
 cm.getTextNodesStr = function(node){
     var str = '',
-        childs;
+        children;
     if(node){
         if(cm.isArray(node)){
             cm.forEach(node, function(child){
                 str += cm.getTextNodesStr(child);
             });
         }else if(cm.isNode(node)){
-            childs = node.childNodes;
-            cm.forEach(childs, function(child){
+            children = node.childNodes;
+            cm.forEach(children, function(child){
                 if(child.nodeType === 1){
                     str += cm.getTextNodesStr(child);
                 }else{
@@ -1540,7 +1531,7 @@ cm.strToHTML = function(str){
     if(!str || cm.isNode(str)){
         return str;
     }
-    var node = cm.Node('div');
+    var node = cm.node('div');
     node.insertAdjacentHTML('beforeend', str);
     return node.childNodes.length === 1? node.firstChild : node.childNodes;
 };
@@ -1935,8 +1926,11 @@ cm.toNumber = function(str){
 };
 
 cm.decode = (function(){
-    var node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
+    var node;
     return function(text){
+        if(!node){
+            node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
+        }
         if(!cm.isEmpty(text)){
             node.innerHTML = text;
             return node.value;
@@ -1948,11 +1942,13 @@ cm.decode = (function(){
 })();
 
 cm.copyToClipboard = (function(){
-    var node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'}),
-        success;
-    cm.insertFirst(node, document.body);
+    var node, success;
     return function(text, callback){
         callback = cm.isFunction(callback) ? callback : function(){};
+        if(!node){
+            node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
+            cm.insertFirst(node, document.body);
+        }
         if(!cm.isEmpty(text)){
             node.value = text;
             node.select();
@@ -2093,7 +2089,7 @@ cm.getCurrentDate = function(format){
     return cm.dateFormat(new Date(), format);
 };
 
-cm.dateFormat = function(date, format, langs, formatCase){
+cm.dateFormat = function(date, format, messages, formatCase){
     if(cm.isDate(date)){
         date = new Date(+date);
     }else if(cm.isString(date)){
@@ -2106,13 +2102,13 @@ cm.dateFormat = function(date, format, langs, formatCase){
     format = cm.isString(format) ? format : cm._config.dateTimeFormat;
     formatCase = cm.isString(formatCase) ? formatCase : cm._config.dateFormatCase;
     // Validate language strings
-    langs = cm.merge({
-        'months' : cm._strings.months,
-        'days' : cm._strings.days
-    }, langs);
+    messages = cm.merge({
+        'months' : cm._messages.months,
+        'days' : cm._messages.days
+    }, messages);
     // Validate language case
-    if(cm.isObject(langs['months']) && langs['months'][formatCase]){
-        langs['months'] = langs['months'][formatCase]
+    if(cm.isObject(messages['months']) && messages['months'][formatCase]){
+        messages['months'] = messages['months'][formatCase]
     }
     // Define format variables
     var convertFormats = {
@@ -2144,7 +2140,7 @@ cm.dateFormat = function(date, format, langs, formatCase){
                 return date ? (date.getMonth() + 1) : '00';
             },
             '%F' : function(){
-                return date ? langs['months'][date.getMonth()] : '00';
+                return date ? messages['months'][date.getMonth()] : '00';
             },
             '%d' : function(){
                 return date ? cm.addLeadZero(date.getDate()) : '00';
@@ -2153,7 +2149,7 @@ cm.dateFormat = function(date, format, langs, formatCase){
                 return date ? date.getDate() : '00';
             },
             '%l' : function(){
-                return date ? langs['days'][date.getDay()] : '00';
+                return date ? messages['days'][date.getDay()] : '00';
             },
             '%a' : function(){
                 return date ? (date.getHours() >= 12? 'pm' : 'am') : '';
@@ -2261,20 +2257,20 @@ cm.parseDate = function(str, format){
     return new Date(parsed['YYYY'], parsed['mm'], parsed['dd'], parsed['HH'], parsed['ii'], parsed['ss'], parsed['vvv']);
 };
 
-cm.parseFormatDate = function(str, format, displayFormat, langs, formatCase){
+cm.parseFormatDate = function(str, format, displayFormat, messages, formatCase){
     format = format || cm._config.dateFormat;
     displayFormat = displayFormat || cm._config.displayDateFormat;
     formatCase = formatCase|| cm._config.displayDateFormatCase;
     var date = cm.parseDate(str, format);
-    return cm.dateFormat(date, displayFormat, langs, formatCase);
+    return cm.dateFormat(date, displayFormat, messages, formatCase);
 };
 
-cm.parseFormatDateTime = function(str, format, displayFormat, langs, formatCase){
+cm.parseFormatDateTime = function(str, format, displayFormat, messages, formatCase){
     format = format || cm._config.dateTimeFormat;
     displayFormat = displayFormat || cm._config.displayDateTimeFormat;
     formatCase = formatCase|| cm._config.displayDateFormatCase;
     var date = cm.parseDate(str, format);
-    return cm.dateFormat(date, displayFormat, langs, formatCase);
+    return cm.dateFormat(date, displayFormat, messages, formatCase);
 };
 
 cm.getWeek = function(date){
@@ -3344,7 +3340,8 @@ cm.allowOnlyNumbersInputEvent = function(input, callback, params){
 
 /* ******* ANIMATION ******* */
 
-var animFrame = (function(){
+// 'requestAnimationFrame' called on an object that does not implement interface Window.
+const animFrame = (function(){
     return  window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
@@ -3863,7 +3860,7 @@ cm.ajax = function(o){
             }
         };
         // Prepare url and attach events
-        scriptNode = cm.Node('script', {'type' : 'application/javascript'});
+        scriptNode = cm.node('script', {'type' : 'application/javascript'});
         cm.addEvent(scriptNode, 'load', window[callbackSuccessName]);
         cm.addEvent(scriptNode, 'error', window[callbackErrorName]);
         // Embed
@@ -3903,19 +3900,19 @@ cm.ajaxPromise = function(o){
 };
 
 cm.parseJSON = function(str){
-    var o;
+    let data;
     if(str){
         try{
-            o = JSON.parse(str);
+            data = JSON.parse(str);
         }catch(e){
             cm.errorLog({
-                'type' : 'common',
-                'name' : 'cm.parseJSON',
-                'message' : ['Error while parsing JSON. Input string:', str].join(' ')
+                type : 'common',
+                name : 'cm.parseJSON',
+                message : `Error while parsing JSON. Input string: ${str}}`,
             });
         }
     }
-    return o;
+    return data;
 };
 
 cm.stringifyJSON = function(o){
@@ -4049,248 +4046,4 @@ cm.createSvg = function(){
     node.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
     node.setAttribute('version', '1.1');
     return node;
-};
-
-/* ******* CLASS FABRIC ******* */
-
-cm._defineStack = {};
-cm._defineExtendStack = {};
-
-cm.defineHelper = function(name, data, handler){
-    var that = this;
-    // Process config
-    data = cm.merge({
-        'modules' : [],
-        'require' : [],
-        'params' : {},
-        'events' : [],
-        'extend' : false
-    }, data);
-    // Create class extend object
-    that.build = {
-        'constructor' : handler,
-        '_raw' : cm.clone(data),
-        '_update' : {},
-        '_name' : {
-            'full' : name,
-            'short' : name.replace('.', ''),
-            'split' : name.split('.')
-        },
-        '_className' : name,
-        '_constructor' : handler,
-        '_modules' : {},
-        'params' : data['params'],
-        'strings' : data['strings']
-    };
-    // Inheritance
-    if(data['extend']){
-        cm.getConstructor(data['extend'], function(classConstructor, className){
-            handler.prototype = Object.create(classConstructor.prototype);
-            that.build._inheritName = className;
-            that.build._inherit = classConstructor;
-            // Merge raw params
-            that.build._raw['modules'] = cm.merge(that.build._inherit.prototype._raw['modules'], that.build._raw['modules']);
-            that.build._raw['events'] = cm.merge(that.build._inherit.prototype._raw['events'], that.build._raw['events']);
-            // Add to extend stack
-            if(cm._defineExtendStack[className]){
-                cm._defineExtendStack[className].push(name);
-            }
-        });
-    }
-    // Extend class by predefine modules
-    cm.forEach(Mod, function(module, name){
-        if(module._config && module._config['predefine']){
-            Mod['Extend']._extend.call(that, name, module);
-        }
-    });
-    // Extend class by class specific modules
-    cm.forEach(that.build._raw['modules'], function(module){
-        if(Mod[module]){
-            Mod['Extend']._extend.call(that, module, Mod[module]);
-        }
-    });
-    // Prototype class methods
-    cm.forEach(that.build, function(value, key){
-        handler.prototype[key] = value;
-    });
-    // Add to stack
-    if(!cm._defineExtendStack[name]){
-        cm._defineExtendStack[name] = [];
-    }
-    cm._defineStack[name] = handler;
-    // Extend Window object
-    cm.objectSelector(name, window, handler);
-};
-
-cm.define = (function(){
-    var definer = Function.prototype.call.bind(cm.defineHelper, arguments);
-    return function(){
-        definer.apply(cm.defineHelper, arguments);
-    };
-})();
-
-cm.getConstructor = function(className, callback){
-    var classConstructor;
-    callback = cm.isFunction(callback) ? callback : function(){};
-    if(cm.isUndefined(className)){
-        if(cm._debug){
-            cm.errorLog({
-                'type' : 'error',
-                'name' : 'cm.getConstructor',
-                'message' : ['Parameter "className" does not specified.'].join(' ')
-            });
-        }
-        return false;
-    }else if(className === '*'){
-        cm.forEach(cm._defineStack, function(classConstructor){
-            callback(classConstructor, className, classConstructor.prototype, classConstructor.prototype._inherit);
-        });
-        return cm._defineStack;
-    }else{
-        classConstructor = cm._defineStack[className];
-        if(!classConstructor){
-            if(cm._debug){
-                cm.errorLog({
-                    'type' : 'attention',
-                    'name' : 'cm.getConstructor',
-                    'message' : ['Class', cm.strWrap(className, '"'), 'does not exists or define.'].join(' ')
-                });
-            }
-            return false;
-        }else{
-            callback(classConstructor, className, classConstructor.prototype, classConstructor.prototype._inherit);
-            return classConstructor;
-        }
-    }
-};
-
-cm.isInstance = function(childClass, parentClass){
-    var isInstance = false;
-    if(cm.isString(parentClass)){
-        parentClass = cm.getConstructor(parentClass);
-    }
-    if(!cm.isEmpty(childClass) && !cm.isEmpty(parentClass)){
-        isInstance = childClass instanceof parentClass;
-    }
-    return isInstance;
-};
-
-cm.find = function(className, name, parentNode, callback, params){
-    var items = [],
-        processed = {};
-    // Config
-    callback = cm.isFunction(callback) ? callback : function(){};
-    params = cm.merge({
-        'childs' : false
-    }, params);
-    // Process
-    if(!className || className === '*'){
-        cm.forEach(cm._defineStack, function(classConstructor){
-            if(classConstructor.prototype.findInStack){
-                items = cm.extend(items, classConstructor.prototype.findInStack(name, parentNode, callback));
-            }
-        });
-    }else{
-        var classConstructor = cm._defineStack[className];
-        if(!classConstructor){
-            cm.errorLog({
-                'type' : 'error',
-                'name' : 'cm.find',
-                'message' : ['Class', cm.strWrap(className, '"'), 'does not exist.'].join(' ')
-            });
-        }else if(!classConstructor.prototype.findInStack){
-            cm.errorLog({
-                'type' : 'error',
-                'name' : 'cm.find',
-                'message' : ['Class', cm.strWrap(className, '"'), 'does not support Module Stack.'].join(' ')
-            });
-        }else{
-            // Find instances of current constructor
-            items = cm.extend(items, classConstructor.prototype.findInStack(name, parentNode, callback));
-            // Find child instances, and stack processed parent classes to avoid infinity loops
-            if(params['childs'] && cm._defineExtendStack[className] && !processed[className]){
-                processed[className] = true;
-                cm.forEach(cm._defineExtendStack[className], function(childName){
-                    items = cm.extend(items, cm.find(childName, name, parentNode, callback, params));
-                });
-            }
-        }
-    }
-    return items;
-};
-
-cm.Finder = function(className, name, parentNode, callback, params){
-    var that = this,
-        isEventBind = false;
-
-    var init = function(){
-        var finder;
-        // Merge params
-        //parentNode = parentNode || document.body;
-        callback = cm.isFunction(callback) ? callback : function(){};
-        params = cm.merge({
-            'event' : 'onRender',
-            'multiple' : false,
-            'childs' : false
-        }, params);
-        // Search in constructed classes
-        finder = cm.find(className, name, parentNode, callback, {
-            'childs' : params['childs']
-        });
-        // Bind event when no one constructed class found
-        if(!finder || !finder.length || params['multiple']){
-            isEventBind = true;
-            cm.getConstructor(className, function(classConstructor){
-                classConstructor.prototype.addEvent(params['event'], watcher);
-            });
-        }
-    };
-
-    var watcher = function(classObject){
-        classObject.removeEvent(params['event'], watcher);
-        var isSame = classObject.isAppropriateToStack(name, parentNode, callback);
-        if(isSame && !params['multiple'] && isEventBind){
-            that.remove(classObject._constructor);
-        }
-    };
-
-    that.remove = function(classConstructor){
-        if(classConstructor){
-            classConstructor.prototype.removeEvent(params['event'], watcher);
-        }else{
-            cm.getConstructor(className, function(classConstructor){
-                classConstructor.prototype.removeEvent(params['event'], watcher);
-            });
-        }
-    };
-
-    init();
-};
-
-cm.setParams = function(className, params){
-    cm.getConstructor(className, function(classConstructor, className, classProto){
-        classProto.setParams(params);
-    });
-};
-
-cm.setMessages = cm.setStrings = function(className, strings){
-    cm.getConstructor(className, function(classConstructor, className, classProto){
-        classProto.setMessages(strings);
-    });
-};
-
-cm.getMessage = cm.getString = function(className, str){
-    var data;
-    cm.getConstructor(className, function(classConstructor, className, classProto){
-        data = classProto.message(str);
-    });
-    return data;
-};
-
-cm.getMessages = cm.getStrings = function(className, o){
-    var data;
-    cm.getConstructor(className, function(classConstructor, className, classProto){
-        data = classProto.messageObject(o);
-    });
-    return data;
 };

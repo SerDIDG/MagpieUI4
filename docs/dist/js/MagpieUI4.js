@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.8 ************ */
+/*! ************ MagpieUI4 v4.0.9 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.8',
+    '_version': '4.0.9',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -1712,14 +1712,6 @@ cm._getVariables = function(){
 };
 
 /* ******* OBJECTS AND ARRAYS ******* */
-
-cm.top = (function(){
-    try {
-        return window.top.cm;
-    }catch(e){
-        return window.cm;
-    }
-})();
 
 cm.isType = function(o, types){
     if(cm.isString(types)){
@@ -2294,11 +2286,14 @@ cm.log = (function(){
 })();
 
 cm.errorLog = function(o){
+    if ( !cm._debug ) {
+        return;
+    }
     var config = cm.merge({
             'type' : 'error',
             'name' : '',
             'message' : '',
-            'strings' : {
+            'messages' : {
                 'error' : 'Error!',
                 'success' : 'Success!',
                 'attention' : 'Attention!',
@@ -2306,7 +2301,7 @@ cm.errorLog = function(o){
             }
         }, o),
         data = [
-            config['strings'][config['type']],
+            config['messages'][config['type']],
             config['name'],
             config['message']
         ],
@@ -2843,26 +2838,26 @@ cm.loadScript = function(o){
         'path' : '',
         'src' : '',
         'async' : true,
-        'callback' : function(){}
+        'callback' : () => {}
     }, o);
-    var path = cm.reducePath(o['path'], window);
+    let path = cm.reducePath(o['path'], window);
     if(!cm.isEmpty(path)){
         o['callback'](path);
-    }else{
-        cm.addScript(o['src'], o['async'], function(){
-            path = cm.reducePath(o['path'], window);
-            if(!cm.isEmpty(path)){
-                o['callback'](path);
-            }else{
-                cm.errorLog({
-                    'type' : 'error',
-                    'name' : 'cm.loadScript',
-                    'message' : [o['path'], 'does not loaded.'].join(' ')
-                });
-                o['callback'](null);
-            }
-        });
+        return;
     }
+    cm.addScript(o['src'], o['async'], () => {
+        let path = cm.reducePath(o['path'], window);
+        if(!cm.isEmpty(path)){
+            o['callback'](path);
+        }else{
+            cm.errorLog({
+                'type' : 'error',
+                'name' : 'cm.loadScript',
+                'message' : `${o.path} does not loaded.`
+            });
+            o['callback'](null);
+        }
+    });
 };
 
 cm.getEl = function(str){
@@ -2875,13 +2870,13 @@ cm.getByClass = function(str, node){
 };
 
 cm.getByAttr = function(attr, value, element){
-    var p = element || document;
-    return p.querySelectorAll('[' + attr + '="' + value + '"]');
+    const node = element || document;
+    return node.querySelectorAll(`[${attr}="${value}"]`);
 };
 
 cm.getByName = function(name, node){
     if(cm.isNode(node)){
-        return node.querySelectorAll('[name="' + name + '"]');
+        return node.querySelectorAll(`[name="${name}"]`);
     }else{
         return document.getElementsByName(name);
     }
@@ -2898,10 +2893,6 @@ cm.getParentByTagName = function(tagName, node){
         }
     }while(el = el.parentNode);
     return null;
-};
-
-cm.getIFrameDOM = function(o){
-    return o.contentDocument || o.document;
 };
 
 cm.getDocumentHead = function(){
@@ -2925,7 +2916,7 @@ cm.getNodeOffsetIndex = function(node){
     return i;
 };
 
-cm.node = cm.Node = function(){
+cm.node = function(){
     var args = arguments,
         el = document.createElement(args[0]),
         i = 0;
@@ -3038,15 +3029,15 @@ cm.getTextValue = cm.getTxtVal = function(o){
 
 cm.getTextNodesStr = function(node){
     var str = '',
-        childs;
+        children;
     if(node){
         if(cm.isArray(node)){
             cm.forEach(node, function(child){
                 str += cm.getTextNodesStr(child);
             });
         }else if(cm.isNode(node)){
-            childs = node.childNodes;
-            cm.forEach(childs, function(child){
+            children = node.childNodes;
+            cm.forEach(children, function(child){
                 if(child.nodeType === 1){
                     str += cm.getTextNodesStr(child);
                 }else{
@@ -3199,7 +3190,7 @@ cm.strToHTML = function(str){
     if(!str || cm.isNode(str)){
         return str;
     }
-    var node = cm.Node('div');
+    var node = cm.node('div');
     node.insertAdjacentHTML('beforeend', str);
     return node.childNodes.length === 1? node.firstChild : node.childNodes;
 };
@@ -3594,8 +3585,11 @@ cm.toNumber = function(str){
 };
 
 cm.decode = (function(){
-    var node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
+    var node;
     return function(text){
+        if(!node){
+            node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
+        }
         if(!cm.isEmpty(text)){
             node.innerHTML = text;
             return node.value;
@@ -3607,11 +3601,13 @@ cm.decode = (function(){
 })();
 
 cm.copyToClipboard = (function(){
-    var node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'}),
-        success;
-    cm.insertFirst(node, document.body);
+    var node, success;
     return function(text, callback){
         callback = cm.isFunction(callback) ? callback : function(){};
+        if(!node){
+            node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
+            cm.insertFirst(node, document.body);
+        }
         if(!cm.isEmpty(text)){
             node.value = text;
             node.select();
@@ -3752,7 +3748,7 @@ cm.getCurrentDate = function(format){
     return cm.dateFormat(new Date(), format);
 };
 
-cm.dateFormat = function(date, format, langs, formatCase){
+cm.dateFormat = function(date, format, messages, formatCase){
     if(cm.isDate(date)){
         date = new Date(+date);
     }else if(cm.isString(date)){
@@ -3765,13 +3761,13 @@ cm.dateFormat = function(date, format, langs, formatCase){
     format = cm.isString(format) ? format : cm._config.dateTimeFormat;
     formatCase = cm.isString(formatCase) ? formatCase : cm._config.dateFormatCase;
     // Validate language strings
-    langs = cm.merge({
-        'months' : cm._strings.months,
-        'days' : cm._strings.days
-    }, langs);
+    messages = cm.merge({
+        'months' : cm._messages.months,
+        'days' : cm._messages.days
+    }, messages);
     // Validate language case
-    if(cm.isObject(langs['months']) && langs['months'][formatCase]){
-        langs['months'] = langs['months'][formatCase]
+    if(cm.isObject(messages['months']) && messages['months'][formatCase]){
+        messages['months'] = messages['months'][formatCase]
     }
     // Define format variables
     var convertFormats = {
@@ -3803,7 +3799,7 @@ cm.dateFormat = function(date, format, langs, formatCase){
                 return date ? (date.getMonth() + 1) : '00';
             },
             '%F' : function(){
-                return date ? langs['months'][date.getMonth()] : '00';
+                return date ? messages['months'][date.getMonth()] : '00';
             },
             '%d' : function(){
                 return date ? cm.addLeadZero(date.getDate()) : '00';
@@ -3812,7 +3808,7 @@ cm.dateFormat = function(date, format, langs, formatCase){
                 return date ? date.getDate() : '00';
             },
             '%l' : function(){
-                return date ? langs['days'][date.getDay()] : '00';
+                return date ? messages['days'][date.getDay()] : '00';
             },
             '%a' : function(){
                 return date ? (date.getHours() >= 12? 'pm' : 'am') : '';
@@ -3920,20 +3916,20 @@ cm.parseDate = function(str, format){
     return new Date(parsed['YYYY'], parsed['mm'], parsed['dd'], parsed['HH'], parsed['ii'], parsed['ss'], parsed['vvv']);
 };
 
-cm.parseFormatDate = function(str, format, displayFormat, langs, formatCase){
+cm.parseFormatDate = function(str, format, displayFormat, messages, formatCase){
     format = format || cm._config.dateFormat;
     displayFormat = displayFormat || cm._config.displayDateFormat;
     formatCase = formatCase|| cm._config.displayDateFormatCase;
     var date = cm.parseDate(str, format);
-    return cm.dateFormat(date, displayFormat, langs, formatCase);
+    return cm.dateFormat(date, displayFormat, messages, formatCase);
 };
 
-cm.parseFormatDateTime = function(str, format, displayFormat, langs, formatCase){
+cm.parseFormatDateTime = function(str, format, displayFormat, messages, formatCase){
     format = format || cm._config.dateTimeFormat;
     displayFormat = displayFormat || cm._config.displayDateTimeFormat;
     formatCase = formatCase|| cm._config.displayDateFormatCase;
     var date = cm.parseDate(str, format);
-    return cm.dateFormat(date, displayFormat, langs, formatCase);
+    return cm.dateFormat(date, displayFormat, messages, formatCase);
 };
 
 cm.getWeek = function(date){
@@ -5003,7 +4999,8 @@ cm.allowOnlyNumbersInputEvent = function(input, callback, params){
 
 /* ******* ANIMATION ******* */
 
-var animFrame = (function(){
+// 'requestAnimationFrame' called on an object that does not implement interface Window.
+const animFrame = (function(){
     return  window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
@@ -5522,7 +5519,7 @@ cm.ajax = function(o){
             }
         };
         // Prepare url and attach events
-        scriptNode = cm.Node('script', {'type' : 'application/javascript'});
+        scriptNode = cm.node('script', {'type' : 'application/javascript'});
         cm.addEvent(scriptNode, 'load', window[callbackSuccessName]);
         cm.addEvent(scriptNode, 'error', window[callbackErrorName]);
         // Embed
@@ -5562,19 +5559,19 @@ cm.ajaxPromise = function(o){
 };
 
 cm.parseJSON = function(str){
-    var o;
+    let data;
     if(str){
         try{
-            o = JSON.parse(str);
+            data = JSON.parse(str);
         }catch(e){
             cm.errorLog({
-                'type' : 'common',
-                'name' : 'cm.parseJSON',
-                'message' : ['Error while parsing JSON. Input string:', str].join(' ')
+                type : 'common',
+                name : 'cm.parseJSON',
+                message : `Error while parsing JSON. Input string: ${str}}`,
             });
         }
     }
-    return o;
+    return data;
 };
 
 cm.stringifyJSON = function(o){
@@ -5710,70 +5707,68 @@ cm.createSvg = function(){
     return node;
 };
 
-/* ******* CLASS FABRIC ******* */
-
 cm._defineStack = {};
 cm._defineExtendStack = {};
 
-cm.defineHelper = function(name, data, handler){
-    var that = this;
+cm.defineHelper = function(name, data, handler) {
+    const that = this;
     // Process config
     data = cm.merge({
-        'modules' : [],
-        'require' : [],
-        'params' : {},
-        'events' : [],
-        'extend' : false
+        modules: [],
+        require: [],
+        params: {},
+        events: [],
+        extend: false,
     }, data);
     // Create class extend object
     that.build = {
-        'constructor' : handler,
-        '_raw' : cm.clone(data),
-        '_update' : {},
-        '_name' : {
-            'full' : name,
-            'short' : name.replace('.', ''),
-            'split' : name.split('.')
+        constructor: handler,
+        _raw: cm.clone(data),
+        _update: {},
+        _name: {
+            full: name,
+            short: name.replace('.', ''),
+            split: name.split('.'),
         },
-        '_className' : name,
-        '_constructor' : handler,
-        '_modules' : {},
-        'params' : data['params'],
-        'strings' : data['strings']
+        _className: name,
+        _constructor: handler,
+        _modules: {},
+        params: data.params,
+        messages: data.messages,
     };
     // Inheritance
-    if(data['extend']){
-        cm.getConstructor(data['extend'], function(classConstructor, className){
+    if (data.extend) {
+        cm.getConstructor(data.extend, (classConstructor, className) => {
             handler.prototype = Object.create(classConstructor.prototype);
             that.build._inheritName = className;
             that.build._inherit = classConstructor;
             // Merge raw params
-            that.build._raw['modules'] = cm.merge(that.build._inherit.prototype._raw['modules'], that.build._raw['modules']);
-            that.build._raw['events'] = cm.merge(that.build._inherit.prototype._raw['events'], that.build._raw['events']);
+            that.build._raw.modules = cm.merge(that.build._inherit.prototype._raw.modules, that.build._raw.modules);
+            that.build._raw.events = cm.merge(that.build._inherit.prototype._raw.events, that.build._raw.events);
             // Add to extend stack
-            if(cm._defineExtendStack[className]){
+            if (cm._defineExtendStack[className]) {
                 cm._defineExtendStack[className].push(name);
             }
         });
     }
     // Extend class by predefine modules
-    cm.forEach(Mod, function(module, name){
-        if(module._config && module._config['predefine']){
-            Mod['Extend']._extend.call(that, name, module);
+    cm.forEach(Mod, (module, name) => {
+        if (module._config && module._config.predefine) {
+            Mod.Extend._extend.call(that, name, module);
         }
     });
     // Extend class by class specific modules
-    cm.forEach(that.build._raw['modules'], function(module){
-        if(Mod[module]){
-            Mod['Extend']._extend.call(that, module, Mod[module]);
+    cm.forEach(that.build._raw.modules, (module) => {
+        if (Mod[module]) {
+            Mod.Extend._extend.call(that, module, Mod[module]);
         }
     });
     // Prototype class methods
-    cm.forEach(that.build, function(value, key){
+    cm.forEach(that.build, (value, key) => {
         handler.prototype[key] = value;
     });
     // Add to stack
-    if(!cm._defineExtendStack[name]){
+    if (!cm._defineExtendStack[name]) {
         cm._defineExtendStack[name] = [];
     }
     cm._defineStack[name] = handler;
@@ -5781,95 +5776,90 @@ cm.defineHelper = function(name, data, handler){
     cm.objectSelector(name, window, handler);
 };
 
-cm.define = (function(){
-    var definer = Function.prototype.call.bind(cm.defineHelper, arguments);
-    return function(){
+cm.define = (function() {
+    const definer = Function.prototype.call.bind(cm.defineHelper, arguments);
+    return function() {
         definer.apply(cm.defineHelper, arguments);
     };
 })();
 
-cm.getConstructor = function(className, callback){
-    var classConstructor;
-    callback = cm.isFunction(callback) ? callback : function(){};
-    if(cm.isUndefined(className)){
-        if(cm._debug){
-            cm.errorLog({
-                'type' : 'error',
-                'name' : 'cm.getConstructor',
-                'message' : ['Parameter "className" does not specified.'].join(' ')
-            });
-        }
-        return false;
-    }else if(className === '*'){
-        cm.forEach(cm._defineStack, function(classConstructor){
+cm.getConstructor = function(className, callback) {
+    callback = cm.isFunction(callback) ? callback : () => {};
+    if (cm.isUndefined(className)) {
+        cm.errorLog({
+            type: 'error',
+            name: 'cm.getConstructor',
+            message: 'Parameter "className" does not specified.',
+        });
+        return null;
+    } else if (className === '*') {
+        cm.forEach(cm._defineStack, classConstructor => {
             callback(classConstructor, className, classConstructor.prototype, classConstructor.prototype._inherit);
         });
         return cm._defineStack;
-    }else{
-        classConstructor = cm._defineStack[className];
-        if(!classConstructor){
-            if(cm._debug){
-                cm.errorLog({
-                    'type' : 'attention',
-                    'name' : 'cm.getConstructor',
-                    'message' : ['Class', cm.strWrap(className, '"'), 'does not exists or define.'].join(' ')
-                });
-            }
-            return false;
-        }else{
+    } else {
+        let classConstructor = cm._defineStack[className];
+        if (!classConstructor) {
+            cm.errorLog({
+                type: 'attention',
+                name: 'cm.getConstructor',
+                message: `Class ${ cm.strWrap(className, '"') } does not exists or define.`,
+            });
+            return null;
+        } else {
             callback(classConstructor, className, classConstructor.prototype, classConstructor.prototype._inherit);
             return classConstructor;
         }
     }
 };
 
-cm.isInstance = function(childClass, parentClass){
-    var isInstance = false;
-    if(cm.isString(parentClass)){
+cm.isInstance = function(childClass, parentClass) {
+    let isInstance = false;
+    if (cm.isString(parentClass)) {
         parentClass = cm.getConstructor(parentClass);
     }
-    if(!cm.isEmpty(childClass) && !cm.isEmpty(parentClass)){
+    if (!cm.isEmpty(childClass) && !cm.isEmpty(parentClass)) {
         isInstance = childClass instanceof parentClass;
     }
     return isInstance;
 };
 
-cm.find = function(className, name, parentNode, callback, params){
-    var items = [],
-        processed = {};
+cm.find = function(className, name, parentNode, callback, params) {
+    let items = [];
+    let processed = {};
     // Config
-    callback = cm.isFunction(callback) ? callback : function(){};
+    callback = cm.isFunction(callback) ? callback : () => {};
     params = cm.merge({
-        'childs' : false
+        children: false,
     }, params);
     // Process
-    if(!className || className === '*'){
-        cm.forEach(cm._defineStack, function(classConstructor){
-            if(classConstructor.prototype.findInStack){
+    if (!className || className === '*') {
+        cm.forEach(cm._defineStack, classConstructor => {
+            if (classConstructor.prototype.findInStack) {
                 items = cm.extend(items, classConstructor.prototype.findInStack(name, parentNode, callback));
             }
         });
-    }else{
-        var classConstructor = cm._defineStack[className];
-        if(!classConstructor){
+    } else {
+        const classConstructor = cm._defineStack[className];
+        if (!classConstructor) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : 'cm.find',
-                'message' : ['Class', cm.strWrap(className, '"'), 'does not exist.'].join(' ')
+                type: 'error',
+                name: 'cm.find',
+                message: `Class ${ cm.strWrap(className, '"') } does not exist.`,
             });
-        }else if(!classConstructor.prototype.findInStack){
+        } else if (!classConstructor.prototype.findInStack) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : 'cm.find',
-                'message' : ['Class', cm.strWrap(className, '"'), 'does not support Module Stack.'].join(' ')
+                type: 'error',
+                name: 'cm.find',
+                message: `Class ${ cm.strWrap(className, '"') } does not support Module Stack.`,
             });
-        }else{
+        } else {
             // Find instances of current constructor
             items = cm.extend(items, classConstructor.prototype.findInStack(name, parentNode, callback));
             // Find child instances, and stack processed parent classes to avoid infinity loops
-            if(params['childs'] && cm._defineExtendStack[className] && !processed[className]){
+            if (params.children && cm._defineExtendStack[className] && !processed[className]) {
                 processed[className] = true;
-                cm.forEach(cm._defineExtendStack[className], function(childName){
+                cm.forEach(cm._defineExtendStack[className], childName => {
                     items = cm.extend(items, cm.find(childName, name, parentNode, callback, params));
                 });
             }
@@ -5878,47 +5868,45 @@ cm.find = function(className, name, parentNode, callback, params){
     return items;
 };
 
-cm.Finder = function(className, name, parentNode, callback, params){
-    var that = this,
-        isEventBind = false;
+cm.Finder = function(className, name, parentNode, callback, params) {
+    const that = this;
+    let isEventBind = false;
 
-    var init = function(){
-        var finder;
+    function init() {
         // Merge params
-        //parentNode = parentNode || document.body;
-        callback = cm.isFunction(callback) ? callback : function(){};
+        callback = cm.isFunction(callback) ? callback : () => {};
         params = cm.merge({
-            'event' : 'onRender',
-            'multiple' : false,
-            'childs' : false
+            event: 'onRender',
+            multiple: false,
+            children: false,
         }, params);
         // Search in constructed classes
-        finder = cm.find(className, name, parentNode, callback, {
-            'childs' : params['childs']
+        const finder = cm.find(className, name, parentNode, callback, {
+            children: params.children,
         });
         // Bind event when no one constructed class found
-        if(!finder || !finder.length || params['multiple']){
+        if (!finder || !finder.length || params.multiple) {
             isEventBind = true;
-            cm.getConstructor(className, function(classConstructor){
-                classConstructor.prototype.addEvent(params['event'], watcher);
+            cm.getConstructor(className, classConstructor => {
+                classConstructor.prototype.addEvent(params.event, watcher);
             });
         }
-    };
+    }
 
-    var watcher = function(classObject){
-        classObject.removeEvent(params['event'], watcher);
-        var isSame = classObject.isAppropriateToStack(name, parentNode, callback);
-        if(isSame && !params['multiple'] && isEventBind){
+    function watcher(classObject) {
+        classObject.removeEvent(params.event, watcher);
+        const isSame = classObject.isAppropriateToStack(name, parentNode, callback);
+        if (isSame && !params.multiple && isEventBind) {
             that.remove(classObject._constructor);
         }
-    };
+    }
 
-    that.remove = function(classConstructor){
-        if(classConstructor){
-            classConstructor.prototype.removeEvent(params['event'], watcher);
-        }else{
-            cm.getConstructor(className, function(classConstructor){
-                classConstructor.prototype.removeEvent(params['event'], watcher);
+    that.remove = function(classConstructor) {
+        if (classConstructor) {
+            classConstructor.prototype.removeEvent(params.event, watcher);
+        } else {
+            cm.getConstructor(className, classConstructor => {
+                classConstructor.prototype.removeEvent(params.event, watcher);
             });
         }
     };
@@ -5926,871 +5914,850 @@ cm.Finder = function(className, name, parentNode, callback, params){
     init();
 };
 
-cm.setParams = function(className, params){
-    cm.getConstructor(className, function(classConstructor, className, classProto){
+cm.setParams = function(className, params) {
+    cm.getConstructor(className, (classConstructor, className, classProto) => {
         classProto.setParams(params);
     });
 };
 
-cm.setMessages = cm.setStrings = function(className, strings){
-    cm.getConstructor(className, function(classConstructor, className, classProto){
-        classProto.setMessages(strings);
+cm.setMessages = function(className, messages) {
+    cm.getConstructor(className, (classConstructor, className, classProto) => {
+        classProto.setMessages(messages);
     });
 };
 
-cm.getMessage = cm.getString = function(className, str){
-    var data;
-    cm.getConstructor(className, function(classConstructor, className, classProto){
+cm.getMessage = function(className, str) {
+    let data;
+    cm.getConstructor(className, (classConstructor, className, classProto) => {
         data = classProto.message(str);
     });
     return data;
 };
 
-cm.getMessages = cm.getStrings = function(className, o){
-    var data;
-    cm.getConstructor(className, function(classConstructor, className, classProto){
+cm.getMessages = function(className, o) {
+    let data;
+    cm.getConstructor(className, (classConstructor, className, classProto) => {
         data = classProto.messageObject(o);
     });
     return data;
 };
 
-/* ******* EXTEND ******* */
+/******* EXTEND *******/
 
-Mod['Extend'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : true
+Mod.Extend = {
+    '_config': {
+        extend: true,
+        predefine: true,
     },
-    '_construct' : function(){},
-    '_extend' : function(name, o){
-        var that = this;
-        if(!that.build._modules[name]){
+    '_construct': function() {
+    },
+    '_extend': function(name, o) {
+        const that = this;
+        if (!that.build._modules[name]) {
             // Merge Config
             o._config = cm.merge({
-                'extend' : false,
-                'predefine' : false,
-                'require' : [],
-                'events' : []
+                extend: false,
+                predefine: false,
+                require: [],
+                events: [],
             }, o._config);
             // Check Requires
-            cm.forEach(o._config['require'], function(module){
-                if(Mod[module]){
-                    Mod['Extend']._extend.call(that, module, Mod[module]);
+            cm.forEach(o._config.require, module => {
+                if (Mod[module]) {
+                    Mod.Extend._extend.call(that, module, Mod[module]);
                 }
             });
             // Extend class by module's methods
-            if(o._config['extend']){
-                cm.forEach(o, function(item, key){
-                    if(!/^(_)/.test(key)){
+            if (o._config.extend) {
+                cm.forEach(o, (item, key) => {
+                    if (!/^(_)/.test(key)) {
                         that.build[key] = item;
                     }
                 });
             }
             // Extend class events
-            if(!cm.isEmpty(o._config['events'])){
-                that.build._raw['events'] = cm.extend(that.build._raw['events'], o._config['events']);
+            if (!cm.isEmpty(o._config.events)) {
+                that.build._raw.events = cm.extend(that.build._raw.events, o._config.events);
             }
             // Construct module
-            if(cm.isFunction(o._construct)){
+            if (cm.isFunction(o._construct)) {
                 // Construct
                 o._construct.call(that);
-            }else{
+            } else {
                 cm.errorLog({
-                    'type' : 'error',
-                    'name' : that.build._name['full'],
-                    'message' : ['Module', cm.strWrap(name, '"'), 'does not have "_construct" method.'].join(' ')
+                    type: 'error',
+                    name: that.build._name.full,
+                    message: `Module ${ cm.strWrap(name, '"') } does not have "_construct" method.`
                 });
             }
             // Add into stack of class's modules
             that.build._modules[name] = o;
         }
     },
-    'extend' : function(name, o){
-        var that = this;
-        if(!o){
+    'extend': function(name, o) {
+        const that = this;
+        if (!o) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._name['full'],
-                'message' : 'Trying to extend the class by non-existing module.'
+                type: 'error',
+                name: that._name.full,
+                message: 'Trying to extend the class by non-existing module.',
             });
-        }else if(!name){
+        } else if (!name) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._name['full'],
-                'message' : 'Module should have a name.'
+                type: 'error',
+                name: that._name.full,
+                message: 'Module should have a name.',
             });
-        }else if(that._modules[name]){
+        } else if (that._modules[name]) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._name['full'],
-                'message' : ['Module with name', cm.strWrap(name, '"'), 'already constructed.'].join(' ')
+                type: 'error',
+                name: that._name.full,
+                message: `Module with name ${ cm.strWrap(name, '"') } already constructed.`
             });
-        }else{
+        } else {
             // Merge Config
             o._config = cm.merge({
-                'extend' : false,
-                'predefine' : false,
-                'require' : [],
-                'events' : []
+                extend: false,
+                predefine: false,
+                require: [],
+                events: [],
             }, o._config);
             // Check Requires
-            cm.forEach(o._config['require'], function(module){
-                if(Mod[module]){
-                    Mod['Extend']._extend.call(that, module, Mod[module]);
+            cm.forEach(o._config.require, module => {
+                if (Mod[module]) {
+                    Mod.Extend._extend.call(that, module, Mod[module]);
                 }
             });
             // Extend class by module's methods
-            if(o._config['extend']){
-                cm.forEach(o, function(item, key){
-                    if(!/^(_)/.test(key)){
-                        cm._defineStack[that._name['full']].prototype[key] = item;
+            if (o._config.extend) {
+                cm.forEach(o, (item, key) => {
+                    if (!/^(_)/.test(key)) {
+                        cm._defineStack[that._name.full].prototype[key] = item;
                     }
                 });
             }
             // Extend events
-            if(!cm.isEmpty(o._config['events'])){
-                cm._defineStack[that._name['full']].prototype._raw['events'] = cm.extend(cm._defineStack[that._name['full']].prototype._raw['events'], o._config['events']);
+            if (!cm.isEmpty(o._config.events)) {
+                cm._defineStack[that._name.full].prototype._raw.events = cm.extend(cm._defineStack[that._name.full].prototype._raw.events, o._config.events);
             }
             // Construct module
-            if(cm.isFunction(o._construct)){
+            if (cm.isFunction(o._construct)) {
                 // Construct
                 o._construct.call(that);
-            }else{
+            } else {
                 cm.errorLog({
-                    'type' : 'error',
-                    'name' : that._name['full'],
-                    'message' : ['Module', cm.strWrap(name, '"'), 'does not have "_construct" method.'].join(' ')
+                    type: 'error',
+                    name: that._name.full,
+                    message: `Module ${ cm.strWrap(name, '"') } does not have "_construct" method.`
                 });
             }
             // Add into stack of class's modules
             that._modules[name] = o;
         }
-    }
+    },
 };
 
-/* ******* COMPONENTS ******* */
+/******* COMPONENTS *******/
 
-Mod['Component'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : true
+Mod.Component = {
+    '_config': {
+        extend: true,
+        predefine: true,
     },
-    '_construct' : function(){
-        var that = this;
+    '_construct': function() {
+        const that = this;
         that.build._isComponent = true;
-        if(typeof that.build['params']['consoleLogErrors'] === 'undefined'){
-            that.build['params']['consoleLogErrors'] = true;
-        }
     },
-    'renderComponent' : function(){
-        var that = this;
-        cm.forEach(that._modules, function(module){
+    'renderComponent': function() {
+        const that = this;
+        cm.forEach(that._modules, module => {
             cm.isFunction(module._render) && module._render.call(that);
-        })
+        });
     },
-    'cloneComponent' : function(params){
-        var that = this,
-            component = null;
-        cm.getConstructor(that._className, function(classConstructor){
+    'cloneComponent': function(params) {
+        const that = this;
+        let component;
+        cm.getConstructor(that._className, classConstructor => {
             component = new classConstructor(
-                cm.merge(that.params, params)
+                cm.merge(that.params, params),
             );
         });
         return component;
-    }
+    },
 };
 
-/* ******* PARAMS ******* */
+/******* PARAMS *******/
 
-Mod['Params'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend'],
-        'events' : ['onSetParams']
+Mod.Params = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
+        events: ['onSetParams'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']){
-            that.build['params'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params) {
+            that.build.params = {};
         }
-        if(!that.build._update['params']){
-            that.build._update['params'] = {};
+        if (!that.build._update.params) {
+            that.build._update.params = {};
         }
-        if(that.build._inherit){
-            that.build['params'] = cm.merge(that.build._inherit.prototype['params'], that.build['params']);
-        }
-    },
-    '_render' : function(){
-        var that = this;
-        if(that._inherit){
-            that.params = cm.merge(that._inherit.prototype['params'], that.params);
+        if (that.build._inherit) {
+            that.build.params = cm.merge(that.build._inherit.prototype.params, that.build.params);
         }
     },
-    'setParams' : function(params, replace){
-        var that = this;
+    '_render': function() {
+        const that = this;
+        if (that._inherit) {
+            that.params = cm.merge(that._inherit.prototype.params, that.params);
+        }
+    },
+    'setParams': function(params, replace) {
+        const that = this;
         replace = cm.isUndefined(replace) ? false : replace;
         that.params = cm.merge(replace ? that._raw.params : that.params, params);
         that._update = cm.clone(that._update);
         that._update.params = cm.merge(that._update.params, that.params);
         // Validate params
-        cm.forEach(that.params, function(item, key){
-            switch(key){
-                case 'strings':
+        cm.forEach(that.params, (item, key) => {
+            switch (key) {
                 case 'messages':
-                case 'langs':
-                    cm.isFunction(that.setLangs) && that.setLangs(item);
+                    cm.isFunction(that.setMessages) && that.setMessages(item);
                     break;
 
                 default:
-                    switch(item){
+                    switch (item) {
                         case 'document.window':
                             that.params[key] = window;
                             break;
 
                         case 'document.html':
-                            if(cm.getDocumentHtml()){
+                            if (cm.getDocumentHtml()) {
                                 that.params[key] = cm.getDocumentHtml();
                             }
                             break;
 
                         case 'document.body':
-                            if(document.body){
+                            if (document.body) {
                                 that.params[key] = document.body;
                             }
                             break;
 
-                        case 'top.document.body':
-                            if(window.top.document.body){
-                                that.params[key] = window.top.document.body;
-                            }
-                            break;
-
                         case 'document.head':
-                            if(cm.getDocumentHead()){
+                            if (cm.getDocumentHead()) {
                                 that.params[key] = cm.getDocumentHead();
                             }
                             break;
 
                         default:
-                            if(/^cm._config./i.test(item)){
+                            if (/^cm._config./i.test(item)) {
                                 that.params[key] = cm._config[item.replace('cm._config.', '')];
                             }
                             break;
                     }
-                    break
+                    break;
             }
         });
         // Trigger event if module defined
-        if(that._modules['Events']){
+        if (that._modules.Events) {
             that.triggerEvent('onSetParams');
         }
         return that;
     },
-    'getParams' : function(key){
-        var that = this;
+    'getParams': function(key) {
+        const that = this;
         return key ? that.params[key] : that.params;
     },
-    'getRawParams' : function(key){
-        var that = this;
+    'getRawParams': function(key) {
+        const that = this;
         return key ? that._raw.params[key] : that._raw.params;
-    }
+    },
 };
 
-/* ******* EVENTS ******* */
+/******* EVENTS *******/
 
-Mod['Events'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Events = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        that.build['events'] = {};
-        cm.forEach(that.build._raw['events'], function(item){
-            that.build['events'][item] = [];
+    '_construct': function() {
+        const that = this;
+        that.build.events = {};
+        cm.forEach(that.build._raw.events, (item) => {
+            that.build.events[item] = [];
         });
-        if(!that.build['params']['events']){
-            that.build['params']['events'] = {};
+        if (!that.build.params.events) {
+            that.build.params.events = {};
         }
-        if(that.build._inherit){
-            that.build['params']['events'] = cm.extend(that.build._inherit.prototype['params']['events'], that.build['params']['events'], true);
-            that.build['events'] = cm.extend(that.build._inherit.prototype['events'], that.build['events'], true);
-        }
-    },
-    '_render' : function(){
-        var that = this;
-        if(that._inherit){
-            that.params['events'] = cm.extend(that._inherit.prototype['params']['events'], that.params['events'], true);
-            that.events = cm.extend(that._inherit.prototype['events'], that.events, true);
+        if (that.build._inherit) {
+            that.build.params.events = cm.extend(that.build._inherit.prototype.params.events, that.build.params.events, true);
+            that.build.events = cm.extend(that.build._inherit.prototype.events, that.build.events, true);
         }
     },
-    'addEvent' : function(event, handler){
-        var that = this;
+    '_render': function() {
+        const that = this;
+        if (that._inherit) {
+            that.params.events = cm.extend(that._inherit.prototype.params.events, that.params.events, true);
+            that.events = cm.extend(that._inherit.prototype.events, that.events, true);
+        }
+    },
+    'addEvent': function(event, handler) {
+        const that = this;
         that.events = cm.clone(that.events);
-        if(that.events[event]){
-            if(cm.isFunction(handler)){
+        if (that.events[event]) {
+            if (cm.isFunction(handler)) {
                 that.events[event].push(handler);
-            }else{
+            } else {
                 cm.errorLog({
-                    'name' : that._name['full'],
-                    'message' : ['Handler of event', cm.strWrap(event, '"'), 'must be a function.'].join(' ')
+                    name: that._name.full,
+                    message: `Handler of event ${ cm.strWrap(event, '"') } must be a function.`
                 });
             }
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'addEvents' : function(o){
-        var that = this;
-        if(o){
+    'addEvents': function(o) {
+        const that = this;
+        if (o) {
             that.convertEvents(o);
         }
         return that;
     },
-    'removeEvent' : function(event, handler){
-        var that = this;
+    'removeEvent': function(event, handler) {
+        const that = this;
         that.events = cm.clone(that.events);
-        if(that.events[event]){
-            if(cm.isFunction(handler)){
-                that.events[event] = that.events[event].filter(function(item){
-                    return item !== handler;
-                });
-            }else{
+        if (that.events[event]) {
+            if (cm.isFunction(handler)) {
+                that.events[event] = that.events[event].filter(item => item !== handler);
+            } else {
                 cm.errorLog({
-                    'name' : that._name['full'],
-                    'message' : ['Handler of event', cm.strWrap(event, '"'), 'must be a function.'].join(' ')
+                    name: that._name.full,
+                    message: `Handler of event ${ cm.strWrap(event, '"') } must be a function.`
                 });
             }
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'removeAllEvent' : function(event){
-        var that = this;
+    'removeAllEvent': function(event) {
+        const that = this;
         that.events = cm.clone(that.events);
-        if(that.events[event]){
+        if (that.events[event]) {
             that.events = [];
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'triggerEvent' : function(event, params){
-        var that = this,
-            data = cm.clone(arguments),
-            events;
+    'triggerEvent': function(event, params) {
+        const that = this;
+        let data = cm.clone(arguments);
         // Replace event name parameter with context (legacy) in data
         data[0] = that;
-        if(that.events[event]){
-            events = cm.clone(that.events[event]);
-            cm.forEach(events, function(event){
+        if (that.events[event]) {
+            let events = cm.clone(that.events[event]);
+            cm.forEach(events, event => {
                 event.apply(that, data);
             });
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'hasEvent' : function(event){
-        var that = this;
+    'hasEvent': function(event) {
+        const that = this;
         return !!that.events[event];
     },
-    'convertEvents' : function(o){
-        var that = this;
-        cm.forEach(o, function(item, key){
-            if(cm.isArray(item)){
-                cm.forEach(item, function(itemA){
+    'convertEvents': function(o) {
+        const that = this;
+        cm.forEach(o, (item, key) => {
+            if (cm.isArray(item)) {
+                cm.forEach(item, itemA => {
                     that.addEvent(key, itemA);
                 });
-            }else{
+            } else {
                 that.addEvent(key, item);
             }
         });
         return that;
-    }
+    },
 };
 
-/* ******* LANGS ******* */
+/******* MESSAGES ******* */
 
-Mod['Langs'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Messages = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['strings']){
-            that.build['strings'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.messages) {
+            that.build.messages = {};
         }
-        if(!that.build['params']['langs']){
-            that.build['params']['langs'] = {};
+        if (!that.build.params.messages) {
+            that.build.params.messages = {};
         }
     },
-    '_render' : function(){
-        var that = this;
-        that.strings = cm.merge(that.strings, that.params['langs']);
+    '_render': function() {
+        const that = this;
+        that.messages = cm.merge(that.messages, that.params.messages);
     },
-    'lang' : function(str, vars, plural){
-        var that = this,
-            langStr;
-        if(cm.isUndefined(str) || cm.isEmpty(str)){
+    'message': function(str, vars, plural) {
+        const that = this;
+        if (cm.isUndefined(str) || cm.isEmpty(str)) {
             return '';
         }
-        // Get string
-        langStr = that.getLang(str);
-        if(cm.isUndefined(langStr)){
-            langStr = str;
+        // Get message
+        let message = that.getMessage(str);
+        if (cm.isUndefined(message)) {
+            message = str;
         }
         // Process variable
-        if(cm.isObject(langStr) || cm.isArray(langStr)){
-            langStr = cm.objectReplace(langStr, vars);
-        }else{
-            langStr = cm.strReplace(langStr, vars);
+        if (cm.isObject(message) || cm.isArray(message)) {
+            message = cm.objectReplace(message, vars);
+        } else {
+            message = cm.strReplace(message, vars);
         }
         // Plural
-        if(!cm.isUndefined(plural) && cm.isArray(langStr)){
-            langStr = cm.plural(plural, langStr);
+        if (!cm.isUndefined(plural) && cm.isArray(message)) {
+            message = cm.plural(plural, message);
         }
-        return langStr;
+        return message;
     },
-    'message' : function(){
-        var that = this;
+    'msg': function() {
+        const that = this;
         return that.lang.apply(that, arguments);
     },
-    'msg' : function(){
-        var that = this;
-        return that.lang.apply(that, arguments);
-    },
-    'getLang' : function(str){
-        var that = this,
-            langStr;
-        if(cm.isUndefined(str) || cm.isEmpty(str)){
+    'getMessage': function(str) {
+        const that = this;
+        if (cm.isUndefined(str) || cm.isEmpty(str)) {
             return;
         }
         // Try to get string from current controller params array
-        langStr = cm.reducePath(str, that.params.langs);
-        // Try to get string from current controller strings array
-        if(cm.isUndefined(langStr)){
-            langStr = cm.reducePath(str, that.strings);
+        let message = cm.reducePath(str, that.params.messages);
+        // Try to get string from current controller messages array
+        if (cm.isUndefined(message)) {
+            message = cm.reducePath(str, that.messages);
         }
         // Try to get string from parent controller
-        if(cm.isUndefined(langStr) && that._inherit){
-            langStr = that._inherit.prototype.getMsg(str);
+        if (cm.isUndefined(message) && that._inherit) {
+            message = that._inherit.prototype.getMessage(str);
         }
-        return langStr;
+        return message;
     },
-    'getMessage' : function(){
-        var that = this;
-        return that.getLang.apply(that, arguments);
+    'getMsg': function() {
+        const that = this;
+        return that.getMessage.apply(that, arguments);
     },
-    'getMsg' : function(){
-        var that = this;
-        return that.getLang.apply(that, arguments);
-    },
-    'langObject' : function(str){
-        var that = this,
-            o = that.lang(str);
+    'messageObject': function(str) {
+        const that = this;
+        const o = that.message(str);
         return cm.isObject(o) || cm.isArray(o) ? o : {};
     },
-    'messageObject' : function(){
-        var that = this;
-        return that.langObject.apply(that, arguments);
+    'msgObject': function() {
+        const that = this;
+        return that.messageObject.apply(that, arguments);
     },
-    'msgObject' : function(){
-        var that = this;
-        return that.langObject.apply(that, arguments);
-    },
-    'setLangs' : function(o){
-        var that = this;
-        if(cm.isObject(o)){
-            if(cm.isFunction(that)){
-                that.prototype.strings = cm.merge(that.prototype.strings, o);
-            }else{
-                that.strings = cm.merge(that.strings, o);
+    'setMessages': function(o) {
+        const that = this;
+        if (cm.isObject(o)) {
+            if (cm.isFunction(that)) {
+                that.prototype.messages = cm.merge(that.prototype.messages, o);
+            } else {
+                that.messages = cm.merge(that.messages, o);
             }
         }
         return that;
     },
-    'setMessages' : function(){
-        var that = this;
-        return that.setLangs.apply(that, arguments);
+    'setMsgs': function() {
+        const that = this;
+        return that.setMessages.apply(that, arguments);
     },
-    'setMsgs' : function(){
-        var that = this;
-        return that.setLangs.apply(that, arguments);
-    }
 };
 
-/* ******* DATA CONFIG ******* */
+/******* DATA CONFIG *******/
 
-Mod['DataConfig'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.DataConfig = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(cm.isUndefined(that.build['params']['configDataMarker'])){
-            that.build['params']['configDataMarker'] = 'data-config';
+    '_construct': function() {
+        const that = this;
+        if (cm.isUndefined(that.build.params.configDataMarker)) {
+            that.build.params.configDataMarker = 'data-config';
         }
     },
-    'getDataConfig' : function(container, dataMarker){
-        var that = this,
-            sourceConfig;
-        if(cm.isNode(container)){
-            dataMarker = dataMarker || that.params['configDataMarker'];
-            sourceConfig = container.getAttribute(dataMarker);
-            if(sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))){
+    'getDataConfig': function(container, dataMarker) {
+        const that = this;
+        if (cm.isNode(container)) {
+            dataMarker = dataMarker || that.params.configDataMarker;
+            let sourceConfig = container.getAttribute(dataMarker);
+            if (sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))) {
                 that.setParams(sourceConfig);
             }
         }
         return that;
     },
-    'getNodeDataConfig' : function(node, dataMarker){
-        var that = this,
-            sourceConfig;
-        if(cm.isNode(node)){
-            dataMarker = dataMarker || that.params['configDataMarker'];
-            sourceConfig = node.getAttribute(dataMarker);
-            if(sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))){
+    'getNodeDataConfig': function(node, dataMarker) {
+        const that = this;
+        if (cm.isNode(node)) {
+            dataMarker = dataMarker || that.params.configDataMarker;
+            let sourceConfig = node.getAttribute(dataMarker);
+            if (sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))) {
                 return sourceConfig;
             }
         }
         return {};
-    }
+    },
 };
 
-/* ******* DATA NODES ******* */
+/******* DATA NODES *******/
 
-Mod['DataNodes'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.DataNodes = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['nodes']){
-            that.build['params']['nodes'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.nodes) {
+            that.build.params.nodes = {};
         }
-        that.build['params']['nodesDataMarker'] = 'data-node';
-        that.build['params']['nodesMarker'] = that.build._name['short'];
-        if(!that.build['nodes']){
-            that.build['nodes'] = {};
+        that.build.params.nodesDataMarker = 'data-node';
+        that.build.params.nodesMarker = that.build._name.short;
+        if (!that.build.nodes) {
+            that.build.nodes = {};
         }
-        if(that.build._inherit){
-            that.build['params']['nodes'] = cm.merge(that.build._inherit.prototype['params']['nodes'], that.build['params']['nodes']);
-            that.build['nodes'] = cm.merge(that.build._inherit.prototype['nodes'], that.build['nodes']);
+        if (that.build._inherit) {
+            that.build.params.nodes = cm.merge(that.build._inherit.prototype.params.nodes, that.build.params.nodes);
+            that.build.nodes = cm.merge(that.build._inherit.prototype.nodes, that.build.nodes);
         }
     },
-    'getDataNodes' : function(container, dataMarker, className){
-        var that = this,
-            sourceNodes = {};
+    'getDataNodes': function(container, dataMarker, className) {
+        const that = this;
+        let sourceNodes = {};
         container = cm.isUndefined(container) ? document.body : container;
-        if(container){
-            dataMarker = cm.isUndefined(dataMarker) ? that.params['nodesDataMarker'] : dataMarker;
-            className = cm.isUndefined(className) ? that.params['nodesMarker'] : className;
-            if(className){
+        if (container) {
+            dataMarker = cm.isUndefined(dataMarker) ? that.params.nodesDataMarker : dataMarker;
+            className = cm.isUndefined(className) ? that.params.nodesMarker : className;
+            if (className) {
                 sourceNodes = cm.getNodes(container, dataMarker)[className] || {};
-            }else{
+            } else {
                 sourceNodes = cm.getNodes(container, dataMarker);
             }
             that.nodes = cm.merge(that.nodes, sourceNodes);
         }
-        that.nodes = cm.merge(that.nodes, that.params['nodes']);
+        that.nodes = cm.merge(that.nodes, that.params.nodes);
         return that;
     },
-    'getDataNodesObject' : function(container, dataMarker, className){
-        var that = this,
-            sourceNodes = {};
-        container = typeof container === 'undefined'? document.body : container;
-        dataMarker = typeof dataMarker === 'undefined'? that.params['nodesDataMarker'] : dataMarker;
-        className = typeof className === 'undefined'? that.params['nodesMarker'] : className;
-        if(className){
+    'getDataNodesObject': function(container, dataMarker, className) {
+        const that = this;
+        container = typeof container === 'undefined' ? document.body : container;
+        dataMarker = typeof dataMarker === 'undefined' ? that.params.nodesDataMarker : dataMarker;
+        className = typeof className === 'undefined' ? that.params.nodesMarker : className;
+        let sourceNodes;
+        if (className) {
             sourceNodes = cm.getNodes(container, dataMarker)[className] || {};
-        }else{
+        } else {
             sourceNodes = cm.getNodes(container, dataMarker);
         }
         return sourceNodes;
-    }
+    },
 };
 
-/* ******* LOCAL STORAGE ******* */
+/******* LOCAL STORAGE *******/
 
-Mod['Storage'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Storage = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['name']){
-            that.build['params']['name'] = '';
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.name) {
+            that.build.params.name = '';
         }
     },
-    'storageGet' : function(key, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageGet': function(key, session) {
+        const that = this;
+        const method = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[method](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be read because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be read because "name" parameter not provided.',
             });
-            return null;
+            return;
         }
-        if(!storage[that.params['name']] || cm.isUndefined(storage[that.params['name']][key])){
+        if (!storage[that.params.name] || cm.isUndefined(storage[that.params.name][key])) {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._className,
-                'message' : ['Parameter', cm.strWrap(key, '"'), 'does not exist or is not set in component with name', cm.strWrap(that.params['name'], '"'), '.'].join(' ')
+                type: 'attention',
+                name: that._className,
+                message: `Parameter ${ cm.strWrap(key, '"') } does not exist or is not set in component with name ${ cm.strWrap(that.params.name, '"') }.`
             });
-            return null;
+            return;
         }
-        return storage[that.params['name']][key];
+        return storage[that.params.name][key];
     },
-    'storageGetAll' : function(session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageGetAll': function(session) {
+        const that = this;
+        const method = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[method](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be read because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be read because "name" parameter not provided.',
             });
             return {};
         }
-        if(!storage[that.params['name']]){
+        if (!storage[that.params.name]) {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._className,
-                'message' : 'Storage is empty.'
+                type: 'attention',
+                name: that._className,
+                message: 'Storage is empty.',
             });
             return {};
         }
-        return storage[that.params['name']];
+        return storage[that.params.name];
     },
-    'storageSet' : function(key, value, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageSet': function(key, value, session) {
+        const that = this;
+        // Read
+        const methodGet = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[methodGet](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be written because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be written because "name" parameter not provided.',
             });
             return {};
         }
-        if(!storage[that.params['name']]){
-            storage[that.params['name']] = {};
+        if (!storage[that.params.name]) {
+            storage[that.params.name] = {};
         }
-        storage[that.params['name']][key] = value;
-        method = session ? 'sessionStorageSet' : 'storageSet';
-        cm[method](that._className, JSON.stringify(storage));
-        return storage[that.params['name']];
+        storage[that.params.name][key] = value;
+        // Write
+        const methodSet = session ? 'sessionStorageSet' : 'storageSet';
+        cm[methodSet](that._className, JSON.stringify(storage));
+        return storage[that.params.name];
     },
-    'storageSetAll' : function(data, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageSetAll': function(data, session) {
+        const that = this;
+        // Read
+        const methodGet = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[methodGet](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be written because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be written because "name" parameter not provided.',
             });
             return {};
         }
-        storage[that.params['name']] = data;
-        method = session ? 'sessionStorageSet' : 'storageSet';
-        cm[method](that._className, JSON.stringify(storage));
-        return storage[that.params['name']];
+        storage[that.params.name] = data;
+        // Write
+        const methodSet = session ? 'sessionStorageSet' : 'storageSet';
+        cm[methodSet](that._className, JSON.stringify(storage));
+        return storage[that.params.name];
     },
-    'storageRemove' : function(key, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageRemove': function(key, session) {
+        const that = this;
+        // Read
+        const methodGet = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[methodGet](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be written because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be written because "name" parameter not provided.',
             });
             return {};
         }
-        if(!storage[that.params['name']]){
-            storage[that.params['name']] = {};
+        if (!storage[that.params.name]) {
+            storage[that.params.name] = {};
         }
-        delete storage[that.params['name']][key];
-        method = session ? 'sessionStorageSet' : 'storageSet';
-        cm[method](that._className, JSON.stringify(storage));
-        return storage[that.params['name']];
-    }
+        delete storage[that.params.name][key];
+        // Write
+        const methodSet = session ? 'sessionStorageSet' : 'storageSet';
+        cm[methodSet](that._className, JSON.stringify(storage));
+        return storage[that.params.name];
+    },
 };
 
-/* ******* CALLBACKS ******* */
+/******* CALLBACKS *******/
 
-Mod['Callbacks'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Callbacks = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['callbacks']){
-            that.build['params']['callbacks'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.callbacks) {
+            that.build.params.callbacks = {};
         }
-        that.build['callbacks'] = {};
-        that.build['_callbacks'] = {};
-        if(that.build._inherit){
-            that.build['params']['callbacks'] = cm.extend(that.build._inherit.prototype['params']['callbacks'], that.build['params']['callbacks']);
-            that.build['callbacks'] = cm.extend(that.build._inherit.prototype['callbacks'], that.build['callbacks']);
-        }
-    },
-    '_render' : function(){
-        var that = this;
-        if(that._inherit){
-            that.params['callbacks'] = cm.merge(that._inherit.prototype['params']['callbacks'], that.params['callbacks']);
-            that.callbacks = cm.extend(that._inherit.prototype['callbacks'], that.callbacks);
+        that.build.callbacks = {};
+        that.build._callbacks = {};
+        if (that.build._inherit) {
+            that.build.params.callbacks = cm.extend(that.build._inherit.prototype.params.callbacks, that.build.params.callbacks);
+            that.build.callbacks = cm.extend(that.build._inherit.prototype.callbacks, that.build.callbacks);
         }
     },
-    'callbacksProcess' : function(){
-        var that = this;
+    '_render': function() {
+        const that = this;
+        if (that._inherit) {
+            that.params.callbacks = cm.merge(that._inherit.prototype.params.callbacks, that.params.callbacks);
+            that.callbacks = cm.extend(that._inherit.prototype.callbacks, that.callbacks);
+        }
+    },
+    'callbacksProcess': function() {
+        const that = this;
         that.callbacks = cm.clone(that.callbacks);
         // Save default callbacks
-        cm.forEach(that.callbacks, function(callback, name){
+        cm.forEach(that.callbacks, (callback, name) => {
             that._callbacks[name] = callback;
         });
         // Replace callbacks
-        cm.forEach(that.params['callbacks'], function(callback, name){
+        cm.forEach(that.params.callbacks, (callback, name) => {
             that.callbacks[name] = callback;
         });
         return that;
     },
-    'callbacksRestore' : function(){
-        var that = this;
+    'callbacksRestore': function() {
+        const that = this;
         that.callbacks = cm.clone(that.callbacks);
-        cm.forEach(that._callbacks, function(callback, name){
+        cm.forEach(that._callbacks, (callback, name) => {
             that.callbacks[name] = callback;
         });
         return that;
-    }
+    },
 };
 
 /* ******* STACK ******* */
 
-Mod['Stack'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Stack = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['name']){
-            that.build['params']['name'] = '';
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.name) {
+            that.build.params.name = '';
         }
-        that.build['_stack'] = [];
+        that.build._stack = [];
     },
-    'addToStack' : function(node){
-        var that = this,
-            name = cm.isNumber(that.params['name']) ? that.params['name'].toString() : that.params['name'];
-        if(!that._stackItem){
+    'addToStack': function(node) {
+        const that = this;
+        const name = cm.isNumber(that.params.name) ? that.params.name.toString() : that.params.name;
+        if (!that._stackItem) {
             that._stackItem = {
-                'name' : name,
-                'node' : node,
-                'class' : that,
-                'className' : that._name['full']
+                name: name,
+                node: node,
+                class: that,
+                className: that._name.full,
             };
             that._stack.push(that._stackItem);
-        }else if(cm.isNode(node)){
-            that._stackItem['node'] = node;
+        } else if (cm.isNode(node)) {
+            that._stackItem.node = node;
         }
         return that;
     },
-    'removeFromStack' : function(){
-        var that = this;
+    'removeFromStack': function() {
+        const that = this;
         cm.arrayRemove(that._stack, that._stackItem);
         that._stackItem = null;
         return that;
     },
-    'isAppropriateToStack' : function(name, parent, callback){
-        var that = this,
-            item = that._stackItem;
+    'isAppropriateToStack': function(name, parent, callback) {
+        const that = this;
+        const item = that._stackItem;
         name = cm.isNumber(name) ? name.toString() : name;
-        callback = cm.isFunction(callback) ? callback : function(){};
-        if((cm.isEmpty(name) || item['name'] === name) && (cm.isEmpty(parent) || cm.isParent(parent, item['node'], true))){
-            callback(item['class'], item, name);
+        callback = cm.isFunction(callback) ? callback : () => {};
+        if (
+            (cm.isEmpty(name) || item.name === name)
+            && (cm.isEmpty(parent) || cm.isParent(parent, item.node, true))
+        ) {
+            callback(item.class, item, name);
             return true;
         }
         return false;
     },
-    'findInStack' : function(name, parent, callback){
-        var that = this,
-            items = [];
+    'findInStack': function(name, parent, callback) {
+        const that = this;
         name = cm.isNumber(name) ? name.toString() : name;
-        callback = cm.isFunction(callback) ? callback : function(){};
-        cm.forEach(that._stack, function(item){
-            if((cm.isEmpty(name) || item['name'] === name) && (cm.isEmpty(parent) || cm.isParent(parent, item['node'], true))){
+        callback = cm.isFunction(callback) ? callback : () => {};
+        let items = [];
+        cm.forEach(that._stack, item => {
+            if (
+                (cm.isEmpty(name) || item.name === name)
+                && (cm.isEmpty(parent) || cm.isParent(parent, item.node, true))
+            ) {
                 items.push(item);
-                callback(item['class'], item, name);
+                callback(item.class, item, name);
             }
         });
         return items;
     },
-    'getStackNode' : function(){
-        var that = this;
-        return that._stackItem ? that._stackItem['node'] : null;
-    }
+    'getStackNode': function() {
+        const that = this;
+        return that._stackItem ? that._stackItem.node : null;
+    },
 };
 
-/* ****** STRUCTURE ******* */
+/****** STRUCTURE *******/
 
-Mod['Structure'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Structure = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(cm.isUndefined(that.build['params']['renderStructure'])){
-            that.build['params']['renderStructure'] = true;
+    '_construct': function() {
+        const that = this;
+        if (cm.isUndefined(that.build.params.renderStructure)) {
+            that.build.params.renderStructure = true;
         }
-        if(cm.isUndefined(that.build['params']['embedStructure'])){
-            that.build['params']['embedStructure'] = 'append';
+        if (cm.isUndefined(that.build.params.embedStructure)) {
+            that.build.params.embedStructure = 'append';
         }
     },
-    'embedStructure' : function(node, container){
-        var that = this;
-        switch(that.params['embedStructure']){
+    'embedStructure': function(node, container) {
+        const that = this;
+        switch (that.params.embedStructure) {
             case 'replace':
                 that.replaceStructure(node);
                 break;
@@ -6805,27 +6772,27 @@ Mod['Structure'] = {
         }
         return that;
     },
-    'appendStructure' : function(node, type, container){
-        var that = this;
-        container = container || that.params['container'] || that.params['node'];
+    'appendStructure': function(node, type, container) {
+        const that = this;
+        container = container || that.params.container || that.params.node;
         container && cm[type](node, container);
         return that;
     },
-    'replaceStructure' : function(node, container){
-        var that = this;
-        container = container || that.params['container'];
-        if(container){
-            if(that.params['container'] === that.params['node']){
-                cm.insertBefore(node, that.params['node']);
-            }else{
-                that.params['container'].appendChild(node);
+    'replaceStructure': function(node, container) {
+        const that = this;
+        container = container || that.params.container;
+        if (container) {
+            if (that.params.container === that.params.node) {
+                cm.insertBefore(node, that.params.node);
+            } else {
+                that.params.container.appendChild(node);
             }
-        }else if(that.params['node']){
-            cm.insertBefore(node, that.params['node']);
+        } else if (that.params.node) {
+            cm.insertBefore(node, that.params.node);
         }
-        cm.remove(that.params['node']);
+        cm.remove(that.params.node);
         return that;
-    }
+    },
 };
 
 Part['Menu'] = (function(){
@@ -7103,7 +7070,7 @@ cm.define('Com.AbstractController', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'DataNodes',
@@ -7654,9 +7621,9 @@ cm.getConstructor('Com.AbstractContainer', function(classConstructor, className,
         that.triggerEvent('onRenderPlaceholderViewStart');
         // Structure
         that.nodes['placeholder'] = {};
-        that.nodes['placeholder']['title'] = cm.textNode(that.lang('title'));
+        that.nodes['placeholder']['title'] = cm.textNode(that.message('title'));
         that.nodes['placeholder']['content'] = cm.node('div', {'class' : 'com__container__content'});
-        that.nodes['placeholder']['help'] = that.lang('help');
+        that.nodes['placeholder']['help'] = that.message('help');
         // Events
         that.triggerEvent('onRenderPlaceholderViewProcess');
         that.triggerEvent('onRenderPlaceholderViewEnd');
@@ -7666,7 +7633,7 @@ cm.getConstructor('Com.AbstractContainer', function(classConstructor, className,
         var that = this;
         that.components['placeholder'].addButton({
             'name' : 'close',
-            'label' : that.lang('close'),
+            'label' : that.message('close'),
             'style' : 'button-primary',
             'callback' : that.closeHandler
         });
@@ -7791,8 +7758,8 @@ cm.getConstructor('Com.AbstractFileManagerContainer', function(classConstructor,
     classProto.validateParamsEnd = function(){
         var that = this;
         // Validate Language Strings
-        that.setLangs({
-            'title' : !that.params['params']['max'] || that.params['params']['max'] > 1 ? that.lang('title_multiple') : that.lang('title_single')
+        that.setMessages({
+            'title' : !that.params['params']['max'] || that.params['params']['max'] > 1 ? that.message('title_multiple') : that.message('title_single')
         });
     };
 
@@ -7814,13 +7781,13 @@ cm.getConstructor('Com.AbstractFileManagerContainer', function(classConstructor,
         var that = this;
         that.components['placeholder'].addButton({
             'name' : 'close',
-            'label' : that.lang('close'),
+            'label' : that.message('close'),
             'style' : 'button-transparent',
             'callback' : that.closeHandler
         });
         that.components['placeholder'].addButton({
             'name' : 'save',
-            'label' : that.lang('save'),
+            'label' : that.message('save'),
             'style' : 'button-primary',
             'callback' : that.completeHandler
         });
@@ -8162,7 +8129,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             && that.params.placeholderAsterisk
             && !cm.isEmpty(that.params.placeholder)
         ){
-            that.params.placeholder = [that.params.placeholder, that.lang('*')].join(' ');
+            that.params.placeholder = [that.params.placeholder, that.message('*')].join(' ');
         }
         // Constructor params
         that.params.constructorParams.id = that.params.id;
@@ -8269,7 +8236,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             cm.appendChild(that.nodes.labelText, that.nodes.label);
         }
         // Required
-        that.nodes.required = cm.node('span', {'class' : 'required'}, that.lang('*'));
+        that.nodes.required = cm.node('span', {'class' : 'required'}, that.message('*'));
         if(that.params.required && that.params.requiredAsterisk){
             cm.appendChild(that.nodes.required, that.nodes.label);
         }
@@ -8543,7 +8510,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         if(cm.isEmpty(data.value)){
             if(that.params.required){
                 data.valid = false;
-                data.message = that.lang('required');
+                data.message = that.message('required');
                 return data;
             }else{
                 data.valid = true;
@@ -8552,14 +8519,14 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         }
         if(that.params.minLength && data.value.length < that.params.minLength){
             data.valid = false;
-            data.message = that.lang('too_short', {
+            data.message = that.message('too_short', {
                 '%count%' : that.params.minLength
             });
             return data;
         }
         if(that.params.maxLength && data.value.length > that.params.maxLength){
             data.valid = false;
-            data.message = that.lang('too_long', {
+            data.message = that.message('too_long', {
                 '%count%' : that.params.maxLength
             });
             return data;
@@ -9276,7 +9243,7 @@ cm.getConstructor('Com.AbstractInput', function(classConstructor, className, cla
             });
         }
         if(that.params['title']){
-            that.nodes['container'].setAttribute('title', that.lang(that.params['title']));
+            that.nodes['container'].setAttribute('title', that.message(that.params['title']));
         }
         // Classes
         if(that.params['adaptive']){
@@ -9860,7 +9827,7 @@ cm.define('Com.Tooltip', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Stack'
     ],
     'events' : [
@@ -9957,9 +9924,9 @@ function(params){
 
     var render = function(){
         // Structure
-        that.nodes['container'] = cm.Node('div', {'class' : 'com__tooltip'},
-            that.nodes['inner'] = cm.Node('div', {'class' : 'inner'},
-                that.nodes['content'] = cm.Node('div', {'class' : 'scroll'})
+        that.nodes['container'] = cm.node('div', {'class' : 'com__tooltip'},
+            that.nodes['inner'] = cm.node('div', {'class' : 'inner'},
+                that.nodes['content'] = cm.node('div', {'class' : 'scroll'})
             )
         );
         cm.isString(that.params['scroll']) && cm.addClass(that.nodes['content'], ['is', that.params['scroll']].join('-'));
@@ -9986,8 +9953,8 @@ function(params){
     var renderTitle = function(title){
         cm.remove(that.nodes['title']);
         if(!cm.isEmpty(title)){
-            that.nodes['title'] = cm.Node('div', {'class' : 'title'},
-                cm.Node(that.params['titleTag'], title)
+            that.nodes['title'] = cm.node('div', {'class' : 'title'},
+                cm.node(that.params['titleTag'], title)
             );
             cm.insertFirst(that.nodes['title'], that.nodes['inner']);
         }
@@ -10619,7 +10586,7 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
                 that.nodes['pages'] = cm.node('div', {'class' : 'com__scroll-pagination__pages'})
             ),
             that.nodes['bar'] = cm.node('div', {'class' : 'com__scroll-pagination__bar'},
-                that.nodes['button'] = cm.node('div', {'class' : 'button button-primary'}, that.lang('load_more')),
+                that.nodes['button'] = cm.node('div', {'class' : 'button button-primary'}, that.message('load_more')),
                 that.nodes['loader'] = cm.node('div', {'class' : 'button button-clear has-icon has-icon has-icon-small'},
                     cm.node('div', {'class' : 'icon small loader'})
                 )
@@ -11517,7 +11484,7 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
     classProto.callbacks.renderError = function(that, page){
         if(that.params['responseHTML']){
             page['container'].appendChild(
-                cm.node('div', {'class' : 'cm__empty'}, that.lang('server_error'))
+                cm.node('div', {'class' : 'cm__empty'}, that.message('server_error'))
             );
         }
         that.triggerEvent('onPageRenderError', page);
@@ -11615,7 +11582,7 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
         // Previous page buttons
         that.callbacks.renderBarArrow(that, item, {
             'text' : '<',
-            'title' : that.lang('prev'),
+            'title' : that.message('prev'),
             'className' : 'prev',
             'callback' : that.prevHanlder
         });
@@ -11649,7 +11616,7 @@ cm.getConstructor('Com.Pagination', function(classConstructor, className, classP
         // Next page buttons
         that.callbacks.renderBarArrow(that, item, {
             'text' : '>',
-            'title' : that.lang('next'),
+            'title' : that.message('next'),
             'className' : 'next',
             'callback' : that.nextHanlder
         });
@@ -11886,7 +11853,7 @@ cm.define('Com.Calendar', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'Stack'
     ],
@@ -11946,16 +11913,16 @@ function(params){
     var render = function(){
         var weekday;
         // Structure
-        nodes['container'] = cm.Node('div', {'class' : 'com__calendar'},
-            cm.Node('div', {'class' : 'selects'},
-                nodes['months'] = cm.Node('select', {'class' : 'select months'}),
-                nodes['years'] = cm.Node('select', {'class' : 'select years'})
+        nodes['container'] = cm.node('div', {'class' : 'com__calendar'},
+            cm.node('div', {'class' : 'selects'},
+                nodes['months'] = cm.node('select', {'class' : 'select months'}),
+                nodes['years'] = cm.node('select', {'class' : 'select years'})
             ),
-            cm.Node('table',
-                cm.Node('thead',
-                    nodes['days'] = cm.Node('tr')
+            cm.node('table',
+                cm.node('thead',
+                    nodes['days'] = cm.node('tr')
                 ),
-                nodes['dates'] = cm.Node('tbody')
+                nodes['dates'] = cm.node('tbody')
             )
         );
         // Add css class
@@ -11965,18 +11932,18 @@ function(params){
             weekday = i + that.params['startWeekDay'];
             weekday = weekday > 6? Math.abs(6 - (weekday - 1)) : weekday;
             nodes['days'].appendChild(
-                cm.Node('th', that.lang('daysAbbr')[weekday])
+                cm.node('th', that.message('daysAbbr')[weekday])
             );
         });
         // Render selects options
-        that.lang('months').forEach(function(item, i){
+        that.message('months').forEach(function(item, i){
             nodes['months'].appendChild(
-                cm.Node('option', {'value' : i}, item)
+                cm.node('option', {'value' : i}, item)
             );
         });
         for(var i = that.params['endYear']; i >= that.params['startYear']; i--){
             nodes['years'].appendChild(
-                cm.Node('option', {'value' : i}, i)
+                cm.node('option', {'value' : i}, i)
             );
         }
         // Insert into DOM
@@ -12030,7 +11997,7 @@ function(params){
         var startWeekDay = current['startWeekDay'] - that.params['startWeekDay'],
             day = ((i - 1) * 7) + 1 - (startWeekDay > 0? startWeekDay - 7 : startWeekDay),
             tr = nodes['dates'].appendChild(
-                cm.Node('tr')
+                cm.node('tr')
             );
         cm.forEach(7, function(){
             renderCell(tr, day);
@@ -12041,24 +12008,24 @@ function(params){
     var renderCell = function(tr, day){
         var td, div, params;
         tr.appendChild(
-            td = cm.Node('td')
+            td = cm.node('td')
         );
         // Render day
         if(day <= 0){
             td.appendChild(
-                div = cm.Node('div', (previous['dayCount'] + day))
+                div = cm.node('div', (previous['dayCount'] + day))
             );
             cm.addClass(td, 'out');
             cm.addEvent(div, 'click', that.prevMonth);
         }else if(day > current['dayCount']){
             td.appendChild(
-                div = cm.Node('div', (day - current['dayCount']))
+                div = cm.node('div', (day - current['dayCount']))
             );
             cm.addClass(td, 'out');
             cm.addEvent(div, 'click', that.nextMonth);
         }else{
             td.appendChild(
-                div = cm.Node('div', day)
+                div = cm.node('div', day)
             );
             cm.addClass(td, 'in');
             params = {
@@ -12189,7 +12156,7 @@ cm.define('Com.CalendarEvents', {
         'Structure',
         'Stack',
         'DataConfig',
-        'Langs'
+        'Messages'
     ],
     'params' : {
         'node' : cm.node('div'),
@@ -12232,7 +12199,7 @@ function(params){
             'startYear' : that.params['startYear'],
             'endYear' : that.params['endYear'],
             'startWeekDay' : that.params['startWeekDay'],
-            'langs' : that.params['langs']
+            'messages' : that.params['messages']
         });
         // Render tooltip
         that.components['tooltip'] = new Com.Tooltip(that.params['Com.Tooltip']);
@@ -12279,7 +12246,7 @@ function(params){
             // Show tooltip
             that.components['tooltip']
                 .setTarget(params['node'])
-                .setTitle(cm.dateFormat(params['date'], that.params['format'], that.lang()))
+                .setTitle(cm.dateFormat(params['date'], that.params['format'], that.message()))
                 .setContent(myNodes['content'])
                 .show();
         }
@@ -12318,7 +12285,7 @@ cm.define('Com.CollapsibleLayout', {
         'onExpandRight'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'remember' : false
     }
 },
@@ -12326,10 +12293,10 @@ function(params){
     var that = this;
 
     that.nodes = {
-        'leftButton' : cm.Node('div'),
-        'leftContainer' : cm.Node('div'),
-        'rightButton': cm.Node('div'),
-        'rightContainer' : cm.Node('div')
+        'leftButton' : cm.node('div'),
+        'leftContainer' : cm.node('div'),
+        'rightButton': cm.node('div'),
+        'rightContainer' : cm.node('div')
     };
 
     that.isLeftCollapsed = false;
@@ -12734,7 +12701,7 @@ cm.define('Com.ColumnsHelper', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes',
         'Callbacks',
@@ -13190,9 +13157,9 @@ function(params){
 
     var renderStructure = function(){
         // Structure
-        nodes['container'] = cm.Node('div', {'class' : 'com__columns'},
-            nodes['inner'] = cm.Node('div', {'class' : 'inner'},
-                nodes['holder'] = cm.Node('div', {'class' : 'container'})
+        nodes['container'] = cm.node('div', {'class' : 'com__columns'},
+            nodes['inner'] = cm.node('div', {'class' : 'inner'},
+                nodes['holder'] = cm.node('div', {'class' : 'container'})
             )
         );
         // Render Columns
@@ -13208,7 +13175,7 @@ function(params){
     var collectColumn = function(container){
         var item = {
             'container' : container,
-            'inner' : cm.getByAttr('data-com__columns', 'column-inner', container)[0] || cm.Node('div'),
+            'inner' : cm.getByAttr('data-com__columns', 'column-inner', container)[0] || cm.node('div'),
             'width' : container.style.width
         };
         // Render ruler
@@ -13222,8 +13189,8 @@ function(params){
             'width' : '0%'
         }, item);
         // Structure
-        item['container'] = cm.Node('div', {'class' : 'com__column'},
-            item['inner'] = cm.Node('div', {'class' : 'inner'})
+        item['container'] = cm.node('div', {'class' : 'com__column'},
+            item['inner'] = cm.node('div', {'class' : 'inner'})
         );
         // Render ruler
         renderRuler(item);
@@ -13277,11 +13244,11 @@ function(params){
 
     var renderRuler = function(item){
         // Structure
-        item['rulerContainer'] = cm.Node('div', {'class' : 'com__columns__ruler'},
-            item['ruler'] = cm.Node('div', {'class' : 'pt__ruler is-horizontal is-small'},
-                cm.Node('div', {'class' : 'line line-top'}),
-                item['rulerCounter'] = cm.Node('div', {'class' : 'counter'}, item['width']),
-                cm.Node('div', {'class' : 'line line-bottom'})
+        item['rulerContainer'] = cm.node('div', {'class' : 'com__columns__ruler'},
+            item['ruler'] = cm.node('div', {'class' : 'pt__ruler is-horizontal is-small'},
+                cm.node('div', {'class' : 'line line-top'}),
+                item['rulerCounter'] = cm.node('div', {'class' : 'counter'}, item['width']),
+                cm.node('div', {'class' : 'line line-bottom'})
             )
         );
         // Embed
@@ -13319,11 +13286,11 @@ function(params){
             'index' : i
         };
         // Structure
-        chassis['container'] = cm.Node('div', {'class' : 'com__columns__chassis'},
-            chassis['drag'] = cm.Node('div', {'class' : 'pt__drag is-horizontal'},
-                cm.Node('div', {'class' : 'line'}),
-                cm.Node('div', {'class' : 'drag'},
-                    cm.Node('div', {'class' : 'icon draggable'})
+        chassis['container'] = cm.node('div', {'class' : 'com__columns__chassis'},
+            chassis['drag'] = cm.node('div', {'class' : 'pt__drag is-horizontal'},
+                cm.node('div', {'class' : 'line'}),
+                cm.node('div', {'class' : 'drag'},
+                    cm.node('div', {'class' : 'icon draggable'})
                 )
             )
         );
@@ -13544,7 +13511,7 @@ cm.define('Com.DialogContainer', {
             'autoOpen' : false
         }
     },
-    'strings' : {
+    'messages' : {
         'close' : 'Close'
     }
 },
@@ -13697,7 +13664,7 @@ cm.define('Com.Dialog', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'Stack'
     ],
@@ -13818,10 +13785,10 @@ function(params){
 
     var render = function(){
         // Structure
-        nodes['container'] = cm.Node('div', {'class' : 'com__dialog'},
-            nodes['bg'] = cm.Node('div', {'class' : 'bg'}),
-            nodes['window'] = cm.Node('div', {'class' : 'com__dialog__window window'},
-                nodes['windowInner'] = cm.Node('div', {'class' : 'inner'})
+        nodes['container'] = cm.node('div', {'class' : 'com__dialog'},
+            nodes['bg'] = cm.node('div', {'class' : 'bg'}),
+            nodes['window'] = cm.node('div', {'class' : 'com__dialog__window window'},
+                nodes['windowInner'] = cm.node('div', {'class' : 'inner'})
             )
         );
         if(that.params['appendOnRender']){
@@ -13849,7 +13816,7 @@ function(params){
         // Render close button
         if(that.params['closeButtonOutside']){
             nodes['bg'].appendChild(
-                nodes['closeOutside'] = cm.Node('div', {'class' : that.params['icons']['closeOutside'], 'title' : that.lang('closeTitle')}, that.lang('close'))
+                nodes['closeOutside'] = cm.node('div', {'class' : that.params['icons']['closeOutside'], 'title' : that.message('closeTitle')}, that.message('close'))
             );
             cm.addEvent(nodes['closeOutside'], 'click', close);
         }
@@ -13857,7 +13824,7 @@ function(params){
             cm.addClass(nodes['container'], 'has-close-inside');
             cm.addClass(nodes['window'], 'has-close-inside');
             nodes['window'].appendChild(
-                nodes['closeInside'] = cm.Node('div', {'class' : that.params['icons']['closeInside'], 'title' : that.lang('closeTitle')}, that.lang('close'))
+                nodes['closeInside'] = cm.node('div', {'class' : that.params['icons']['closeInside'], 'title' : that.message('closeTitle')}, that.message('close'))
             );
             cm.addEvent(nodes['closeInside'], 'click', close);
         }
@@ -13868,7 +13835,7 @@ function(params){
         // Render help button
         if(that.params['showHelp']){
             nodes['window'].appendChild(
-                nodes['helpInside'] = cm.Node('div', {'class' : that.params['icons']['helpInside'], 'title' : that.lang('helpTitle')}, that.lang('help'))
+                nodes['helpInside'] = cm.node('div', {'class' : that.params['icons']['helpInside'], 'title' : that.message('helpTitle')}, that.message('help'))
             );
         }
         // Set title
@@ -13903,7 +13870,7 @@ function(params){
             // Remove old nodes
             cm.remove(nodes['title']);
             // Render new nodes
-            nodes['title'] = cm.Node('div', {'class' : 'title'});
+            nodes['title'] = cm.node('div', {'class' : 'title'});
             if(!cm.isEmpty(title)){
                 if(cm.isNode(title)){
                     cm.appendChild(title, nodes['title']);
@@ -13923,9 +13890,9 @@ function(params){
 
     var renderContent = function(node){
         if(!nodes['descr']){
-            nodes['descr'] = cm.Node('div', {'class' : 'descr'},
-                nodes['scroll'] = cm.Node('div', {'class' : 'scroll'},
-                    nodes['inner'] = cm.Node('div', {'class' : 'inner com__dialog__inner'})
+            nodes['descr'] = cm.node('div', {'class' : 'descr'},
+                nodes['scroll'] = cm.node('div', {'class' : 'scroll'},
+                    nodes['inner'] = cm.node('div', {'class' : 'inner com__dialog__inner'})
                 )
             );
             if(!that.params['scroll']){
@@ -13952,7 +13919,7 @@ function(params){
             // Remove old nodes
             cm.remove(nodes['buttons']);
             // Render new nodes
-            nodes['buttons'] = cm.Node('div', {'class' : 'buttons'}, node);
+            nodes['buttons'] = cm.node('div', {'class' : 'buttons'}, node);
             cm.insertLast(nodes['buttons'], nodes['windowInner']);
         }
     };
@@ -14321,7 +14288,7 @@ cm.define('Com.Draganddrop', {
         'onReplace'
     ],
     'params' : {
-        'container' : cm.Node('div'),
+        'container' : cm.node('div'),
         'chassisTag' : 'div',
         'draggableContainer' : 'document.body',      // HTML node | selfParent
         'scroll' : true,
@@ -14385,7 +14352,7 @@ function(params){
             anims['scroll'] = new cm.Animation(that.params['scrollNode']);
             // Render temporary area
             if(that.params['renderTemporaryAria']){
-                nodes['temporaryArea'] = cm.Node('div');
+                nodes['temporaryArea'] = cm.node('div');
                 initArea(nodes['temporaryArea'], {
                     'isTemporary' : true
                 });
@@ -14961,7 +14928,7 @@ function(params){
                     'opacity' : 0
                 };
             }else{
-                node = cm.wrap(cm.Node('div', {'class' : 'pt__dnd-removable'}), draggable['node']);
+                node = cm.wrap(cm.node('div', {'class' : 'pt__dnd-removable'}), draggable['node']);
                 anim = new cm.Animation(node);
                 style = {
                     'height' : '0px',
@@ -15028,7 +14995,7 @@ function(params){
     };
 
     var renderChassis = function(){
-        var node = cm.Node(that.params['chassisTag'], {'class' : 'pt__dnd-chassis'});
+        var node = cm.node(that.params['chassisTag'], {'class' : 'pt__dnd-chassis'});
         return {
             'node' : node,
             'anim' : new cm.Animation(node),
@@ -15297,7 +15264,7 @@ function(params){
             // Find old draggable area and index in area
             var area = oldDraggable['area'],
                 index = area['items'].indexOf(oldDraggable),
-                node = cm.wrap(cm.Node('div', {'class' : 'pt__dnd-removable', 'style' : 'height: 0px;'}), newDraggableNode),
+                node = cm.wrap(cm.node('div', {'class' : 'pt__dnd-removable', 'style' : 'height: 0px;'}), newDraggableNode),
                 anim = new cm.Animation(node);
             // Append new draggable into DOM
             cm.insertAfter(node, oldDraggableNode);
@@ -15379,7 +15346,7 @@ cm.define('Com.Draggable', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig'
     ],
     'events' : [
@@ -15607,6 +15574,7 @@ function(params){
 
     init();
 });
+
 cm.define('Com.FileDropzone', {
     'extend' : 'Com.AbstractController',
     'events' : [
@@ -15665,8 +15633,8 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
             that.params['duration'] = !cm.isEmpty(duration) ? cm.parseTransitionDuration(duration) : that.params['_duration'];
         }
         // Validate Language Strings
-        that.setLangs({
-            'drop' : !that.params['max'] || that.params['max'] > 1 ? that.lang('drop_multiple') : that.lang('drop_single')
+        that.setMessages({
+            'drop' : !that.params['max'] || that.params['max'] > 1 ? that.message('drop_multiple') : that.message('drop_single')
         });
     };
 
@@ -15688,7 +15656,7 @@ cm.getConstructor('Com.FileDropzone', function(classConstructor, className, clas
         that.nodes['container'] = cm.node('div', {'class' : 'com__file-dropzone'},
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'title'},
-                    cm.node('div', {'class' : 'label'}, that.lang('drop')),
+                    cm.node('div', {'class' : 'label'}, that.message('drop')),
                     cm.node('div', {'class' : 'icon cm-i cm-i__circle-arrow-down'})
                 )
             )
@@ -15842,7 +15810,7 @@ cm.define('Com.FileReader', {
     'modules' : [
         'Params',
         'Events',
-        'Langs'
+        'Messages'
     ],
     'events' : [
         'onConstruct',
@@ -16342,7 +16310,7 @@ cm.define('Com.Form', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes',
         'Storage',
@@ -16709,7 +16677,7 @@ function(params){
                 && (fieldParams.required || fieldParams.validate)
                 && cm.isFunction(field.controller.validate);
             if(isFieldValidatable && !field.controller.validate(options)){
-                data.message = that.lang('form_error');
+                data.message = that.message('form_error');
                 data.valid = false;
             }
         });
@@ -16907,7 +16875,7 @@ function(params){
     that.callbacks.success = function(that, data){
         if(that.params.showNotifications && that.params.showSuccessNotification){
             that.callbacks.renderNotification(that, {
-                'label' : that.lang('success_message'),
+                'label' : that.message('success_message'),
                 'type' : 'success'
             });
         }
@@ -16932,7 +16900,7 @@ function(params){
 
     that.callbacks.renderError = function(that, errors, message){
         var hasMessage = !cm.isEmpty(message) && cm.isString(message),
-            label = hasMessage ? message : that.lang('form_error'),
+            label = hasMessage ? message : that.message('form_error'),
             messages;
         // Clear old errors messages
         that.callbacks.clearError(that);
@@ -16957,7 +16925,7 @@ function(params){
         }else{
             if(that.params.showNotifications){
                 that.callbacks.renderNotification(that, {
-                    'label' : that.lang('server_error'),
+                    'label' : that.message('server_error'),
                     'type' : 'danger'
                 });
             }
@@ -17303,7 +17271,7 @@ cm.define('Com.Gallery', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes'
     ],
@@ -17316,8 +17284,8 @@ cm.define('Com.Gallery', {
         'onItemSet'
     ],
     'params' : {
-        'container' : cm.Node('div'),
-        'node' : cm.Node('div'),
+        'container' : cm.node('div'),
+        'node' : cm.node('div'),
         'data' : [],
         'duration' : 500,
         'showCaption' : true,
@@ -17371,30 +17339,30 @@ function(params){
 
     var render = function(){
         // Structure
-        that.nodes['container'] = cm.Node('div', {'class' : 'com__gallery'},
-            that.nodes['holder'] = cm.Node('div', {'class' : 'holder'}),
-            that.nodes['bar'] = cm.Node('div', {'class' : 'com__gallery-controls is-full'},
-                cm.Node('div', {'class' : 'inner'},
-                    that.nodes['prev'] = cm.Node('div', {'class' : 'bar-arrow prev'},
-                        cm.Node('div', {'class' : that.params['icons']['prev']})
+        that.nodes['container'] = cm.node('div', {'class' : 'com__gallery'},
+            that.nodes['holder'] = cm.node('div', {'class' : 'holder'}),
+            that.nodes['bar'] = cm.node('div', {'class' : 'com__gallery-controls is-full'},
+                cm.node('div', {'class' : 'inner'},
+                    that.nodes['prev'] = cm.node('div', {'class' : 'bar-arrow prev'},
+                        cm.node('div', {'class' : that.params['icons']['prev']})
                     ),
-                    that.nodes['next'] = cm.Node('div', {'class' : 'bar-arrow next'},
-                        cm.Node('div', {'class' : that.params['icons']['next']})
+                    that.nodes['next'] = cm.node('div', {'class' : 'bar-arrow next'},
+                        cm.node('div', {'class' : that.params['icons']['next']})
                     ),
-                    that.nodes['zoom'] = cm.Node('div', {'class' : 'bar-zoom'},
-                        cm.Node('div', {'class' : that.params['icons']['zoom']})
+                    that.nodes['zoom'] = cm.node('div', {'class' : 'bar-zoom'},
+                        cm.node('div', {'class' : that.params['icons']['zoom']})
                     )
                 )
             ),
-            that.nodes['loader'] = cm.Node('div', {'class' : 'loader'},
-                cm.Node('div', {'class' : 'bg'}),
-                cm.Node('div', {'class' : 'icon small loader centered'})
+            that.nodes['loader'] = cm.node('div', {'class' : 'loader'},
+                cm.node('div', {'class' : 'bg'}),
+                cm.node('div', {'class' : 'icon small loader centered'})
             )
         );
         // Arrow titles
         if(that.params['showArrowTitles']){
-            that.nodes['next'].setAttribute('title', that.lang('Next'));
-            that.nodes['prev'].setAttribute('title', that.lang('Previous'));
+            that.nodes['next'].setAttribute('title', that.message('Next'));
+            that.nodes['prev'].setAttribute('title', that.message('Previous'));
         }
         // Zoom
         if(that.params['zoom']){
@@ -17455,24 +17423,24 @@ function(params){
         if(!item['link']){
             item['link'] = cm.node('a');
         }
-        item['nodes']['container'] = cm.Node('div', {'class' : 'pt__image is-centered'},
-            item['nodes']['inner'] = cm.Node('div', {'class' : 'inner'})
+        item['nodes']['container'] = cm.node('div', {'class' : 'pt__image is-centered'},
+            item['nodes']['inner'] = cm.node('div', {'class' : 'inner'})
         );
         // Render by type
         if(item['type'] === 'image'){
             item['nodes']['inner'].appendChild(
-                item['nodes']['content'] = cm.Node('img', {'class' : 'descr', 'alt' : item['title'], 'title' : item['title']})
+                item['nodes']['content'] = cm.node('img', {'class' : 'descr', 'alt' : item['title'], 'title' : item['title']})
             );
         }else{
             item['nodes']['inner'].appendChild(
-                item['nodes']['content'] = cm.Node('iframe', {'class' : 'descr', 'allowfullscreen' : true})
+                item['nodes']['content'] = cm.node('iframe', {'class' : 'descr', 'allowfullscreen' : true})
             );
         }
         // Caption
         if(that.params['showCaption'] && !cm.isEmpty(item['title'] && item['type'] === 'image')){
             item['nodes']['inner'].appendChild(
-                cm.Node('div', {'class' : 'title'},
-                    cm.Node('div', {'class' : 'inner'}, item['title'])
+                cm.node('div', {'class' : 'title'},
+                    cm.node('div', {'class' : 'inner'}, item['title'])
                 )
             );
         }
@@ -17695,7 +17663,7 @@ cm.define('Com.GalleryLayout', {
         'onChange'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'barDirection' : 'horizontal',      // horizontal | vertical
         'hasBar' : true,
         'Com.Gallery' : {},
@@ -17711,9 +17679,9 @@ function(params){
         items = [];
     
     that.nodes = {
-        'inner' : cm.Node('div'),
-        'preview-inner' : cm.Node('div'),
-        'bar-inner' : cm.Node('div'),
+        'inner' : cm.node('div'),
+        'preview-inner' : cm.node('div'),
+        'bar-inner' : cm.node('div'),
         'bar-items' : []
     };
 
@@ -17785,6 +17753,7 @@ function(params){
 
     init();
 });
+
 cm.define('Com.GalleryPopupContainer', {
     'extend' : 'Com.AbstractContainer',
     'params' : {
@@ -18263,7 +18232,7 @@ cm.define('Com.Glossary', {
         'onRender'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'showTitle' : true,
         'Com.Tooltip' : {
             'className' : 'com__glossary__tooltip',
@@ -18276,9 +18245,9 @@ function(params){
 
     that.components = {};
     that.nodes = {
-        'container' : cm.Node('div'),
-        'title' : cm.Node('div'),
-        'content' : cm.Node('div')
+        'container' : cm.node('div'),
+        'title' : cm.node('div'),
+        'content' : cm.node('div')
     };
 
     var init = function(){
@@ -18305,6 +18274,7 @@ function(params){
 
     init();
 });
+
 cm.define('Com.GridlistFilter', {
     'extend' : 'Com.AbstractController',
     'events' : [
@@ -18382,7 +18352,7 @@ cm.getConstructor('Com.GridlistFilter', function(classConstructor, className, cl
         // Structure
         that.triggerEvent('onRenderContentStart');
         nodes['container'] = cm.node('div', {'class' : 'pt__input'},
-            nodes['input'] = cm.node('input', {'type' : 'search', 'class' : 'input', 'autocomplete' : 'off', 'placeholder' : that.lang('placeholder')}),
+            nodes['input'] = cm.node('input', {'type' : 'search', 'class' : 'input', 'autocomplete' : 'off', 'placeholder' : that.message('placeholder')}),
             nodes['icon'] = cm.node('div', {'class' : 'icon icon svg__search'})
         );
         that.triggerEvent('onRenderContent');
@@ -18460,7 +18430,7 @@ cm.define('Com.GridlistHelper', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes',
         'Stack'
@@ -18475,7 +18445,7 @@ cm.define('Com.GridlistHelper', {
         'disableEditable'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'isEditing' : true,
         'customEvents' : true,
@@ -18597,7 +18567,7 @@ cm.define('Com.Gridlist', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Callbacks',
@@ -18640,7 +18610,7 @@ cm.define('Com.Gridlist', {
         'sort' : true,
         'sortBy' : 'id',                                            // Default sort by key in array
         'orderBy' : 'ASC',
-        'childsBy' : false,                                         // Render child rows after parent, (WIP - doesn't work checking / uncheking rows and statuses for now)
+        'childrenBy' : false,                                         // Render child rows after parent, (WIP - doesn't work checking / uncheking rows and statuses for now)
 
         // Visibility
         'showCounter' : false,
@@ -18947,13 +18917,13 @@ function(params){
             that.nodes['counter'] = cm.node('div', {'class' : 'pt__gridlist__counter'});
             cm.insertFirst(that.nodes['counter'], that.nodes['container']);
         }
-        that.nodes['counter'].innerHTML = cm.strReplace(that.lang('counter'), {
+        that.nodes['counter'].innerHTML = cm.strReplace(that.message('counter'), {
             '%count%' : count
         });
     };
 
     var renderEmptiness = function(container, errors){
-        errors = !cm.isEmpty(errors) ? errors : that.lang('empty');
+        errors = !cm.isEmpty(errors) ? errors : that.message('empty');
         if(that.nodes['empty'] && cm.isParent(container, that.nodes['empty'])){
             cm.remove(that.nodes['empty']);
         }
@@ -19120,7 +19090,7 @@ function(params){
                 case 'checkbox' :
                     cm.addClass(item['nodes']['container'], 'control');
                     item['nodes']['inner'].appendChild(
-                        item['nodes']['checkbox'] = cm.node('input', {'type' : 'checkbox', 'class' : 'checkbox', 'title' : that.lang('check_all')})
+                        item['nodes']['checkbox'] = cm.node('input', {'type' : 'checkbox', 'class' : 'checkbox', 'title' : that.message('check_all')})
                     );
                     item['nodes']['checkbox'].checked = that.isCheckedAll;
                     cm.addEvent(item['nodes']['checkbox'], 'click', function(){
@@ -19225,7 +19195,7 @@ function(params){
             'i' : i,
             'index' : data[that.params['uniqueKey']],
             'data' : data,
-            'childs' : [],
+            'children' : [],
             'isChecked' : false,
             'status' : data['_status'] || false,
             'nodes' : {
@@ -19243,10 +19213,10 @@ function(params){
                 renderCell(config, item)
             );
         });
-        // Render childs
-        if(that.params['childsBy']){
-            cm.forEach(data[that.params['childsBy']], function(child, childI){
-                renderRow(item['childs'], child, childI);
+        // Render children
+        if(that.params['childrenBy']){
+            cm.forEach(data[that.params['childrenBy']], function(child, childI){
+                renderRow(item['children'], child, childI);
             });
         }
         // Push to rows array
@@ -19423,7 +19393,7 @@ function(params){
         item['nodes']['node'] = cm.node('div', {'class' : ['pt__links', 'pull-right', config['class']].join(' ')},
             cm.node('ul',
                 item['nodes']['componentNode'] = cm.node('li', {'class' : 'com__menu', 'data-node' : 'ComMenu:{}:button'},
-                    cm.node('a', {'class' : 'label'}, that.lang('actions')),
+                    cm.node('a', {'class' : 'label'}, that.message('actions')),
                     cm.node('span', {'class' : 'cm-i__chevron-down xx-small display-inline'}),
                     cm.node('div', {'class' : 'pt__menu', 'data-node' : 'ComMenu.target'},
                         item['nodes']['itemsList'] = item['nodes']['actionsList'] = cm.node('ul', {'class' : 'pt__menu-dropdown'})
@@ -20125,7 +20095,7 @@ cm.define('Com.Zoom', {
         'onCloseStart'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'container' : 'document.body',
         'name' : '',
         'src' :'',
@@ -20289,6 +20259,7 @@ function(params){
 
     init();
 });
+
 cm.define('Com.Menu', {
     'modules' : [
         'Params',
@@ -20301,7 +20272,7 @@ cm.define('Com.Menu', {
         'onRender'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'event' : 'hover',
         'top' : 'targetHeight',
@@ -20322,8 +20293,8 @@ function(params){
     var that = this;
 
     that.nodes = {
-        'button' : cm.Node('div'),
-        'target' : cm.Node('div')
+        'button' : cm.node('div'),
+        'target' : cm.node('div')
     };
     that.components = {};
 
@@ -20477,7 +20448,7 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
         // Structure
         nodes['container'] = cm.node('div', {'class' : 'com__multiple-field__toolbar'},
             nodes['content'] = cm.node('div', {'class' : 'com__multiple-field__item'},
-                nodes['add'] = cm.node('div', {'class' : that.params['icons']['add'], 'title' : that.lang('add')})
+                nodes['add'] = cm.node('div', {'class' : that.params['icons']['add'], 'title' : that.message('add')})
             )
         );
         // Add button events
@@ -20690,7 +20661,7 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
             that.renderItemTemplate(that.params['template'], item);
             // Controls
             if(that.params['showControls'] && item['showControls']){
-                item['remove'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.lang('remove'), 'data-node' : 'remove'});
+                item['remove'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.message('remove'), 'data-node' : 'remove'});
                 cm.appendChild(item['remove'], item['container']);
             }
             // Sortable
@@ -21099,7 +21070,7 @@ cm.getConstructor('Com.Notifications', function(classConstructor, className, cla
         }, item);
         // Structure
         item['nodes']['container'] = cm.node('li', {'class' : item['type']},
-            item['nodes']['close'] = cm.node('div', {'class' : that.params['icon'], 'title' : that.lang('close')}),
+            item['nodes']['close'] = cm.node('div', {'class' : that.params['icon'], 'title' : that.message('close')}),
             item['nodes']['descr'] = cm.node('div', {'class' : 'descr'}),
             item['nodes']['messages'] = cm.node('div', {'class' : 'messages'},
                 item['nodes']['messagesList'] = cm.node('ul')
@@ -21113,7 +21084,7 @@ cm.getConstructor('Com.Notifications', function(classConstructor, className, cla
         // Messages
         if(!cm.isEmpty(item['messages'])){
             // Button
-            item['nodes']['button'] = cm.node('a', {'class' : 'more'}, that.lang('more'));
+            item['nodes']['button'] = cm.node('a', {'class' : 'more'}, that.message('more'));
             cm.insertFirst(item['nodes']['button'], item['nodes']['descr']);
             // List
             cm.forEach(item['messages'], function(message){
@@ -21158,111 +21129,11 @@ cm.getConstructor('Com.Notifications', function(classConstructor, className, cla
     };
 });
 
-cm.define('Com.OldBrowserAlert', {
-    'modules' : [
-        'Params',
-        'Events',
-        'Langs',
-        'Storage',
-        'Stack'
-    ],
-    'events' : [
-        'onRender'
-    ],
-    'params' : {
-        'name' : 'default',
-        'remember' : true,
-        'versions' : {
-            'IE' : 11,
-            'FF' : 31,
-            'Chrome' : 40,
-            'Safari' : 6,
-            'Opera' : 26
-        }
-    }
-},
-function(params){
-    var that = this,
-        userAgent = Com.UA.get();
-
-    that.nodes = {};
-    that.components = {};
-
-    var init = function(){
-        that.setParams(params);
-        that.convertEvents(that.params['events']);
-        that.addToStack();
-        check();
-        that.triggerEvent('onRender');
-    };
-
-    var check = function(){
-        cm.forEach(that.params['versions'], function(version, browser){
-            if(Com.UA.is(browser) && Com.UA.isVersion() < version){
-                // Parse description string, insert browser name and version
-                that.params['langs']['descr'] = that.lang('descr', {
-                    '%browser%' : userAgent['full_name'],
-                    '%version%' : userAgent['full_version'],
-                    '%minimum_version%' : version
-                });
-                // Render window
-                if(!that.params['remember'] || (that.params['remember'] && !that.storageGet('isShow'))){
-                    render();
-                }
-            }
-        });
-    };
-
-    var render = function(){
-        // Structure
-        that.nodes['container'] = cm.Node('div', {'class' : 'com__oldbrowser-alert'},
-            cm.Node('div', {'class' : 'b-descr'},
-                cm.Node('p', {'innerHTML' : that.lang('descr')})
-            ),
-            cm.Node('ul', {'class' : 'b-browsers'},
-                cm.Node('li', cm.Node('a', {'class' : 'icon linked chrome', 'title' : 'Google Chrome', 'href' : 'http://www.google.com/chrome/', 'target' : '_blank'})),
-                cm.Node('li', cm.Node('a', {'class' : 'icon linked firefox', 'title' : 'Mozilla Firefox', 'href' : 'http://www.mozilla.com/', 'target' : '_blank'})),
-                cm.Node('li', cm.Node('a', {'class' : 'icon linked safari', 'title' : 'Apple Safari', 'href' : 'http://www.apple.com/safari/', 'target' : '_blank'})),
-                cm.Node('li', cm.Node('a', {'class' : 'icon linked msie', 'title' : 'Microsoft Internet Explorer', 'href' : 'http://ie.microsoft.com/', 'target' : '_blank'}))
-            ),
-            cm.Node('div', {'class' : 'form'},
-                cm.Node('div', {'class' : 'btn-wrap pull-center'},
-                    that.nodes['button'] = cm.Node('input', {'type' : 'button', 'class' : 'button', 'value' : that.lang('continue')})
-                )
-            )
-        );
-        // Init dialog
-        cm.getConstructor('Com.Dialog', function(classConstructor){
-            that.components['dialog'] = new classConstructor({
-                'title' : that.lang('title'),
-                'content' : that.nodes['container'],
-                'autoOpen' : false,
-                'width' : 500,
-                'events' : {
-                    'onClose' : function(){
-                        if(that.params['remember']){
-                            that.storageSet('isShow', true);
-                        }
-                    }
-                }
-            });
-            // Add event on continue button
-            cm.addEvent(that.nodes['button'], 'click', that.components['dialog'].close);
-            // Open dialog
-            that.components['dialog'].open();
-        });
-    };
-
-    /* ******* MAIN ******* */
-
-    init();
-});
-
 cm.define('Com.Overlay', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Stack'
     ],
     'events' : [
@@ -21326,9 +21197,9 @@ function(params){
 
     var render = function(){
         // Structure
-        that.nodes['container'] = cm.Node('div', {'class' : 'com__overlay pt__overlay'},
-            that.nodes['spinner'] = cm.Node('div', {'class' : 'overlay__spinner'}),
-            that.nodes['content'] = cm.Node('div', {'class' : 'overlay__content'})
+        that.nodes['container'] = cm.node('div', {'class' : 'com__overlay pt__overlay'},
+            that.nodes['spinner'] = cm.node('div', {'class' : 'overlay__spinner'}),
+            that.nodes['content'] = cm.node('div', {'class' : 'overlay__content'})
         );
         // CSS Class
         cm.addClass(that.nodes['container'], that.params['className']);
@@ -21534,7 +21405,7 @@ cm.define('Com.Palette', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Stack'
@@ -21602,28 +21473,28 @@ function(params){
                         that.nodes['paletteCanvas'] = cm.node('canvas', {'width' : '100%', 'height' : '100%'})
                     )
                 ),
-                cm.node('div', {'class' : 'b-range', 'title' : that.lang('hue')},
+                cm.node('div', {'class' : 'b-range', 'title' : that.message('hue')},
                     that.nodes['tintZone'] = cm.node('div', {'class' : 'inner'})
                 ),
-                cm.node('div', {'class' : 'b-range b-opacity', 'title' : that.lang('opacity')},
+                cm.node('div', {'class' : 'b-range b-opacity', 'title' : that.message('opacity')},
                     that.nodes['opacityZone'] = cm.node('div', {'class' : 'inner'})
                 ),
                 cm.node('div', {'class' : 'b-stuff'},
                     cm.node('div', {'class' : 'inner'},
                         cm.node('div', {'class' : 'b-preview-color'},
-                            cm.node('div', {'class' : 'b-title'}, that.lang('new')),
+                            cm.node('div', {'class' : 'b-title'}, that.message('new')),
                             cm.node('div', {'class' : 'b-colors'},
                                 that.nodes['previewNew'] = cm.node('div', {'class' : 'b-color'}),
                                 that.nodes['previewPrev'] = cm.node('div', {'class' : 'b-color'})
                             ),
-                            cm.node('div', {'class' : 'b-title'}, that.lang('previous'))
+                            cm.node('div', {'class' : 'b-title'}, that.message('previous'))
                         ),
                         cm.node('div', {'class' : 'b-bottom'},
                             cm.node('div', {'class' : 'b-preview-inputs'},
-                                that.nodes['inputHEX'] = cm.node('input', {'type' : 'text', 'class' : 'input', 'title' : that.lang('hex')})
+                                that.nodes['inputHEX'] = cm.node('input', {'type' : 'text', 'class' : 'input', 'title' : that.message('hex')})
                             ),
                             cm.node('div', {'class' : 'b-buttons'},
-                                that.nodes['buttonSelect'] = cm.node('div', {'class' : 'button button-primary is-wide'}, that.lang('select'))
+                                that.nodes['buttonSelect'] = cm.node('div', {'class' : 'button button-primary is-wide'}, that.message('select'))
                             )
                         )
                     )
@@ -21914,7 +21785,7 @@ cm.define('Com.Request', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Stack',
         'Structure'
     ],
@@ -22327,7 +22198,7 @@ cm.getConstructor('Com.Request', function(classConstructor, className, classProt
             temporary,
             node;
         if(that.params.responseHTML){
-            node = cm.node('div', {'class' : 'cm__empty'}, that.lang('server_error'));
+            node = cm.node('div', {'class' : 'cm__empty'}, that.message('server_error'));
             // Append
             if(cm.isNode(that.params.responseContainer)){
                 that.triggerEvent('onContentRenderStart', node);
@@ -23050,7 +22921,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
 Com['Scroll'] = function(o){
     var that = this,
         config = cm.merge({
-            'node' : cm.Node('div'),
+            'node' : cm.node('div'),
             'step' : 15,
             'time' : 50,
             'duration' : 300,
@@ -23063,11 +22934,11 @@ Com['Scroll'] = function(o){
             'onScrollEnd' : []
         },
         nodes = {
-            'left' : cm.Node('div'),
-            'right' : cm.Node('div'),
-            'up' : cm.Node('div'),
-            'down' : cm.Node('div'),
-            'scroll' : cm.Node('div')
+            'left' : cm.node('div'),
+            'right' : cm.node('div'),
+            'up' : cm.node('div'),
+            'down' : cm.node('div'),
+            'scroll' : cm.node('div')
         },
         anim,
         animInterval,
@@ -23210,6 +23081,7 @@ Com['Scroll'] = function(o){
 
     init();
 };
+
 cm.define('Com.Slider', {
     'modules' : [
         'Params',
@@ -23267,16 +23139,16 @@ function(params){
         minHeightDimension;
 
     that.nodes = {
-        'container' : cm.Node('div'),
-        'inner' : cm.Node('div'),
-        'slides' : cm.Node('div'),
-        'slidesInner' : cm.Node('ul'),
-        'next' : cm.Node('div'),
-        'prev' : cm.Node('div'),
-        'buttons' : cm.Node('ul'),
+        'container' : cm.node('div'),
+        'inner' : cm.node('div'),
+        'slides' : cm.node('div'),
+        'slidesInner' : cm.node('ul'),
+        'next' : cm.node('div'),
+        'prev' : cm.node('div'),
+        'buttons' : cm.node('ul'),
         'items' : [],
-        'layout-inner' : cm.Node('div'),
-        'bar-inner' : cm.Node('div'),
+        'layout-inner' : cm.node('div'),
+        'bar-inner' : cm.node('div'),
         'bar-items' : []
     };
 
@@ -23523,7 +23395,7 @@ function(params){
         item = cm.merge({
             'index' : that.items.length,
             'nodes' : {
-                'container' : cm.Node('li'),
+                'container' : cm.node('li'),
                 'inner' : null
             }
         }, item);
@@ -23560,7 +23432,7 @@ function(params){
     var renderButton = function(item){
         // Structure
         that.nodes['buttons'].appendChild(
-            item['nodes']['button'] = cm.Node('li')
+            item['nodes']['button'] = cm.node('li')
         );
         if(that.params['numericButtons']){
             item['nodes']['button'].innerHTML = item['index'] + 1;
@@ -24068,7 +23940,7 @@ cm.define('Com.Sortable', {
         'onSort'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'process' : true,
         'Com.Draganddrop' : {
             'draggableContainer' : 'selfParent',
@@ -24172,6 +24044,7 @@ function(params){
 
     init();
 });
+
 cm.define('Com.Spacer', {
     'modules' : [
         'Params',
@@ -24192,7 +24065,7 @@ cm.define('Com.Spacer', {
         'disableEditable'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'height' : 0,
         'minHeight' : 0,
@@ -24233,20 +24106,20 @@ function(params){
 
     var render = function(){
         // Chassis Structure
-        that.nodes['dragContainer'] = cm.Node('div', {'class' : 'com__spacer__chassis'},
-            that.nodes['drag'] = cm.Node('div', {'class' : 'pt__drag is-vertical'},
-                cm.Node('div', {'class' : 'line'}),
-                cm.Node('div', {'class' : 'drag'},
-                    cm.Node('div', {'class' : 'icon draggable'})
+        that.nodes['dragContainer'] = cm.node('div', {'class' : 'com__spacer__chassis'},
+            that.nodes['drag'] = cm.node('div', {'class' : 'pt__drag is-vertical'},
+                cm.node('div', {'class' : 'line'}),
+                cm.node('div', {'class' : 'drag'},
+                    cm.node('div', {'class' : 'icon draggable'})
                 )
             )
         );
         // Ruler Structure
-        that.nodes['rulerContainer'] = cm.Node('div', {'class' : 'com__spacer__ruler'},
-            that.nodes['ruler'] = cm.Node('div', {'class' : 'pt__ruler is-vertical is-small'},
-                cm.Node('div', {'class' : 'line line-top'}),
-                that.nodes['rulerCounter'] = cm.Node('div', {'class' : 'counter'}),
-                cm.Node('div', {'class' : 'line line-bottom'})
+        that.nodes['rulerContainer'] = cm.node('div', {'class' : 'com__spacer__ruler'},
+            that.nodes['ruler'] = cm.node('div', {'class' : 'pt__ruler is-vertical is-small'},
+                cm.node('div', {'class' : 'line line-top'}),
+                that.nodes['rulerCounter'] = cm.node('div', {'class' : 'counter'}),
+                cm.node('div', {'class' : 'line line-bottom'})
             )
         );
         // Embed
@@ -24376,6 +24249,7 @@ function(params){
 
     init();
 });
+
 cm.define('Com.TabsetHelper', {
     'extend' : 'Com.AbstractController',
     'events' : [
@@ -24952,7 +24826,7 @@ cm.getConstructor('Com.TabsetHelper', function(classConstructor, className, clas
         if(that.params['responseHTML']){
             cm.clearNode(item['tab']['inner']);
             item['tab']['inner'].appendChild(
-                cm.node('div', {'class' : 'cm__empty'}, that.lang('server_error'))
+                cm.node('div', {'class' : 'cm__empty'}, that.message('server_error'))
             );
         }
     };
@@ -25252,8 +25126,8 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         var that = this,
             nodes = {};
         // Structure
-        nodes['container'] = cm.Node('li',
-            nodes['inner'] = cm.Node('div', item['content'])
+        nodes['container'] = cm.node('li',
+            nodes['inner'] = cm.node('div', item['content'])
         );
         return nodes;
     };
@@ -25262,8 +25136,8 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         var that = this,
             nodes = {};
         // Structure
-        nodes['container'] = cm.Node('li',
-            nodes['link'] = cm.Node('a',
+        nodes['container'] = cm.node('li',
+            nodes['link'] = cm.node('a',
                 nodes['title'] = cm.node('div', {'class' : 'title'}, item['title'])
             )
         );
@@ -25444,11 +25318,12 @@ function(params){
 
     init();
 });
+
 cm.define('Com.ToggleBox', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'DataNodes',
@@ -25482,9 +25357,9 @@ function(params){
 
     that.nodes = {
         'container' : cm.node('div'),
-        'button': cm.Node('div'),
-        'target': cm.Node('div'),
-        'title': cm.Node('div')
+        'button': cm.node('div'),
+        'target': cm.node('div'),
+        'title': cm.node('div')
     };
     that.animations = {};
 
@@ -25515,13 +25390,13 @@ function(params){
         var storageCollapsed;
         // Render Structure
         if(that.params['renderStructure']){
-            that.nodes['container'] = cm.Node('dl', {'class' : 'com__togglebox'},
-                that.nodes['titleContainer'] = cm.Node('dt',
-                    that.nodes['button'] = cm.Node('span', {'class' : 'icon default linked'}),
-                    that.nodes['title'] = cm.Node('span', {'class' : 'title'}, that.params['title'])
+            that.nodes['container'] = cm.node('dl', {'class' : 'com__togglebox'},
+                that.nodes['titleContainer'] = cm.node('dt',
+                    that.nodes['button'] = cm.node('span', {'class' : 'icon default linked'}),
+                    that.nodes['title'] = cm.node('span', {'class' : 'title'}, that.params['title'])
                 ),
-                that.nodes['target'] = cm.Node('dd',
-                    that.nodes['content'] = cm.Node('div', {'class' : 'inner'})
+                that.nodes['target'] = cm.node('dd',
+                    that.nodes['content'] = cm.node('div', {'class' : 'inner'})
                 )
             );
             cm.addClass(that.nodes['container'], that.params['className']);
@@ -25624,7 +25499,7 @@ function(params){
             cm.replaceClass(that.nodes['container'], 'is-hide', 'is-show');
             // Set title
             if(that.params['toggleTitle']){
-                that.nodes['title'].innerHTML = that.lang('hide');
+                that.nodes['title'].innerHTML = that.message('hide');
             }
             // Animate
             if(isImmediately){
@@ -25669,7 +25544,7 @@ function(params){
             cm.replaceClass(that.nodes['container'], 'is-show', 'is-hide');
             // Set title
             if(that.params['toggleTitle']){
-                that.nodes['title'].innerHTML = that.lang('show');
+                that.nodes['title'].innerHTML = that.message('show');
             }
             // Animate
             that.nodes['target'].style.overflow = 'hidden';
@@ -25699,7 +25574,7 @@ cm.define('Com.Toolbar', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'DataNodes',
@@ -26628,7 +26503,7 @@ cm.define('Com.Autocomplete', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'Storage',
         'Callbacks',
@@ -27406,7 +27281,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'content'},
                     cm.node('span', {'class' : 'icon small cm-ia__spinner'}),
-                    cm.node('span', {'innerHTML' : that.lang('loader', {'%query%' : params['query']})})
+                    cm.node('span', {'innerHTML' : that.message('loader', {'%query%' : params['query']})})
                 )
             )
         );
@@ -27475,7 +27350,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'content'},
                     cm.node('span', {'class' : 'icon small add'}),
-                    cm.node('span', {'innerHTML' : that.lang('suggestion', {'%query%' : params['query']})})
+                    cm.node('span', {'innerHTML' : that.message('suggestion', {'%query%' : params['query']})})
                 )
             )
         );
@@ -27604,7 +27479,7 @@ cm.getConstructor('Com.BoxTools', function(classConstructor, className, classPro
             cm.node('div', {'class' : 'b-line'},
                 that.renderInput(that.params['inputs'][3], 3),
                 cm.node('div', {'class' : 'b-link-container'},
-                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.lang('link')},
+                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.message('link')},
                         cm.node('div', {'class' : 'icon'})
                     )
                 ),
@@ -27737,7 +27612,7 @@ cm.getConstructor('Com.BoxTools', function(classConstructor, className, classPro
             if(!that.isInputsLinked){
                 that.isInputsLinked = true;
                 cm.addClass(that.nodes['content']['link'], 'active');
-                that.nodes['content']['link'].title = that.lang('unlink');
+                that.nodes['content']['link'].title = that.message('unlink');
                 if(that.lastInput){
                     that.set(that.lastInput['input'].value);
                 }else{
@@ -27750,7 +27625,7 @@ cm.getConstructor('Com.BoxTools', function(classConstructor, className, classPro
             }else{
                 that.isInputsLinked = false;
                 cm.removeClass(that.nodes['content']['link'], 'active');
-                that.nodes['content']['link'].title = that.lang('link');
+                that.nodes['content']['link'].title = that.message('link');
             }
         }
         return that;
@@ -27813,7 +27688,7 @@ cm.getConstructor('Com.BoxToolsRadius', function(classConstructor, className, cl
             ),
             cm.node('div', {'class' : 'b-line'},
                 cm.node('div', {'class' : 'b-link-container'},
-                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.lang('link')},
+                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.message('link')},
                         cm.node('div', {'class' : 'icon'})
                     )
                 )
@@ -28237,7 +28112,7 @@ cm.define('Com.CodeHighlight', {
         'onRender'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'language' : 'javascript',
         'lineNumbers' : true,
@@ -28321,11 +28196,12 @@ function(params){
 
     init();
 });
+
 cm.define('Com.ColorPicker', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Storage',
@@ -28417,14 +28293,14 @@ function(params){
 
     var render = function(){
         /* *** RENDER STRUCTURE *** */
-        that.nodes['container'] = cm.Node('div', {'class' : 'com__colorpicker'},
-            that.nodes['hidden'] = cm.Node('input', {'type' : 'hidden'}),
-            that.nodes['target'] = cm.Node('div', {'class' : 'pt__input'},
-                that.nodes['input'] = cm.Node('input', {'type' : 'text', 'class' : 'input', 'readOnly' : 'true'}),
-                that.nodes['icon'] = cm.Node('div', {'class' : that.params['icons']['picker']})
+        that.nodes['container'] = cm.node('div', {'class' : 'com__colorpicker'},
+            that.nodes['hidden'] = cm.node('input', {'type' : 'hidden'}),
+            that.nodes['target'] = cm.node('div', {'class' : 'pt__input'},
+                that.nodes['input'] = cm.node('input', {'type' : 'text', 'class' : 'input', 'readOnly' : 'true'}),
+                that.nodes['icon'] = cm.node('div', {'class' : that.params['icons']['picker']})
             ),
-            that.nodes['menuContainer'] = cm.Node('div', {'class' : 'form'},
-                that.nodes['paletteContainer'] = cm.Node('div')
+            that.nodes['menuContainer'] = cm.node('div', {'class' : 'form'},
+                that.nodes['paletteContainer'] = cm.node('div')
             )
         );
         /* *** ATTRIBUTES *** */
@@ -28452,7 +28328,7 @@ function(params){
         if(that.params['showClearButton']){
             cm.addClass(that.nodes['container'], 'has-clear-button');
             that.nodes['container'].appendChild(
-                that.nodes['clearButton'] = cm.Node('div', {'class' : that.params['icons']['clear'], 'title' : that.lang('Clear')})
+                that.nodes['clearButton'] = cm.node('div', {'class' : that.params['icons']['clear'], 'title' : that.message('Clear')})
             );
         }
         /* *** INSERT INTO DOM *** */
@@ -28518,7 +28394,7 @@ function(params){
         that.nodes['hidden'].value = that.components['palette'].get('rgb');
         if(that.value === 'transparent'){
             if(that.params['showLabel']){
-                that.nodes['input'].value = that.lang('Transparent');
+                that.nodes['input'].value = that.message('Transparent');
             }
             cm.replaceClass(that.nodes['input'], 'input-dark input-light', 'input-checkers');
         }else{
@@ -28641,7 +28517,7 @@ cm.define('Com.DatePicker', {
         'Events',
         'DataConfig',
         'Structure',
-        'Langs',
+        'Messages',
         'Stack'
     ],
     'events' : [
@@ -28758,14 +28634,14 @@ function(params){
 
     var render = function(){
         /* *** RENDER STRUCTURE *** */
-        nodes['container'] = cm.Node('div', {'class' : 'com__datepicker-input'},
-            nodes['hidden'] = cm.Node('input', {'type' : 'hidden'}),
-            nodes['target'] = cm.Node('div', {'class' : 'pt__input has-icon-right'},
-                nodes['input'] = cm.Node('input', {'type' : 'text', 'class' : 'input'}),
-                nodes['icon'] = cm.Node('div', {'class' : that.params['icons']['datepicker']})
+        nodes['container'] = cm.node('div', {'class' : 'com__datepicker-input'},
+            nodes['hidden'] = cm.node('input', {'type' : 'hidden'}),
+            nodes['target'] = cm.node('div', {'class' : 'pt__input has-icon-right'},
+                nodes['input'] = cm.node('input', {'type' : 'text', 'class' : 'input'}),
+                nodes['icon'] = cm.node('div', {'class' : that.params['icons']['datepicker']})
             ),
-            nodes['menuContainer'] = cm.Node('div', {'class' : 'form'},
-                nodes['calendarContainer'] = cm.Node('div', {'class' : 'calendar-holder'})
+            nodes['menuContainer'] = cm.node('div', {'class' : 'form'},
+                nodes['calendarContainer'] = cm.node('div', {'class' : 'calendar-holder'})
             )
         );
         if(!cm.isEmpty(that.params['size'])){
@@ -28792,21 +28668,21 @@ function(params){
         if(that.params['showClearButton']){
             cm.addClass(nodes['container'], 'has-clear-button');
             nodes['container'].appendChild(
-                nodes['clearButton'] = cm.Node('div', {'class' : that.params['icons']['clear'], 'title' : that.lang('Clear date')})
+                nodes['clearButton'] = cm.node('div', {'class' : that.params['icons']['clear'], 'title' : that.message('Clear date')})
             );
         }
         // Today / Now Button
         if(that.params['showTodayButton']){
             nodes['menuContainer'].appendChild(
-                nodes['todayButton'] = cm.Node('div', {'class' : 'button today is-wide'}, that.lang(that.params['isDateTime']? 'Now' : 'Today'))
+                nodes['todayButton'] = cm.node('div', {'class' : 'button today is-wide'}, that.message(that.params['isDateTime']? 'Now' : 'Today'))
             );
         }
         // Time Select
         if(that.params['isDateTime']){
-            nodes['timeHolder'] = cm.Node('div', {'class' : 'time-holder'},
-                cm.Node('dl', {'class' : 'pt__field is-box'},
-                    cm.Node('dt', that.lang('Time')),
-                    nodes['timeContainer'] = cm.Node('dd')
+            nodes['timeHolder'] = cm.node('div', {'class' : 'time-holder'},
+                cm.node('dl', {'class' : 'pt__field is-box'},
+                    cm.node('dt', that.message('Time')),
+                    nodes['timeContainer'] = cm.node('dd')
                 )
             );
             cm.insertAfter(nodes['timeHolder'], nodes['calendarContainer']);
@@ -28852,7 +28728,7 @@ function(params){
             'startYear' : that.params['startYear'],
             'endYear' : that.params['endYear'],
             'startWeekDay' : that.params['startWeekDay'],
-            'langs' : that.params['langs'],
+            'messages' : that.params['messages'],
             'renderMonthOnInit' : false,
             'events' : {
                 'onMonthRender' : function(){
@@ -28960,9 +28836,9 @@ function(params){
             // Set date
             setDate();
             // Set value
-            that.value = cm.dateFormat(that.date, that.format, that.lang());
+            that.value = cm.dateFormat(that.date, that.format, that.message());
         }else{
-            that.value = cm.dateFormat(false, that.format, that.lang());
+            that.value = cm.dateFormat(false, that.format, that.message());
         }
         setInputValues();
         renderCalendarMonth();
@@ -29078,7 +28954,7 @@ function(params){
         format = !cm.isUndefined(format) ? format : that.format;
         triggerEvents = !cm.isUndefined(triggerEvents) ? triggerEvents : true;
         // Get date
-        var pattern = cm.dateFormat(false, format, that.lang());
+        var pattern = cm.dateFormat(false, format, that.message());
         if(cm.isEmpty(str) || str === pattern){
             that.clear();
             return that;
@@ -29151,7 +29027,7 @@ cm.define('Com.DateSelect', {
     'modules' : [
         'Params',
         'DataConfig',
-        'Langs',
+        'Messages',
         'Events',
         'Structure',
         'Stack'
@@ -29162,7 +29038,7 @@ cm.define('Com.DateSelect', {
     ],
     'params' : {
         'input' : null,                                 // Deprecated, use 'node' parameter instead.
-        'node' : cm.Node('input', {'type' : 'text'}),
+        'node' : cm.node('input', {'type' : 'text'}),
         'name' : '',
         'embedStructure' : 'replace',
         'container' : null,
@@ -29227,11 +29103,11 @@ function(params){
 
     var render = function(){
         // Structure
-        nodes['container'] = cm.Node('div', {'class' : 'com__dateselect'},
-            nodes['hidden'] = cm.Node('input', {'type' : 'hidden'}),
-            cm.Node('div', {'class' : 'pt__toolbar bottom'},
-                cm.Node('div', {'class' : 'inner clear'},
-                    nodes['fields'] = cm.Node('ul', {'class' : 'group'})
+        nodes['container'] = cm.node('div', {'class' : 'com__dateselect'},
+            nodes['hidden'] = cm.node('input', {'type' : 'hidden'}),
+            cm.node('div', {'class' : 'pt__toolbar bottom'},
+                cm.node('div', {'class' : 'inner clear'},
+                    nodes['fields'] = cm.node('ul', {'class' : 'group'})
                 )
             )
         );
@@ -29262,12 +29138,12 @@ function(params){
 
     var renderYearField = function(){
         // Structure
-        nodes['year'] = cm.Node('li', {'class' : 'is-field'});
+        nodes['year'] = cm.node('li', {'class' : 'is-field'});
         cm.addClass(nodes['year'], that.params['fieldSizes']['year']);
         cm.appendChild(nodes['year'], nodes['fields']);
         // Render component
         var data = [
-            {'value' : '0000', 'text' : that.lang('Year')}
+            {'value' : '0000', 'text' : that.message('Year')}
         ], i;
         for(i = that.params['endYear']; i >= that.params['startYear']; i--){
             data.push({'value' : i, 'text' : i});
@@ -29288,14 +29164,14 @@ function(params){
 
     var renderMonthField = function(){
         // Structure
-        nodes['month'] = cm.Node('li', {'class' : 'is-field'});
+        nodes['month'] = cm.node('li', {'class' : 'is-field'});
         cm.addClass(nodes['month'], that.params['fieldSizes']['month']);
         cm.appendChild(nodes['month'], nodes['fields']);
         // Render component
         var data = [
-            {'value' : '00', 'text' : that.lang('Month')}
+            {'value' : '00', 'text' : that.message('Month')}
         ];
-        cm.forEach(that.lang('months'), function(month, i){
+        cm.forEach(that.message('months'), function(month, i){
             data.push({'value' : cm.addLeadZero(parseInt(i + 1)), 'text' : month});
         });
         components['month'] = new Com.Select({
@@ -29314,12 +29190,12 @@ function(params){
 
     var renderDayField = function(){
         // Structure
-        nodes['day'] = cm.Node('li', {'class' : 'is-field'});
+        nodes['day'] = cm.node('li', {'class' : 'is-field'});
         cm.addClass(nodes['day'], that.params['fieldSizes']['day']);
         cm.appendChild(nodes['day'], nodes['fields']);
         // Render component
         var data = [
-            {'value' : '00', 'text' : that.lang('Day')}
+            {'value' : '00', 'text' : that.message('Day')}
         ], i;
         for(i = 1; i <= 31; i++){
             data.push({'value' : cm.addLeadZero(i), 'text' : i});
@@ -29526,9 +29402,9 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
     classProto.onValidateParamsEnd = function(){
         var that = this;
         // Validate Language Strings
-        that.setLangs({
-            '_browse_local' : that.params['fileManager'] ? that.lang('browse_local') : that.lang('browse'),
-            '_browse_filemanager' : that.params['local'] ? that.lang('browse_filemanager') : that.lang('browse')
+        that.setMessages({
+            '_browse_local' : that.params['fileManager'] ? that.message('browse_local') : that.message('browse'),
+            '_browse_filemanager' : that.params['local'] ? that.message('browse_filemanager') : that.message('browse')
         });
         // Dropzone
         that.params['dropzone'] = !that.params['local'] ? false : that.params['dropzone'];
@@ -29622,7 +29498,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
                 nodes['content'] = cm.node('div', {'class' : 'com__file-input__holder'},
                     cm.node('div', {'class' : 'pt__file-line'},
                         nodes['buttonsInner'] = cm.node('div', {'class' : 'inner'},
-                            nodes['clear'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('remove')),
+                            nodes['clear'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('remove')),
                             nodes['label'] = cm.node('div', {'class' : 'label'}),
                             nodes['placeholder'] = cm.node('div', {'class' : 'label label-placeholder', 'innerHTML' : that.params['placeholder']})
                         )
@@ -29637,7 +29513,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
         // Render Browse Buttons
         if(that.params['local']){
             nodes['browseLocal'] = cm.node('div', {'class' : 'browse-button'},
-                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_local')),
+                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_local')),
                 cm.node('div', {'class' : 'inner'},
                     nodes['input'] = cm.node('input', {'type' : 'file'})
                 )
@@ -29646,11 +29522,11 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
             cm.insertFirst(nodes['browseLocal'], nodes['buttonsInner']);
         }
         if(that.params['fileManager']){
-            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_filemanager'));
+            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_filemanager'));
             cm.insertFirst(nodes['browseFileManager'], nodes['buttonsInner']);
         }
         if(that.params['fileUploader']){
-            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('browse'));
+            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('browse'));
             cm.insertFirst(nodes['browseFileUploader'], nodes['buttonsInner']);
         }
         // Events
@@ -29734,7 +29610,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
             cm.removeClass(that.nodes['content']['label'], 'is-hidden');
             if(that.params['showFilename']){
                 if(that.params['showLink']){
-                    that.nodes['content']['link'] = cm.node('a', {'target' : '_blank', 'href' : that.value['url'], 'title' : that.lang('open')}, that.value['name']);
+                    that.nodes['content']['link'] = cm.node('a', {'target' : '_blank', 'href' : that.value['url'], 'title' : that.message('open')}, that.value['name']);
                 }else{
                     that.nodes['content']['link'] = cm.textNode(that.value['name']);
                 }
@@ -29834,9 +29710,9 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         var that = this;
         that.isMultiple = !that.params['max'] || that.params['max'] > 1;
         // Validate Language Strings
-        that.setLangs({
-            '_browse_local' : that.params['fileManager'] ? that.lang('browse_local') : that.lang('browse'),
-            '_browse_filemanager' : that.params['local'] ? that.lang('browse_filemanager') : that.lang('browse')
+        that.setMessages({
+            '_browse_local' : that.params['fileManager'] ? that.message('browse_local') : that.message('browse'),
+            '_browse_filemanager' : that.params['local'] ? that.message('browse_filemanager') : that.message('browse')
         });
         // Components parameters
         that.params['dropzoneParams']['max'] = that.params['max'];
@@ -29918,7 +29794,7 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
         // Render Browse Buttons
         if(that.params['local']){
             nodes['browseLocal'] = cm.node('div', {'class' : 'browse-button'},
-                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_local')),
+                cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_local')),
                 cm.node('div', {'class' : 'inner'},
                     nodes['input'] = cm.node('input', {'type' : 'file'})
                 )
@@ -29927,11 +29803,11 @@ cm.getConstructor('Com.MultipleFileInput', function(classConstructor, className,
             cm.insertFirst(nodes['browseLocal'], nodes['contentInner']);
         }
         if(that.params['fileManager']){
-            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('_browse_filemanager'));
+            nodes['browseFileManager'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('_browse_filemanager'));
             cm.insertFirst(nodes['browseFileManager'], nodes['contentInner']);
         }
         if(that.params['fileUploader']){
-            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.lang('browse'));
+            nodes['browseFileUploader'] = cm.node('button', {'type' : 'button', 'class' : 'button button-primary'}, that.message('browse'));
             cm.insertFirst(nodes['browseFileUploader'], nodes['contentInner']);
         }
         if(!that.hasButtons){
@@ -30100,7 +29976,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
                         nodes['buttonsInner'] = cm.node('div', {'class' : 'input__buttons'},
                             nodes['clear'] = cm.node('div', {'class' : 'cm__button-wrapper'},
                                 cm.node('button', {'type' : 'button', 'class' : 'button button-danger'},
-                                    cm.node('span', that.lang('remove'))
+                                    cm.node('span', that.message('remove'))
                                 )
                             )
                         )
@@ -30133,7 +30009,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
         if(that.params['preview']){
             that.nodes['content']['preview'] = cm.node('div', {'class' : 'cm__button-wrapper'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
-                    cm.node('span', that.lang('preview'))
+                    cm.node('span', that.message('preview'))
                 )
             );
             cm.insertFirst(that.nodes['content']['preview'], that.nodes['content']['buttonsInner']);
@@ -30141,7 +30017,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
         if(that.params['local']){
             that.nodes['content']['browseLocal'] = cm.node('div', {'class' : 'browse-button'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
-                    cm.node('span', that.lang('_browse_local'))
+                    cm.node('span', that.message('_browse_local'))
                 ),
                 cm.node('div', {'class' : 'inner'},
                     that.nodes['content']['input'] = cm.node('input', {'type' : 'file'})
@@ -30153,7 +30029,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
         if(that.params['fileManager']){
             that.nodes['content']['browseFileManager'] = cm.node('div', {'class' : 'cm__button-wrapper'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
-                    cm.node('span', that.lang('_browse_filemanager'))
+                    cm.node('span', that.message('_browse_filemanager'))
                 )
             );
             cm.insertFirst(that.nodes['content']['browseFileManager'], that.nodes['content']['buttonsInner']);
@@ -30161,7 +30037,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
         if(that.params['fileUploader']){
             that.nodes['content']['browseFileUploader'] = cm.node('div', {'class' : 'cm__button-wrapper'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
-                    cm.node('span', that.lang('browse'))
+                    cm.node('span', that.message('browse'))
                 )
             );
             cm.insertFirst(that.nodes['content']['browseFileUploader'], that.nodes['content']['buttonsInner']);
@@ -30181,7 +30057,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
             // Label
             cm.clearNode(that.nodes['content']['label']);
             if(that.params['showLink']){
-                that.nodes['content']['link'] = cm.node('a', {'target' : '_blank', 'href' : that.value['url'], 'title' : that.lang('open')}, that.value['name']);
+                that.nodes['content']['link'] = cm.node('a', {'target' : '_blank', 'href' : that.value['url'], 'title' : that.message('open')}, that.value['name']);
             }else{
                 that.nodes['content']['link'] = cm.textNode(that.value['name']);
             }
@@ -31205,7 +31081,7 @@ cm.getConstructor('Com.RepeatTools', function(classConstructor, className, class
             'nodes' : {}
         }, item);
         // Structure
-        item['nodes']['container'] = cm.node('div', {'class' : 'option__item', 'title' : that.lang(item['name'])},
+        item['nodes']['container'] = cm.node('div', {'class' : 'option__item', 'title' : that.message(item['name'])},
             item['nodes']['icon'] = cm.node('div', {'class' : [item['iconType'], item['icon']].join(' ')})
         );
         cm.appendChild(item['nodes']['container'], that.nodes['content']['inner']);
@@ -31304,7 +31180,7 @@ cm.getConstructor('Com.ScaleTools', function(classConstructor, className, classP
             'nodes' : {}
         }, item);
         // Structure
-        item['nodes']['container'] = cm.node('div', {'class' : 'option__item', 'title' : that.lang(item['name'])},
+        item['nodes']['container'] = cm.node('div', {'class' : 'option__item', 'title' : that.message(item['name'])},
             item['nodes']['icon'] = cm.node('div', {'class' : [item['iconType'], item['icon']].join(' ')})
         );
         cm.appendChild(item['nodes']['container'], that.nodes['content']['inner']);
@@ -32266,7 +32142,7 @@ cm.define('Com.TagsInput', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Stack'
@@ -32363,7 +32239,7 @@ function(params){
 
     var renderInput = function(){
         // Structure
-        nodes['input'] = cm.node('input', {'type' : 'text', 'maxlength' : that.params['maxSingleTagLength'], 'class' : 'input adder', 'placeholder' : that.lang('placeholder')});
+        nodes['input'] = cm.node('input', {'type' : 'text', 'maxlength' : that.params['maxSingleTagLength'], 'class' : 'input adder', 'placeholder' : that.message('placeholder')});
         cm.appendChild(nodes['input'], nodes['inner']);
         // Autocomplete
         if(that.isAutocomplete){
@@ -32439,7 +32315,7 @@ function(params){
         item['container'] = cm.node('div', {'class' : 'item'},
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'text', 'title' : tag}, tag),
-                item['button'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.lang('remove')})
+                item['button'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.message('remove')})
             )
         );
         item['anim'] = new cm.Animation(item['container']);
@@ -32555,7 +32431,7 @@ cm.define('Com.TimeSelect', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Stack'
@@ -32567,7 +32443,7 @@ cm.define('Com.TimeSelect', {
         'onClear'
     ],
     'params' : {
-        'node' : cm.Node('input', {'type' : 'text'}),
+        'node' : cm.node('input', {'type' : 'text'}),
         'container' : null,
         'embedStructure' : 'replace',
         'name' : '',
@@ -32630,22 +32506,22 @@ function(params){
             minutes = 0,
             seconds = 0;
         /* *** STRUCTURE *** */
-        nodes['container'] = cm.Node('div', {'class' : 'com__timeselect'},
-            nodes['hidden'] = cm.Node('input', {'type' : 'hidden'}),
-            nodes['inner'] = cm.Node('div', {'class' : 'inner'})
+        nodes['container'] = cm.node('div', {'class' : 'com__timeselect'},
+            nodes['hidden'] = cm.node('input', {'type' : 'hidden'}),
+            nodes['inner'] = cm.node('div', {'class' : 'inner'})
         );
         /* *** ITEMS *** */
         // Hours
         if(that.params['withHours']){
             if(nodes['inner'].childNodes.length){
-                nodes['inner'].appendChild(cm.Node('div', {'class' : 'sep'}, that.lang('separator')));
+                nodes['inner'].appendChild(cm.node('div', {'class' : 'sep'}, that.message('separator')));
             }
-            nodes['inner'].appendChild(cm.Node('div', {'class' : 'field'},
-                nodes['selectHours'] = cm.Node('select', {'placeholder' : that.lang('Hours'), 'title' : that.lang('HoursTitle')})
+            nodes['inner'].appendChild(cm.node('div', {'class' : 'field'},
+                nodes['selectHours'] = cm.node('select', {'placeholder' : that.message('Hours'), 'class' : 'select', 'title' : that.message('HoursTitle')})
             ));
             while(hours < 24){
                 nodes['selectHours'].appendChild(
-                    cm.Node('option', {'value' : hours},cm.addLeadZero(hours))
+                    cm.node('option', {'value' : hours},cm.addLeadZero(hours))
                 );
                 hours += that.params['hoursInterval'];
             }
@@ -32653,14 +32529,14 @@ function(params){
         // Minutes
         if(that.params['withMinutes']){
             if(nodes['inner'].childNodes.length){
-                nodes['inner'].appendChild(cm.Node('div', {'class' : 'sep'}, that.lang('separator')));
+                nodes['inner'].appendChild(cm.node('div', {'class' : 'sep'}, that.message('separator')));
             }
-            nodes['inner'].appendChild(cm.Node('div', {'class' : 'field'},
-                nodes['selectMinutes'] = cm.Node('select', {'placeholder' : that.lang('Minutes'), 'title' : that.lang('MinutesTitle')})
+            nodes['inner'].appendChild(cm.node('div', {'class' : 'field'},
+                nodes['selectMinutes'] = cm.node('select', {'placeholder' : that.message('Minutes'), 'class' : 'select', 'title' : that.message('MinutesTitle')})
             ));
             while(minutes < 60){
                 nodes['selectMinutes'].appendChild(
-                    cm.Node('option', {'value' : minutes}, cm.addLeadZero(minutes))
+                    cm.node('option', {'value' : minutes}, cm.addLeadZero(minutes))
                 );
                 minutes += that.params['minutesInterval'];
             }
@@ -32668,14 +32544,14 @@ function(params){
         // Seconds
         if(that.params['withSeconds']){
             if(nodes['inner'].childNodes.length){
-                nodes['inner'].appendChild(cm.Node('div', {'class' : 'sep'}, that.lang('separator')));
+                nodes['inner'].appendChild(cm.node('div', {'class' : 'sep'}, that.message('separator')));
             }
-            nodes['inner'].appendChild(cm.Node('div', {'class' : 'field'},
-                nodes['selectSeconds'] = cm.Node('select', {'placeholder' : that.lang('Seconds'), 'title' : that.lang('SecondsTitle')})
+            nodes['inner'].appendChild(cm.node('div', {'class' : 'field'},
+                nodes['selectSeconds'] = cm.node('select', {'placeholder' : that.message('Seconds'), 'class' : 'select', 'title' : that.message('SecondsTitle')})
             ));
             while(seconds < 60){
                 nodes['selectSeconds'].appendChild(
-                    cm.Node('option', {'value' : seconds},cm.addLeadZero(seconds))
+                    cm.node('option', {'value' : seconds},cm.addLeadZero(seconds))
                 );
                 seconds += that.params['secondsInterval'];
             }
@@ -32697,7 +32573,7 @@ function(params){
         // Hours select
         if(that.params['withHours']){
             components['selectHours'] = new Com.Select({
-                    'select' : nodes['selectHours'],
+                    'node' : nodes['selectHours'],
                     'renderInBody' : that.params['renderSelectsInBody']
                 }).addEvent('onChange', function(){
                     set(true);
@@ -32706,7 +32582,7 @@ function(params){
         // Minutes select
         if(that.params['withMinutes']){
             components['selectMinutes'] = new Com.Select({
-                    'select' : nodes['selectMinutes'],
+                    'node' : nodes['selectMinutes'],
                     'renderInBody' : that.params['renderSelectsInBody']
                 }).addEvent('onChange', function(){
                     set(true);
@@ -32715,7 +32591,7 @@ function(params){
         // Seconds select
         if(that.params['withSeconds']){
             components['selectSeconds'] = new Com.Select({
-                    'select' : nodes['selectSeconds'],
+                    'node' : nodes['selectSeconds'],
                     'renderInBody' : that.params['renderSelectsInBody']
                 })
                 .addEvent('onChange', function(){
@@ -32926,8 +32802,8 @@ cm.getConstructor('Com.TwoSideMultiSelect', function(classConstructor, className
             nodes['inner'] = cm.node('div', {'class' : 'inner'},
                 nodes['firstColumn'] = cm.node('div', {'class' : 'column column--first'}),
                 nodes['controls'] = cm.node('div', {'class' : 'controls'},
-                    nodes['moveToRight'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.lang('addTitle')}, that.lang('add')),
-                    nodes['moveToLeft'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.lang('removeTitle')}, that.lang('remove'))
+                    nodes['moveToRight'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.message('addTitle')}, that.message('add')),
+                    nodes['moveToLeft'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.message('removeTitle')}, that.message('remove'))
                 ),
                 nodes['secondColumn'] = cm.node('div', {'class' : 'column column--second'})
             )
@@ -32935,11 +32811,11 @@ cm.getConstructor('Com.TwoSideMultiSelect', function(classConstructor, className
         // Labels
         if(that.params['showLabels']){
             cm.appendChild(
-                cm.node('div', {'class' : 'label'}, that.lang('firstLabel')),
+                cm.node('div', {'class' : 'label'}, that.message('firstLabel')),
                 nodes['firstColumn']
             );
             cm.appendChild(
-                cm.node('div', {'class' : 'label'}, that.lang('secondLabel')),
+                cm.node('div', {'class' : 'label'}, that.message('secondLabel')),
                 nodes['secondColumn']
             );
             cm.addClass(nodes['container'], 'has-labels');
@@ -33261,7 +33137,7 @@ cm._config.displayDateFormatCase = 'nominative';
 cm._config.displayDateFormat = '%F %j, %Y';
 cm._config.displayDateTimeFormat = '%F %j, %Y, %H:%i';
 
-cm._strings = {
+cm._messages = {
 	'common' : {
 		'server_error' : 'An unexpected error has occurred. Please try again later.'
 	},
@@ -33270,62 +33146,62 @@ cm._strings = {
 	'daysAbbr' : ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 };
 
-cm.setStrings('Com.AbstractContainer', {
+cm.setMessages('Com.AbstractContainer', {
     'title': 'Container',
     'close': 'Close',
     'save': 'Save',
     'help': '',
 });
 
-cm.setStrings('Com.AbstractFileManagerContainer', {
+cm.setMessages('Com.AbstractFileManagerContainer', {
 	'title_single' : 'Please select a file',
 	'title_multiple' : 'Please select files',
 	'close' : 'Cancel',
 	'save' : 'Select'
 });
 
-cm.setStrings('Com.AbstractFormField', {
+cm.setMessages('Com.AbstractFormField', {
 	'required' : 'This field is required.',
 	'too_short' : 'Value should be at least %count% characters.',
 	'too_long' : 'Value should be less than %count% characters.',
 	'*' : '*'
 });
 
-cm.setStrings('Com.Calendar', {
-	'months' : cm._strings.months,
-	'days' : cm._strings.days,
-	'daysAbbr' : cm._strings.daysAbbr
+cm.setMessages('Com.Calendar', {
+	'months' : cm._messages.months,
+	'days' : cm._messages.days,
+	'daysAbbr' : cm._messages.daysAbbr
 });
 
-cm.setStrings('Com.CalendarEvents', {
-	'months' : cm._strings.months,
-	'days' : cm._strings.days,
-	'daysAbbr' : cm._strings.daysAbbr
+cm.setMessages('Com.CalendarEvents', {
+	'months' : cm._messages.months,
+	'days' : cm._messages.days,
+	'daysAbbr' : cm._messages.daysAbbr
 });
 
-cm.setStrings('Com.Dialog', {
+cm.setMessages('Com.Dialog', {
     'closeTitle': 'Close',
     'close': '',
     'helpTitle': 'Help',
     'help': '',
 });
 
-cm.setStrings('Com.DialogContainer', {
+cm.setMessages('Com.DialogContainer', {
     'close': 'Close',
 });
 
-cm.setStrings('Com.FileDropzone', {
+cm.setMessages('Com.FileDropzone', {
 	'drop_single' : 'drop file here',
 	'drop_multiple' : 'drop files here'
 });
 
-cm.setStrings('Com.Form', {
+cm.setMessages('Com.Form', {
 	'form_error' : 'Form is not filled correctly.',
-	'server_error' : cm._strings.common['server_error'],
+	'server_error' : cm._messages.common['server_error'],
 	'success_message' : 'Form successfully sent'
 });
 
-cm.setStrings('Com.Gridlist', {
+cm.setMessages('Com.Gridlist', {
 	'counter' : 'Count: %count%',
 	'check_all' : 'Check all',
 	'uncheck_all' : 'Uncheck all',
@@ -33333,33 +33209,27 @@ cm.setStrings('Com.Gridlist', {
 	'actions' : 'Actions'
 });
 
-cm.setStrings('Com.GridlistFilter', {
+cm.setMessages('Com.GridlistFilter', {
 	'placeholder' : 'Type query...'
 });
 
-cm.setStrings('Com.MultipleField', {
+cm.setMessages('Com.MultipleField', {
 	'add' : 'Add',
 	'remove' : 'Remove'
 });
 
-cm.setStrings('Com.Notifications', {
+cm.setMessages('Com.Notifications', {
 	'close' : 'Close',
 	'more' : 'Read more'
 });
 
-cm.setStrings('Com.OldBrowserAlert', {
-	'title' : 'Thank you for visiting our site!',
-	'descr' : 'It seems that you are using an outdated browser <strong>(%browser% %version%)</strong>. As a result, we cannot provide you with the best user experience while visiting our site. Please upgrade your <stromg>%browser%</stromg> to version <strong>%minimum_version%</strong> or above, or use another standards based browser such as Firefox, Chrome or Safari, by clicking on the icons below.',
-	'continue' : 'Skip for now'
-});
-
-cm.setStrings('Com.Pagination', {
+cm.setMessages('Com.Pagination', {
 	'prev' : 'Previous',
 	'next' : 'Next',
-	'server_error' : cm._strings.common['server_error']
+	'server_error' : cm._messages.common['server_error']
 });
 
-cm.setStrings('Com.Palette', {
+cm.setMessages('Com.Palette', {
 	'new' : 'new',
 	'previous' : 'previous',
 	'select' : 'Select',
@@ -33368,43 +33238,43 @@ cm.setStrings('Com.Palette', {
 	'hex' : 'HEX'
 });
 
-cm.setStrings('Com.Request', {
-	'server_error' : cm._strings.common['server_error']
+cm.setMessages('Com.Request', {
+	'server_error' : cm._messages.common['server_error']
 });
 
-cm.setStrings('Com.ScrollPagination', {
+cm.setMessages('Com.ScrollPagination', {
 	'load_more' : 'Load More',
-	'server_error' : cm._strings.common['server_error']
+	'server_error' : cm._messages.common['server_error']
 });
 
-cm.setStrings('Com.TabsetHelper', {
-	'server_error' : cm._strings.common['server_error']
+cm.setMessages('Com.TabsetHelper', {
+	'server_error' : cm._messages.common['server_error']
 });
 
-cm.setStrings('Com.ToggleBox', {
+cm.setMessages('Com.ToggleBox', {
 	'show' : 'Show',
 	'hide' : 'Hide'
 });
 
-cm.setStrings('Com.Autocomplete', {
+cm.setMessages('Com.Autocomplete', {
 	'loader' : 'Searching for <b>"%query%"</b>…',
 	'suggestion' : '<b>"%query%"</b> not found. Add?'
 });
 
-cm.setStrings('Com.BoxTools', {
+cm.setMessages('Com.BoxTools', {
 	'link' : 'Link',
 	'unlink' : 'Unlink'
 });
 
-cm.setStrings('Com.ColorPicker', {
+cm.setMessages('Com.ColorPicker', {
 	'Transparent' : 'Transparent',
 	'Clear' : 'Clear'
 });
 
-cm.setStrings('Com.DatePicker', {
-	'months' : cm._strings.months,
-	'days' : cm._strings.days,
-	'daysAbbr' : cm._strings.daysAbbr,
+cm.setMessages('Com.DatePicker', {
+	'months' : cm._messages.months,
+	'days' : cm._messages.days,
+	'daysAbbr' : cm._messages.daysAbbr,
 	'Clear date' : 'Clear date',
 	'Today' : 'Today',
 	'Now' : 'Now',
@@ -33415,14 +33285,14 @@ cm.setParams('Com.DatePicker', {
 	'startWeekDay': 0
 });
 
-cm.setStrings('Com.DateSelect', {
-	'months' : cm._strings.months,
+cm.setMessages('Com.DateSelect', {
+	'months' : cm._messages.months,
 	'Day' : 'Day',
 	'Month' : 'Month',
 	'Year' : 'Year'
 });
 
-cm.setStrings('Com.FileInput', {
+cm.setMessages('Com.FileInput', {
 	'browse' : 'Browse',
 	'browse_local' : 'Browse Local',
 	'browse_filemanager' : 'Browse File Manager',
@@ -33430,41 +33300,41 @@ cm.setStrings('Com.FileInput', {
 	'open' : 'Open'
 });
 
-cm.setStrings('Com.MultipleFileInput', {
+cm.setMessages('Com.MultipleFileInput', {
 	'browse' : 'Browse',
 	'browse_local' : 'Browse Local',
 	'browse_filemanager' : 'Browse File Manager'
 });
 
-cm.setStrings('Com.ImageInput', {
+cm.setMessages('Com.ImageInput', {
 	'preview' : 'Preview',
 	'edit' : 'Edit',
 	'remove' : 'Remove',
 	'browse' : 'Browse'
 });
 
-cm.setStrings('Com.RepeatTools', {
+cm.setMessages('Com.RepeatTools', {
 	'no-repeat' : 'No',
 	'repeat-x' : 'Horizontally',
 	'repeat-y' : 'Vertically',
 	'repeat' : 'Both'
 });
 
-cm.setStrings('Com.ScaleTools', {
+cm.setMessages('Com.ScaleTools', {
 	'auto' : 'Auto',
 	'contain' : 'Contain',
 	'cover' : 'Cover',
 	'100% 100%' : 'Fill'
 });
 
-cm.setStrings('Com.TagsInput', {
+cm.setMessages('Com.TagsInput', {
 	'tags' : 'Tags',
 	'add' : 'Add',
 	'remove' : 'Remove',
 	'placeholder' : 'Add tags...'
 });
 
-cm.setStrings('Com.TimeSelect', {
+cm.setMessages('Com.TimeSelect', {
 	'separator' : ':',
 	'Hours' : 'HH',
 	'Minutes' : 'MM',
@@ -33474,7 +33344,7 @@ cm.setStrings('Com.TimeSelect', {
 	'SecondsTitle' : 'Seconds'
 });
 
-cm.setStrings('Com.TwoSideMultiSelect', {
+cm.setMessages('Com.TwoSideMultiSelect', {
 	'firstLabel' : 'Left:',
 	'secondLabel' : 'Right:',
 	'add' : '>>',
@@ -33503,7 +33373,7 @@ cm.define('Docs.DynamicForm', {
         'onRender'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'formName' : 'dynamic'
     }
@@ -33550,6 +33420,7 @@ function(params){
 
     init();
 });
+
 cm.define('Docs.DynamicToolbar', {
     'modules' : [
         'Params',
@@ -33563,7 +33434,7 @@ cm.define('Docs.DynamicToolbar', {
         'onRender'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : ''
     }
 },
@@ -33609,6 +33480,7 @@ function(params){
 
     init();
 });
+
 window.Collector = new Com.Collector({
         'autoInit' : true
     })

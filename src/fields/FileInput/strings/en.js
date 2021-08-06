@@ -1,4 +1,4 @@
-cm.setStrings('Com.FileInput', {
+cm.setMessages('Com.FileInput', {
 	'browse' : 'Browse',
 	'browse_local' : 'Browse Local',
 	'browse_filemanager' : 'Browse File Manager',
@@ -6,7 +6,7 @@ cm.setStrings('Com.FileInput', {
 	'open' : 'Open'
 });
 
-cm.setStrings('Com.MultipleFileInput', {
+cm.setMessages('Com.MultipleFileInput', {
 	'browse' : 'Browse',
 	'browse_local' : 'Browse Local',
 	'browse_filemanager' : 'Browse File Manager'

@@ -10,7 +10,7 @@ cm.define('Com.Menu', {
         'onRender'
     ],
     'params' : {
-        'node' : cm.Node('div'),
+        'node' : cm.node('div'),
         'name' : '',
         'event' : 'hover',
         'top' : 'targetHeight',
@@ -31,8 +31,8 @@ function(params){
     var that = this;
 
     that.nodes = {
-        'button' : cm.Node('div'),
-        'target' : cm.Node('div')
+        'button' : cm.node('div'),
+        'target' : cm.node('div')
     };
     that.components = {};
 

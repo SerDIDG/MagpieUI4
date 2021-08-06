@@ -1,4 +1,4 @@
-cm.setStrings('Com.ImageInput', {
+cm.setMessages('Com.ImageInput', {
 	'preview' : 'Preview',
 	'edit' : 'Edit',
 	'remove' : 'Remove',

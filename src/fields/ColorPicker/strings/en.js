@@ -1,4 +1,4 @@
-cm.setStrings('Com.ColorPicker', {
+cm.setMessages('Com.ColorPicker', {
 	'Transparent' : 'Transparent',
 	'Clear' : 'Clear'
 });

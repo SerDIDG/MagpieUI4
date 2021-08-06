@@ -2,7 +2,7 @@ cm.define('Com.AbstractController', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'DataNodes',

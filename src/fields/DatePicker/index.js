@@ -4,7 +4,7 @@ cm.define('Com.DatePicker', {
         'Events',
         'DataConfig',
         'Structure',
-        'Langs',
+        'Messages',
         'Stack'
     ],
     'events' : [
@@ -121,14 +121,14 @@ function(params){
 
     var render = function(){
         /* *** RENDER STRUCTURE *** */
-        nodes['container'] = cm.Node('div', {'class' : 'com__datepicker-input'},
-            nodes['hidden'] = cm.Node('input', {'type' : 'hidden'}),
-            nodes['target'] = cm.Node('div', {'class' : 'pt__input has-icon-right'},
-                nodes['input'] = cm.Node('input', {'type' : 'text', 'class' : 'input'}),
-                nodes['icon'] = cm.Node('div', {'class' : that.params['icons']['datepicker']})
+        nodes['container'] = cm.node('div', {'class' : 'com__datepicker-input'},
+            nodes['hidden'] = cm.node('input', {'type' : 'hidden'}),
+            nodes['target'] = cm.node('div', {'class' : 'pt__input has-icon-right'},
+                nodes['input'] = cm.node('input', {'type' : 'text', 'class' : 'input'}),
+                nodes['icon'] = cm.node('div', {'class' : that.params['icons']['datepicker']})
             ),
-            nodes['menuContainer'] = cm.Node('div', {'class' : 'form'},
-                nodes['calendarContainer'] = cm.Node('div', {'class' : 'calendar-holder'})
+            nodes['menuContainer'] = cm.node('div', {'class' : 'form'},
+                nodes['calendarContainer'] = cm.node('div', {'class' : 'calendar-holder'})
             )
         );
         if(!cm.isEmpty(that.params['size'])){
@@ -155,21 +155,21 @@ function(params){
         if(that.params['showClearButton']){
             cm.addClass(nodes['container'], 'has-clear-button');
             nodes['container'].appendChild(
-                nodes['clearButton'] = cm.Node('div', {'class' : that.params['icons']['clear'], 'title' : that.lang('Clear date')})
+                nodes['clearButton'] = cm.node('div', {'class' : that.params['icons']['clear'], 'title' : that.message('Clear date')})
             );
         }
         // Today / Now Button
         if(that.params['showTodayButton']){
             nodes['menuContainer'].appendChild(
-                nodes['todayButton'] = cm.Node('div', {'class' : 'button today is-wide'}, that.lang(that.params['isDateTime']? 'Now' : 'Today'))
+                nodes['todayButton'] = cm.node('div', {'class' : 'button today is-wide'}, that.message(that.params['isDateTime']? 'Now' : 'Today'))
             );
         }
         // Time Select
         if(that.params['isDateTime']){
-            nodes['timeHolder'] = cm.Node('div', {'class' : 'time-holder'},
-                cm.Node('dl', {'class' : 'pt__field is-box'},
-                    cm.Node('dt', that.lang('Time')),
-                    nodes['timeContainer'] = cm.Node('dd')
+            nodes['timeHolder'] = cm.node('div', {'class' : 'time-holder'},
+                cm.node('dl', {'class' : 'pt__field is-box'},
+                    cm.node('dt', that.message('Time')),
+                    nodes['timeContainer'] = cm.node('dd')
                 )
             );
             cm.insertAfter(nodes['timeHolder'], nodes['calendarContainer']);
@@ -215,7 +215,7 @@ function(params){
             'startYear' : that.params['startYear'],
             'endYear' : that.params['endYear'],
             'startWeekDay' : that.params['startWeekDay'],
-            'langs' : that.params['langs'],
+            'messages' : that.params['messages'],
             'renderMonthOnInit' : false,
             'events' : {
                 'onMonthRender' : function(){
@@ -323,9 +323,9 @@ function(params){
             // Set date
             setDate();
             // Set value
-            that.value = cm.dateFormat(that.date, that.format, that.lang());
+            that.value = cm.dateFormat(that.date, that.format, that.message());
         }else{
-            that.value = cm.dateFormat(false, that.format, that.lang());
+            that.value = cm.dateFormat(false, that.format, that.message());
         }
         setInputValues();
         renderCalendarMonth();
@@ -441,7 +441,7 @@ function(params){
         format = !cm.isUndefined(format) ? format : that.format;
         triggerEvents = !cm.isUndefined(triggerEvents) ? triggerEvents : true;
         // Get date
-        var pattern = cm.dateFormat(false, format, that.lang());
+        var pattern = cm.dateFormat(false, format, that.message());
         if(cm.isEmpty(str) || str === pattern){
             that.clear();
             return that;

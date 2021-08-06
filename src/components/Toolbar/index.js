@@ -2,7 +2,7 @@ cm.define('Com.Toolbar', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'DataNodes',

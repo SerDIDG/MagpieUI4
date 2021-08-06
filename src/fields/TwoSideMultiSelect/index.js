@@ -77,8 +77,8 @@ cm.getConstructor('Com.TwoSideMultiSelect', function(classConstructor, className
             nodes['inner'] = cm.node('div', {'class' : 'inner'},
                 nodes['firstColumn'] = cm.node('div', {'class' : 'column column--first'}),
                 nodes['controls'] = cm.node('div', {'class' : 'controls'},
-                    nodes['moveToRight'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.lang('addTitle')}, that.lang('add')),
-                    nodes['moveToLeft'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.lang('removeTitle')}, that.lang('remove'))
+                    nodes['moveToRight'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.message('addTitle')}, that.message('add')),
+                    nodes['moveToLeft'] = cm.node('button', {'class' : 'button button-primary is-box', 'type' : 'button', 'title' : that.message('removeTitle')}, that.message('remove'))
                 ),
                 nodes['secondColumn'] = cm.node('div', {'class' : 'column column--second'})
             )
@@ -86,11 +86,11 @@ cm.getConstructor('Com.TwoSideMultiSelect', function(classConstructor, className
         // Labels
         if(that.params['showLabels']){
             cm.appendChild(
-                cm.node('div', {'class' : 'label'}, that.lang('firstLabel')),
+                cm.node('div', {'class' : 'label'}, that.message('firstLabel')),
                 nodes['firstColumn']
             );
             cm.appendChild(
-                cm.node('div', {'class' : 'label'}, that.lang('secondLabel')),
+                cm.node('div', {'class' : 'label'}, that.message('secondLabel')),
                 nodes['secondColumn']
             );
             cm.addClass(nodes['container'], 'has-labels');

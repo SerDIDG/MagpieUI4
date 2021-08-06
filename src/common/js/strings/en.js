@@ -3,7 +3,7 @@ cm._config.displayDateFormatCase = 'nominative';
 cm._config.displayDateFormat = '%F %j, %Y';
 cm._config.displayDateTimeFormat = '%F %j, %Y, %H:%i';
 
-cm._strings = {
+cm._messages = {
 	'common' : {
 		'server_error' : 'An unexpected error has occurred. Please try again later.'
 	},

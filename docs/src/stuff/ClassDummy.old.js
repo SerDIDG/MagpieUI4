@@ -1,7 +1,7 @@
 Com['ClassName'] = function(o){
     var that = this,
         config = cm.merge({
-            'node' : cm.Node('div'),
+            'node' : cm.node('div'),
             'nodesMarker' : 'ClassName',
             'configMarker' : 'data-config',
             'nodes' : {},
@@ -12,8 +12,8 @@ Com['ClassName'] = function(o){
             'onRender' : []
         },
         nodes = {
-            'container' : cm.Node('div'),
-            'button' : cm.Node('div')
+            'container' : cm.node('div'),
+            'button' : cm.node('div')
         };
 
     /* *** CLASS FUNCTIONS *** */

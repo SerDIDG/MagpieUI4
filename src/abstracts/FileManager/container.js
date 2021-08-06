@@ -60,8 +60,8 @@ cm.getConstructor('Com.AbstractFileManagerContainer', function(classConstructor,
     classProto.validateParamsEnd = function(){
         var that = this;
         // Validate Language Strings
-        that.setLangs({
-            'title' : !that.params['params']['max'] || that.params['params']['max'] > 1 ? that.lang('title_multiple') : that.lang('title_single')
+        that.setMessages({
+            'title' : !that.params['params']['max'] || that.params['params']['max'] > 1 ? that.message('title_multiple') : that.message('title_single')
         });
     };
 
@@ -83,13 +83,13 @@ cm.getConstructor('Com.AbstractFileManagerContainer', function(classConstructor,
         var that = this;
         that.components['placeholder'].addButton({
             'name' : 'close',
-            'label' : that.lang('close'),
+            'label' : that.message('close'),
             'style' : 'button-transparent',
             'callback' : that.closeHandler
         });
         that.components['placeholder'].addButton({
             'name' : 'save',
-            'label' : that.lang('save'),
+            'label' : that.message('save'),
             'style' : 'button-primary',
             'callback' : that.completeHandler
         });

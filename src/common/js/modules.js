@@ -1,840 +1,819 @@
-/* ******* EXTEND ******* */
+/******* EXTEND *******/
 
-Mod['Extend'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : true
+Mod.Extend = {
+    '_config': {
+        extend: true,
+        predefine: true,
     },
-    '_construct' : function(){},
-    '_extend' : function(name, o){
-        var that = this;
-        if(!that.build._modules[name]){
+    '_construct': function() {
+    },
+    '_extend': function(name, o) {
+        const that = this;
+        if (!that.build._modules[name]) {
             // Merge Config
             o._config = cm.merge({
-                'extend' : false,
-                'predefine' : false,
-                'require' : [],
-                'events' : []
+                extend: false,
+                predefine: false,
+                require: [],
+                events: [],
             }, o._config);
             // Check Requires
-            cm.forEach(o._config['require'], function(module){
-                if(Mod[module]){
-                    Mod['Extend']._extend.call(that, module, Mod[module]);
+            cm.forEach(o._config.require, module => {
+                if (Mod[module]) {
+                    Mod.Extend._extend.call(that, module, Mod[module]);
                 }
             });
             // Extend class by module's methods
-            if(o._config['extend']){
-                cm.forEach(o, function(item, key){
-                    if(!/^(_)/.test(key)){
+            if (o._config.extend) {
+                cm.forEach(o, (item, key) => {
+                    if (!/^(_)/.test(key)) {
                         that.build[key] = item;
                     }
                 });
             }
             // Extend class events
-            if(!cm.isEmpty(o._config['events'])){
-                that.build._raw['events'] = cm.extend(that.build._raw['events'], o._config['events']);
+            if (!cm.isEmpty(o._config.events)) {
+                that.build._raw.events = cm.extend(that.build._raw.events, o._config.events);
             }
             // Construct module
-            if(cm.isFunction(o._construct)){
+            if (cm.isFunction(o._construct)) {
                 // Construct
                 o._construct.call(that);
-            }else{
+            } else {
                 cm.errorLog({
-                    'type' : 'error',
-                    'name' : that.build._name['full'],
-                    'message' : ['Module', cm.strWrap(name, '"'), 'does not have "_construct" method.'].join(' ')
+                    type: 'error',
+                    name: that.build._name.full,
+                    message: `Module ${ cm.strWrap(name, '"') } does not have "_construct" method.`
                 });
             }
             // Add into stack of class's modules
             that.build._modules[name] = o;
         }
     },
-    'extend' : function(name, o){
-        var that = this;
-        if(!o){
+    'extend': function(name, o) {
+        const that = this;
+        if (!o) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._name['full'],
-                'message' : 'Trying to extend the class by non-existing module.'
+                type: 'error',
+                name: that._name.full,
+                message: 'Trying to extend the class by non-existing module.',
             });
-        }else if(!name){
+        } else if (!name) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._name['full'],
-                'message' : 'Module should have a name.'
+                type: 'error',
+                name: that._name.full,
+                message: 'Module should have a name.',
             });
-        }else if(that._modules[name]){
+        } else if (that._modules[name]) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._name['full'],
-                'message' : ['Module with name', cm.strWrap(name, '"'), 'already constructed.'].join(' ')
+                type: 'error',
+                name: that._name.full,
+                message: `Module with name ${ cm.strWrap(name, '"') } already constructed.`
             });
-        }else{
+        } else {
             // Merge Config
             o._config = cm.merge({
-                'extend' : false,
-                'predefine' : false,
-                'require' : [],
-                'events' : []
+                extend: false,
+                predefine: false,
+                require: [],
+                events: [],
             }, o._config);
             // Check Requires
-            cm.forEach(o._config['require'], function(module){
-                if(Mod[module]){
-                    Mod['Extend']._extend.call(that, module, Mod[module]);
+            cm.forEach(o._config.require, module => {
+                if (Mod[module]) {
+                    Mod.Extend._extend.call(that, module, Mod[module]);
                 }
             });
             // Extend class by module's methods
-            if(o._config['extend']){
-                cm.forEach(o, function(item, key){
-                    if(!/^(_)/.test(key)){
-                        cm._defineStack[that._name['full']].prototype[key] = item;
+            if (o._config.extend) {
+                cm.forEach(o, (item, key) => {
+                    if (!/^(_)/.test(key)) {
+                        cm._defineStack[that._name.full].prototype[key] = item;
                     }
                 });
             }
             // Extend events
-            if(!cm.isEmpty(o._config['events'])){
-                cm._defineStack[that._name['full']].prototype._raw['events'] = cm.extend(cm._defineStack[that._name['full']].prototype._raw['events'], o._config['events']);
+            if (!cm.isEmpty(o._config.events)) {
+                cm._defineStack[that._name.full].prototype._raw.events = cm.extend(cm._defineStack[that._name.full].prototype._raw.events, o._config.events);
             }
             // Construct module
-            if(cm.isFunction(o._construct)){
+            if (cm.isFunction(o._construct)) {
                 // Construct
                 o._construct.call(that);
-            }else{
+            } else {
                 cm.errorLog({
-                    'type' : 'error',
-                    'name' : that._name['full'],
-                    'message' : ['Module', cm.strWrap(name, '"'), 'does not have "_construct" method.'].join(' ')
+                    type: 'error',
+                    name: that._name.full,
+                    message: `Module ${ cm.strWrap(name, '"') } does not have "_construct" method.`
                 });
             }
             // Add into stack of class's modules
             that._modules[name] = o;
         }
-    }
+    },
 };
 
-/* ******* COMPONENTS ******* */
+/******* COMPONENTS *******/
 
-Mod['Component'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : true
+Mod.Component = {
+    '_config': {
+        extend: true,
+        predefine: true,
     },
-    '_construct' : function(){
-        var that = this;
+    '_construct': function() {
+        const that = this;
         that.build._isComponent = true;
-        if(typeof that.build['params']['consoleLogErrors'] === 'undefined'){
-            that.build['params']['consoleLogErrors'] = true;
-        }
     },
-    'renderComponent' : function(){
-        var that = this;
-        cm.forEach(that._modules, function(module){
+    'renderComponent': function() {
+        const that = this;
+        cm.forEach(that._modules, module => {
             cm.isFunction(module._render) && module._render.call(that);
-        })
+        });
     },
-    'cloneComponent' : function(params){
-        var that = this,
-            component = null;
-        cm.getConstructor(that._className, function(classConstructor){
+    'cloneComponent': function(params) {
+        const that = this;
+        let component;
+        cm.getConstructor(that._className, classConstructor => {
             component = new classConstructor(
-                cm.merge(that.params, params)
+                cm.merge(that.params, params),
             );
         });
         return component;
-    }
+    },
 };
 
-/* ******* PARAMS ******* */
+/******* PARAMS *******/
 
-Mod['Params'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend'],
-        'events' : ['onSetParams']
+Mod.Params = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
+        events: ['onSetParams'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']){
-            that.build['params'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params) {
+            that.build.params = {};
         }
-        if(!that.build._update['params']){
-            that.build._update['params'] = {};
+        if (!that.build._update.params) {
+            that.build._update.params = {};
         }
-        if(that.build._inherit){
-            that.build['params'] = cm.merge(that.build._inherit.prototype['params'], that.build['params']);
-        }
-    },
-    '_render' : function(){
-        var that = this;
-        if(that._inherit){
-            that.params = cm.merge(that._inherit.prototype['params'], that.params);
+        if (that.build._inherit) {
+            that.build.params = cm.merge(that.build._inherit.prototype.params, that.build.params);
         }
     },
-    'setParams' : function(params, replace){
-        var that = this;
+    '_render': function() {
+        const that = this;
+        if (that._inherit) {
+            that.params = cm.merge(that._inherit.prototype.params, that.params);
+        }
+    },
+    'setParams': function(params, replace) {
+        const that = this;
         replace = cm.isUndefined(replace) ? false : replace;
         that.params = cm.merge(replace ? that._raw.params : that.params, params);
         that._update = cm.clone(that._update);
         that._update.params = cm.merge(that._update.params, that.params);
         // Validate params
-        cm.forEach(that.params, function(item, key){
-            switch(key){
-                case 'strings':
+        cm.forEach(that.params, (item, key) => {
+            switch (key) {
                 case 'messages':
-                case 'langs':
-                    cm.isFunction(that.setLangs) && that.setLangs(item);
+                    cm.isFunction(that.setMessages) && that.setMessages(item);
                     break;
 
                 default:
-                    switch(item){
+                    switch (item) {
                         case 'document.window':
                             that.params[key] = window;
                             break;
 
                         case 'document.html':
-                            if(cm.getDocumentHtml()){
+                            if (cm.getDocumentHtml()) {
                                 that.params[key] = cm.getDocumentHtml();
                             }
                             break;
 
                         case 'document.body':
-                            if(document.body){
+                            if (document.body) {
                                 that.params[key] = document.body;
                             }
                             break;
 
-                        case 'top.document.body':
-                            if(window.top.document.body){
-                                that.params[key] = window.top.document.body;
-                            }
-                            break;
-
                         case 'document.head':
-                            if(cm.getDocumentHead()){
+                            if (cm.getDocumentHead()) {
                                 that.params[key] = cm.getDocumentHead();
                             }
                             break;
 
                         default:
-                            if(/^cm._config./i.test(item)){
+                            if (/^cm._config./i.test(item)) {
                                 that.params[key] = cm._config[item.replace('cm._config.', '')];
                             }
                             break;
                     }
-                    break
+                    break;
             }
         });
         // Trigger event if module defined
-        if(that._modules['Events']){
+        if (that._modules.Events) {
             that.triggerEvent('onSetParams');
         }
         return that;
     },
-    'getParams' : function(key){
-        var that = this;
+    'getParams': function(key) {
+        const that = this;
         return key ? that.params[key] : that.params;
     },
-    'getRawParams' : function(key){
-        var that = this;
+    'getRawParams': function(key) {
+        const that = this;
         return key ? that._raw.params[key] : that._raw.params;
-    }
+    },
 };
 
-/* ******* EVENTS ******* */
+/******* EVENTS *******/
 
-Mod['Events'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Events = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        that.build['events'] = {};
-        cm.forEach(that.build._raw['events'], function(item){
-            that.build['events'][item] = [];
+    '_construct': function() {
+        const that = this;
+        that.build.events = {};
+        cm.forEach(that.build._raw.events, (item) => {
+            that.build.events[item] = [];
         });
-        if(!that.build['params']['events']){
-            that.build['params']['events'] = {};
+        if (!that.build.params.events) {
+            that.build.params.events = {};
         }
-        if(that.build._inherit){
-            that.build['params']['events'] = cm.extend(that.build._inherit.prototype['params']['events'], that.build['params']['events'], true);
-            that.build['events'] = cm.extend(that.build._inherit.prototype['events'], that.build['events'], true);
-        }
-    },
-    '_render' : function(){
-        var that = this;
-        if(that._inherit){
-            that.params['events'] = cm.extend(that._inherit.prototype['params']['events'], that.params['events'], true);
-            that.events = cm.extend(that._inherit.prototype['events'], that.events, true);
+        if (that.build._inherit) {
+            that.build.params.events = cm.extend(that.build._inherit.prototype.params.events, that.build.params.events, true);
+            that.build.events = cm.extend(that.build._inherit.prototype.events, that.build.events, true);
         }
     },
-    'addEvent' : function(event, handler){
-        var that = this;
+    '_render': function() {
+        const that = this;
+        if (that._inherit) {
+            that.params.events = cm.extend(that._inherit.prototype.params.events, that.params.events, true);
+            that.events = cm.extend(that._inherit.prototype.events, that.events, true);
+        }
+    },
+    'addEvent': function(event, handler) {
+        const that = this;
         that.events = cm.clone(that.events);
-        if(that.events[event]){
-            if(cm.isFunction(handler)){
+        if (that.events[event]) {
+            if (cm.isFunction(handler)) {
                 that.events[event].push(handler);
-            }else{
+            } else {
                 cm.errorLog({
-                    'name' : that._name['full'],
-                    'message' : ['Handler of event', cm.strWrap(event, '"'), 'must be a function.'].join(' ')
+                    name: that._name.full,
+                    message: `Handler of event ${ cm.strWrap(event, '"') } must be a function.`
                 });
             }
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'addEvents' : function(o){
-        var that = this;
-        if(o){
+    'addEvents': function(o) {
+        const that = this;
+        if (o) {
             that.convertEvents(o);
         }
         return that;
     },
-    'removeEvent' : function(event, handler){
-        var that = this;
+    'removeEvent': function(event, handler) {
+        const that = this;
         that.events = cm.clone(that.events);
-        if(that.events[event]){
-            if(cm.isFunction(handler)){
-                that.events[event] = that.events[event].filter(function(item){
-                    return item !== handler;
-                });
-            }else{
+        if (that.events[event]) {
+            if (cm.isFunction(handler)) {
+                that.events[event] = that.events[event].filter(item => item !== handler);
+            } else {
                 cm.errorLog({
-                    'name' : that._name['full'],
-                    'message' : ['Handler of event', cm.strWrap(event, '"'), 'must be a function.'].join(' ')
+                    name: that._name.full,
+                    message: `Handler of event ${ cm.strWrap(event, '"') } must be a function.`
                 });
             }
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'removeAllEvent' : function(event){
-        var that = this;
+    'removeAllEvent': function(event) {
+        const that = this;
         that.events = cm.clone(that.events);
-        if(that.events[event]){
+        if (that.events[event]) {
             that.events = [];
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'triggerEvent' : function(event, params){
-        var that = this,
-            data = cm.clone(arguments),
-            events;
+    'triggerEvent': function(event, params) {
+        const that = this;
+        let data = cm.clone(arguments);
         // Replace event name parameter with context (legacy) in data
         data[0] = that;
-        if(that.events[event]){
-            events = cm.clone(that.events[event]);
-            cm.forEach(events, function(event){
+        if (that.events[event]) {
+            let events = cm.clone(that.events[event]);
+            cm.forEach(events, event => {
                 event.apply(that, data);
             });
-        }else{
+        } else {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._name['full'],
-                'message' : [cm.strWrap(event, '"'), 'does not exists.'].join(' ')
+                type: 'attention',
+                name: that._name.full,
+                message: `${ cm.strWrap(event, '"') } does not exists.`
             });
         }
         return that;
     },
-    'hasEvent' : function(event){
-        var that = this;
+    'hasEvent': function(event) {
+        const that = this;
         return !!that.events[event];
     },
-    'convertEvents' : function(o){
-        var that = this;
-        cm.forEach(o, function(item, key){
-            if(cm.isArray(item)){
-                cm.forEach(item, function(itemA){
+    'convertEvents': function(o) {
+        const that = this;
+        cm.forEach(o, (item, key) => {
+            if (cm.isArray(item)) {
+                cm.forEach(item, itemA => {
                     that.addEvent(key, itemA);
                 });
-            }else{
+            } else {
                 that.addEvent(key, item);
             }
         });
         return that;
-    }
+    },
 };
 
-/* ******* LANGS ******* */
+/******* MESSAGES ******* */
 
-Mod['Langs'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Messages = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['strings']){
-            that.build['strings'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.messages) {
+            that.build.messages = {};
         }
-        if(!that.build['params']['langs']){
-            that.build['params']['langs'] = {};
+        if (!that.build.params.messages) {
+            that.build.params.messages = {};
         }
     },
-    '_render' : function(){
-        var that = this;
-        that.strings = cm.merge(that.strings, that.params['langs']);
+    '_render': function() {
+        const that = this;
+        that.messages = cm.merge(that.messages, that.params.messages);
     },
-    'lang' : function(str, vars, plural){
-        var that = this,
-            langStr;
-        if(cm.isUndefined(str) || cm.isEmpty(str)){
+    'message': function(str, vars, plural) {
+        const that = this;
+        if (cm.isUndefined(str) || cm.isEmpty(str)) {
             return '';
         }
-        // Get string
-        langStr = that.getLang(str);
-        if(cm.isUndefined(langStr)){
-            langStr = str;
+        // Get message
+        let message = that.getMessage(str);
+        if (cm.isUndefined(message)) {
+            message = str;
         }
         // Process variable
-        if(cm.isObject(langStr) || cm.isArray(langStr)){
-            langStr = cm.objectReplace(langStr, vars);
-        }else{
-            langStr = cm.strReplace(langStr, vars);
+        if (cm.isObject(message) || cm.isArray(message)) {
+            message = cm.objectReplace(message, vars);
+        } else {
+            message = cm.strReplace(message, vars);
         }
         // Plural
-        if(!cm.isUndefined(plural) && cm.isArray(langStr)){
-            langStr = cm.plural(plural, langStr);
+        if (!cm.isUndefined(plural) && cm.isArray(message)) {
+            message = cm.plural(plural, message);
         }
-        return langStr;
+        return message;
     },
-    'message' : function(){
-        var that = this;
+    'msg': function() {
+        const that = this;
         return that.lang.apply(that, arguments);
     },
-    'msg' : function(){
-        var that = this;
-        return that.lang.apply(that, arguments);
-    },
-    'getLang' : function(str){
-        var that = this,
-            langStr;
-        if(cm.isUndefined(str) || cm.isEmpty(str)){
+    'getMessage': function(str) {
+        const that = this;
+        if (cm.isUndefined(str) || cm.isEmpty(str)) {
             return;
         }
         // Try to get string from current controller params array
-        langStr = cm.reducePath(str, that.params.langs);
-        // Try to get string from current controller strings array
-        if(cm.isUndefined(langStr)){
-            langStr = cm.reducePath(str, that.strings);
+        let message = cm.reducePath(str, that.params.messages);
+        // Try to get string from current controller messages array
+        if (cm.isUndefined(message)) {
+            message = cm.reducePath(str, that.messages);
         }
         // Try to get string from parent controller
-        if(cm.isUndefined(langStr) && that._inherit){
-            langStr = that._inherit.prototype.getMsg(str);
+        if (cm.isUndefined(message) && that._inherit) {
+            message = that._inherit.prototype.getMessage(str);
         }
-        return langStr;
+        return message;
     },
-    'getMessage' : function(){
-        var that = this;
-        return that.getLang.apply(that, arguments);
+    'getMsg': function() {
+        const that = this;
+        return that.getMessage.apply(that, arguments);
     },
-    'getMsg' : function(){
-        var that = this;
-        return that.getLang.apply(that, arguments);
-    },
-    'langObject' : function(str){
-        var that = this,
-            o = that.lang(str);
+    'messageObject': function(str) {
+        const that = this;
+        const o = that.message(str);
         return cm.isObject(o) || cm.isArray(o) ? o : {};
     },
-    'messageObject' : function(){
-        var that = this;
-        return that.langObject.apply(that, arguments);
+    'msgObject': function() {
+        const that = this;
+        return that.messageObject.apply(that, arguments);
     },
-    'msgObject' : function(){
-        var that = this;
-        return that.langObject.apply(that, arguments);
-    },
-    'setLangs' : function(o){
-        var that = this;
-        if(cm.isObject(o)){
-            if(cm.isFunction(that)){
-                that.prototype.strings = cm.merge(that.prototype.strings, o);
-            }else{
-                that.strings = cm.merge(that.strings, o);
+    'setMessages': function(o) {
+        const that = this;
+        if (cm.isObject(o)) {
+            if (cm.isFunction(that)) {
+                that.prototype.messages = cm.merge(that.prototype.messages, o);
+            } else {
+                that.messages = cm.merge(that.messages, o);
             }
         }
         return that;
     },
-    'setMessages' : function(){
-        var that = this;
-        return that.setLangs.apply(that, arguments);
+    'setMsgs': function() {
+        const that = this;
+        return that.setMessages.apply(that, arguments);
     },
-    'setMsgs' : function(){
-        var that = this;
-        return that.setLangs.apply(that, arguments);
-    }
 };
 
-/* ******* DATA CONFIG ******* */
+/******* DATA CONFIG *******/
 
-Mod['DataConfig'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.DataConfig = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(cm.isUndefined(that.build['params']['configDataMarker'])){
-            that.build['params']['configDataMarker'] = 'data-config';
+    '_construct': function() {
+        const that = this;
+        if (cm.isUndefined(that.build.params.configDataMarker)) {
+            that.build.params.configDataMarker = 'data-config';
         }
     },
-    'getDataConfig' : function(container, dataMarker){
-        var that = this,
-            sourceConfig;
-        if(cm.isNode(container)){
-            dataMarker = dataMarker || that.params['configDataMarker'];
-            sourceConfig = container.getAttribute(dataMarker);
-            if(sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))){
+    'getDataConfig': function(container, dataMarker) {
+        const that = this;
+        if (cm.isNode(container)) {
+            dataMarker = dataMarker || that.params.configDataMarker;
+            let sourceConfig = container.getAttribute(dataMarker);
+            if (sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))) {
                 that.setParams(sourceConfig);
             }
         }
         return that;
     },
-    'getNodeDataConfig' : function(node, dataMarker){
-        var that = this,
-            sourceConfig;
-        if(cm.isNode(node)){
-            dataMarker = dataMarker || that.params['configDataMarker'];
-            sourceConfig = node.getAttribute(dataMarker);
-            if(sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))){
+    'getNodeDataConfig': function(node, dataMarker) {
+        const that = this;
+        if (cm.isNode(node)) {
+            dataMarker = dataMarker || that.params.configDataMarker;
+            let sourceConfig = node.getAttribute(dataMarker);
+            if (sourceConfig && (sourceConfig = cm.parseJSON(sourceConfig))) {
                 return sourceConfig;
             }
         }
         return {};
-    }
+    },
 };
 
-/* ******* DATA NODES ******* */
+/******* DATA NODES *******/
 
-Mod['DataNodes'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.DataNodes = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['nodes']){
-            that.build['params']['nodes'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.nodes) {
+            that.build.params.nodes = {};
         }
-        that.build['params']['nodesDataMarker'] = 'data-node';
-        that.build['params']['nodesMarker'] = that.build._name['short'];
-        if(!that.build['nodes']){
-            that.build['nodes'] = {};
+        that.build.params.nodesDataMarker = 'data-node';
+        that.build.params.nodesMarker = that.build._name.short;
+        if (!that.build.nodes) {
+            that.build.nodes = {};
         }
-        if(that.build._inherit){
-            that.build['params']['nodes'] = cm.merge(that.build._inherit.prototype['params']['nodes'], that.build['params']['nodes']);
-            that.build['nodes'] = cm.merge(that.build._inherit.prototype['nodes'], that.build['nodes']);
+        if (that.build._inherit) {
+            that.build.params.nodes = cm.merge(that.build._inherit.prototype.params.nodes, that.build.params.nodes);
+            that.build.nodes = cm.merge(that.build._inherit.prototype.nodes, that.build.nodes);
         }
     },
-    'getDataNodes' : function(container, dataMarker, className){
-        var that = this,
-            sourceNodes = {};
+    'getDataNodes': function(container, dataMarker, className) {
+        const that = this;
+        let sourceNodes = {};
         container = cm.isUndefined(container) ? document.body : container;
-        if(container){
-            dataMarker = cm.isUndefined(dataMarker) ? that.params['nodesDataMarker'] : dataMarker;
-            className = cm.isUndefined(className) ? that.params['nodesMarker'] : className;
-            if(className){
+        if (container) {
+            dataMarker = cm.isUndefined(dataMarker) ? that.params.nodesDataMarker : dataMarker;
+            className = cm.isUndefined(className) ? that.params.nodesMarker : className;
+            if (className) {
                 sourceNodes = cm.getNodes(container, dataMarker)[className] || {};
-            }else{
+            } else {
                 sourceNodes = cm.getNodes(container, dataMarker);
             }
             that.nodes = cm.merge(that.nodes, sourceNodes);
         }
-        that.nodes = cm.merge(that.nodes, that.params['nodes']);
+        that.nodes = cm.merge(that.nodes, that.params.nodes);
         return that;
     },
-    'getDataNodesObject' : function(container, dataMarker, className){
-        var that = this,
-            sourceNodes = {};
-        container = typeof container === 'undefined'? document.body : container;
-        dataMarker = typeof dataMarker === 'undefined'? that.params['nodesDataMarker'] : dataMarker;
-        className = typeof className === 'undefined'? that.params['nodesMarker'] : className;
-        if(className){
+    'getDataNodesObject': function(container, dataMarker, className) {
+        const that = this;
+        container = typeof container === 'undefined' ? document.body : container;
+        dataMarker = typeof dataMarker === 'undefined' ? that.params.nodesDataMarker : dataMarker;
+        className = typeof className === 'undefined' ? that.params.nodesMarker : className;
+        let sourceNodes;
+        if (className) {
             sourceNodes = cm.getNodes(container, dataMarker)[className] || {};
-        }else{
+        } else {
             sourceNodes = cm.getNodes(container, dataMarker);
         }
         return sourceNodes;
-    }
+    },
 };
 
-/* ******* LOCAL STORAGE ******* */
+/******* LOCAL STORAGE *******/
 
-Mod['Storage'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Storage = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['name']){
-            that.build['params']['name'] = '';
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.name) {
+            that.build.params.name = '';
         }
     },
-    'storageGet' : function(key, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageGet': function(key, session) {
+        const that = this;
+        const method = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[method](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be read because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be read because "name" parameter not provided.',
             });
-            return null;
+            return;
         }
-        if(!storage[that.params['name']] || cm.isUndefined(storage[that.params['name']][key])){
+        if (!storage[that.params.name] || cm.isUndefined(storage[that.params.name][key])) {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._className,
-                'message' : ['Parameter', cm.strWrap(key, '"'), 'does not exist or is not set in component with name', cm.strWrap(that.params['name'], '"'), '.'].join(' ')
+                type: 'attention',
+                name: that._className,
+                message: `Parameter ${ cm.strWrap(key, '"') } does not exist or is not set in component with name ${ cm.strWrap(that.params.name, '"') }.`
             });
-            return null;
+            return;
         }
-        return storage[that.params['name']][key];
+        return storage[that.params.name][key];
     },
-    'storageGetAll' : function(session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageGetAll': function(session) {
+        const that = this;
+        const method = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[method](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be read because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be read because "name" parameter not provided.',
             });
             return {};
         }
-        if(!storage[that.params['name']]){
+        if (!storage[that.params.name]) {
             cm.errorLog({
-                'type' : 'attention',
-                'name' : that._className,
-                'message' : 'Storage is empty.'
+                type: 'attention',
+                name: that._className,
+                message: 'Storage is empty.',
             });
             return {};
         }
-        return storage[that.params['name']];
+        return storage[that.params.name];
     },
-    'storageSet' : function(key, value, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageSet': function(key, value, session) {
+        const that = this;
+        // Read
+        const methodGet = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[methodGet](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be written because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be written because "name" parameter not provided.',
             });
             return {};
         }
-        if(!storage[that.params['name']]){
-            storage[that.params['name']] = {};
+        if (!storage[that.params.name]) {
+            storage[that.params.name] = {};
         }
-        storage[that.params['name']][key] = value;
-        method = session ? 'sessionStorageSet' : 'storageSet';
-        cm[method](that._className, JSON.stringify(storage));
-        return storage[that.params['name']];
+        storage[that.params.name][key] = value;
+        // Write
+        const methodSet = session ? 'sessionStorageSet' : 'storageSet';
+        cm[methodSet](that._className, JSON.stringify(storage));
+        return storage[that.params.name];
     },
-    'storageSetAll' : function(data, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageSetAll': function(data, session) {
+        const that = this;
+        // Read
+        const methodGet = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[methodGet](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be written because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be written because "name" parameter not provided.',
             });
             return {};
         }
-        storage[that.params['name']] = data;
-        method = session ? 'sessionStorageSet' : 'storageSet';
-        cm[method](that._className, JSON.stringify(storage));
-        return storage[that.params['name']];
+        storage[that.params.name] = data;
+        // Write
+        const methodSet = session ? 'sessionStorageSet' : 'storageSet';
+        cm[methodSet](that._className, JSON.stringify(storage));
+        return storage[that.params.name];
     },
-    'storageRemove' : function(key, session){
-        var that = this,
-            method = session ? 'sessionStorageGet' : 'storageGet',
-            storage = JSON.parse(cm[method](that._className)) || {};
-        if(cm.isEmpty(that.params['name'])){
+    'storageRemove': function(key, session) {
+        const that = this;
+        // Read
+        const methodGet = session ? 'sessionStorageGet' : 'storageGet';
+        let storage = JSON.parse(cm[methodGet](that._className)) || {};
+        if (cm.isEmpty(that.params.name)) {
             cm.errorLog({
-                'type' : 'error',
-                'name' : that._className,
-                'message' : 'Storage cannot be written because "name" parameter not provided.'
+                type: 'error',
+                name: that._className,
+                message: 'Storage cannot be written because "name" parameter not provided.',
             });
             return {};
         }
-        if(!storage[that.params['name']]){
-            storage[that.params['name']] = {};
+        if (!storage[that.params.name]) {
+            storage[that.params.name] = {};
         }
-        delete storage[that.params['name']][key];
-        method = session ? 'sessionStorageSet' : 'storageSet';
-        cm[method](that._className, JSON.stringify(storage));
-        return storage[that.params['name']];
-    }
+        delete storage[that.params.name][key];
+        // Write
+        const methodSet = session ? 'sessionStorageSet' : 'storageSet';
+        cm[methodSet](that._className, JSON.stringify(storage));
+        return storage[that.params.name];
+    },
 };
 
-/* ******* CALLBACKS ******* */
+/******* CALLBACKS *******/
 
-Mod['Callbacks'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Callbacks = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['callbacks']){
-            that.build['params']['callbacks'] = {};
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.callbacks) {
+            that.build.params.callbacks = {};
         }
-        that.build['callbacks'] = {};
-        that.build['_callbacks'] = {};
-        if(that.build._inherit){
-            that.build['params']['callbacks'] = cm.extend(that.build._inherit.prototype['params']['callbacks'], that.build['params']['callbacks']);
-            that.build['callbacks'] = cm.extend(that.build._inherit.prototype['callbacks'], that.build['callbacks']);
-        }
-    },
-    '_render' : function(){
-        var that = this;
-        if(that._inherit){
-            that.params['callbacks'] = cm.merge(that._inherit.prototype['params']['callbacks'], that.params['callbacks']);
-            that.callbacks = cm.extend(that._inherit.prototype['callbacks'], that.callbacks);
+        that.build.callbacks = {};
+        that.build._callbacks = {};
+        if (that.build._inherit) {
+            that.build.params.callbacks = cm.extend(that.build._inherit.prototype.params.callbacks, that.build.params.callbacks);
+            that.build.callbacks = cm.extend(that.build._inherit.prototype.callbacks, that.build.callbacks);
         }
     },
-    'callbacksProcess' : function(){
-        var that = this;
+    '_render': function() {
+        const that = this;
+        if (that._inherit) {
+            that.params.callbacks = cm.merge(that._inherit.prototype.params.callbacks, that.params.callbacks);
+            that.callbacks = cm.extend(that._inherit.prototype.callbacks, that.callbacks);
+        }
+    },
+    'callbacksProcess': function() {
+        const that = this;
         that.callbacks = cm.clone(that.callbacks);
         // Save default callbacks
-        cm.forEach(that.callbacks, function(callback, name){
+        cm.forEach(that.callbacks, (callback, name) => {
             that._callbacks[name] = callback;
         });
         // Replace callbacks
-        cm.forEach(that.params['callbacks'], function(callback, name){
+        cm.forEach(that.params.callbacks, (callback, name) => {
             that.callbacks[name] = callback;
         });
         return that;
     },
-    'callbacksRestore' : function(){
-        var that = this;
+    'callbacksRestore': function() {
+        const that = this;
         that.callbacks = cm.clone(that.callbacks);
-        cm.forEach(that._callbacks, function(callback, name){
+        cm.forEach(that._callbacks, (callback, name) => {
             that.callbacks[name] = callback;
         });
         return that;
-    }
+    },
 };
 
 /* ******* STACK ******* */
 
-Mod['Stack'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Stack = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(!that.build['params']['name']){
-            that.build['params']['name'] = '';
+    '_construct': function() {
+        const that = this;
+        if (!that.build.params.name) {
+            that.build.params.name = '';
         }
-        that.build['_stack'] = [];
+        that.build._stack = [];
     },
-    'addToStack' : function(node){
-        var that = this,
-            name = cm.isNumber(that.params['name']) ? that.params['name'].toString() : that.params['name'];
-        if(!that._stackItem){
+    'addToStack': function(node) {
+        const that = this;
+        const name = cm.isNumber(that.params.name) ? that.params.name.toString() : that.params.name;
+        if (!that._stackItem) {
             that._stackItem = {
-                'name' : name,
-                'node' : node,
-                'class' : that,
-                'className' : that._name['full']
+                name: name,
+                node: node,
+                class: that,
+                className: that._name.full,
             };
             that._stack.push(that._stackItem);
-        }else if(cm.isNode(node)){
-            that._stackItem['node'] = node;
+        } else if (cm.isNode(node)) {
+            that._stackItem.node = node;
         }
         return that;
     },
-    'removeFromStack' : function(){
-        var that = this;
+    'removeFromStack': function() {
+        const that = this;
         cm.arrayRemove(that._stack, that._stackItem);
         that._stackItem = null;
         return that;
     },
-    'isAppropriateToStack' : function(name, parent, callback){
-        var that = this,
-            item = that._stackItem;
+    'isAppropriateToStack': function(name, parent, callback) {
+        const that = this;
+        const item = that._stackItem;
         name = cm.isNumber(name) ? name.toString() : name;
-        callback = cm.isFunction(callback) ? callback : function(){};
-        if((cm.isEmpty(name) || item['name'] === name) && (cm.isEmpty(parent) || cm.isParent(parent, item['node'], true))){
-            callback(item['class'], item, name);
+        callback = cm.isFunction(callback) ? callback : () => {};
+        if (
+            (cm.isEmpty(name) || item.name === name)
+            && (cm.isEmpty(parent) || cm.isParent(parent, item.node, true))
+        ) {
+            callback(item.class, item, name);
             return true;
         }
         return false;
     },
-    'findInStack' : function(name, parent, callback){
-        var that = this,
-            items = [];
+    'findInStack': function(name, parent, callback) {
+        const that = this;
         name = cm.isNumber(name) ? name.toString() : name;
-        callback = cm.isFunction(callback) ? callback : function(){};
-        cm.forEach(that._stack, function(item){
-            if((cm.isEmpty(name) || item['name'] === name) && (cm.isEmpty(parent) || cm.isParent(parent, item['node'], true))){
+        callback = cm.isFunction(callback) ? callback : () => {};
+        let items = [];
+        cm.forEach(that._stack, item => {
+            if (
+                (cm.isEmpty(name) || item.name === name)
+                && (cm.isEmpty(parent) || cm.isParent(parent, item.node, true))
+            ) {
                 items.push(item);
-                callback(item['class'], item, name);
+                callback(item.class, item, name);
             }
         });
         return items;
     },
-    'getStackNode' : function(){
-        var that = this;
-        return that._stackItem ? that._stackItem['node'] : null;
-    }
+    'getStackNode': function() {
+        const that = this;
+        return that._stackItem ? that._stackItem.node : null;
+    },
 };
 
-/* ****** STRUCTURE ******* */
+/****** STRUCTURE *******/
 
-Mod['Structure'] = {
-    '_config' : {
-        'extend' : true,
-        'predefine' : false,
-        'require' : ['Extend']
+Mod.Structure = {
+    '_config': {
+        extend: true,
+        predefine: false,
+        require: ['Extend'],
     },
-    '_construct' : function(){
-        var that = this;
-        if(cm.isUndefined(that.build['params']['renderStructure'])){
-            that.build['params']['renderStructure'] = true;
+    '_construct': function() {
+        const that = this;
+        if (cm.isUndefined(that.build.params.renderStructure)) {
+            that.build.params.renderStructure = true;
         }
-        if(cm.isUndefined(that.build['params']['embedStructure'])){
-            that.build['params']['embedStructure'] = 'append';
+        if (cm.isUndefined(that.build.params.embedStructure)) {
+            that.build.params.embedStructure = 'append';
         }
     },
-    'embedStructure' : function(node, container){
-        var that = this;
-        switch(that.params['embedStructure']){
+    'embedStructure': function(node, container) {
+        const that = this;
+        switch (that.params.embedStructure) {
             case 'replace':
                 that.replaceStructure(node);
                 break;
@@ -849,25 +828,25 @@ Mod['Structure'] = {
         }
         return that;
     },
-    'appendStructure' : function(node, type, container){
-        var that = this;
-        container = container || that.params['container'] || that.params['node'];
+    'appendStructure': function(node, type, container) {
+        const that = this;
+        container = container || that.params.container || that.params.node;
         container && cm[type](node, container);
         return that;
     },
-    'replaceStructure' : function(node, container){
-        var that = this;
-        container = container || that.params['container'];
-        if(container){
-            if(that.params['container'] === that.params['node']){
-                cm.insertBefore(node, that.params['node']);
-            }else{
-                that.params['container'].appendChild(node);
+    'replaceStructure': function(node, container) {
+        const that = this;
+        container = container || that.params.container;
+        if (container) {
+            if (that.params.container === that.params.node) {
+                cm.insertBefore(node, that.params.node);
+            } else {
+                that.params.container.appendChild(node);
             }
-        }else if(that.params['node']){
-            cm.insertBefore(node, that.params['node']);
+        } else if (that.params.node) {
+            cm.insertBefore(node, that.params.node);
         }
-        cm.remove(that.params['node']);
+        cm.remove(that.params.node);
         return that;
-    }
+    },
 };

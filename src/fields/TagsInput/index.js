@@ -2,7 +2,7 @@ cm.define('Com.TagsInput', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Stack'
@@ -99,7 +99,7 @@ function(params){
 
     var renderInput = function(){
         // Structure
-        nodes['input'] = cm.node('input', {'type' : 'text', 'maxlength' : that.params['maxSingleTagLength'], 'class' : 'input adder', 'placeholder' : that.lang('placeholder')});
+        nodes['input'] = cm.node('input', {'type' : 'text', 'maxlength' : that.params['maxSingleTagLength'], 'class' : 'input adder', 'placeholder' : that.message('placeholder')});
         cm.appendChild(nodes['input'], nodes['inner']);
         // Autocomplete
         if(that.isAutocomplete){
@@ -175,7 +175,7 @@ function(params){
         item['container'] = cm.node('div', {'class' : 'item'},
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'text', 'title' : tag}, tag),
-                item['button'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.lang('remove')})
+                item['button'] = cm.node('div', {'class' : that.params['icons']['remove'], 'title' : that.message('remove')})
             )
         );
         item['anim'] = new cm.Animation(item['container']);

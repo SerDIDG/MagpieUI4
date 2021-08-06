@@ -1,4 +1,4 @@
-cm.setStrings('Com.TagsInput', {
+cm.setMessages('Com.TagsInput', {
 	'tags' : 'Метки',
 	'add' : 'Добавить',
 	'remove' : 'Удалить',

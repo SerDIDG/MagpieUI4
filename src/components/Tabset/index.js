@@ -200,8 +200,8 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         var that = this,
             nodes = {};
         // Structure
-        nodes['container'] = cm.Node('li',
-            nodes['inner'] = cm.Node('div', item['content'])
+        nodes['container'] = cm.node('li',
+            nodes['inner'] = cm.node('div', item['content'])
         );
         return nodes;
     };
@@ -210,8 +210,8 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         var that = this,
             nodes = {};
         // Structure
-        nodes['container'] = cm.Node('li',
-            nodes['link'] = cm.Node('a',
+        nodes['container'] = cm.node('li',
+            nodes['link'] = cm.node('a',
                 nodes['title'] = cm.node('div', {'class' : 'title'}, item['title'])
             )
         );

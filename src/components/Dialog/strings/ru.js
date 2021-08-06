@@ -1,10 +1,10 @@
-cm.setStrings('Com.Dialog', {
+cm.setMessages('Com.Dialog', {
     'closeTitle': 'Закрыть',
     'close': '',
     'helpTitle': 'Помощь',
     'help': '',
 });
 
-cm.setStrings('Com.DialogContainer', {
+cm.setMessages('Com.DialogContainer', {
     'close': 'Закрыть',
 });

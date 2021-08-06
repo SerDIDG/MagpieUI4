@@ -162,7 +162,7 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
                 that.nodes['pages'] = cm.node('div', {'class' : 'com__scroll-pagination__pages'})
             ),
             that.nodes['bar'] = cm.node('div', {'class' : 'com__scroll-pagination__bar'},
-                that.nodes['button'] = cm.node('div', {'class' : 'button button-primary'}, that.lang('load_more')),
+                that.nodes['button'] = cm.node('div', {'class' : 'button button-primary'}, that.message('load_more')),
                 that.nodes['loader'] = cm.node('div', {'class' : 'button button-clear has-icon has-icon has-icon-small'},
                     cm.node('div', {'class' : 'icon small loader'})
                 )

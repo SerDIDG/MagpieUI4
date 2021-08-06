@@ -66,7 +66,7 @@ cm.getConstructor('Com.BoxTools', function(classConstructor, className, classPro
             cm.node('div', {'class' : 'b-line'},
                 that.renderInput(that.params['inputs'][3], 3),
                 cm.node('div', {'class' : 'b-link-container'},
-                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.lang('link')},
+                    nodes['link'] = cm.node('div', {'class' : 'b-link', 'title' : that.message('link')},
                         cm.node('div', {'class' : 'icon'})
                     )
                 ),
@@ -199,7 +199,7 @@ cm.getConstructor('Com.BoxTools', function(classConstructor, className, classPro
             if(!that.isInputsLinked){
                 that.isInputsLinked = true;
                 cm.addClass(that.nodes['content']['link'], 'active');
-                that.nodes['content']['link'].title = that.lang('unlink');
+                that.nodes['content']['link'].title = that.message('unlink');
                 if(that.lastInput){
                     that.set(that.lastInput['input'].value);
                 }else{
@@ -212,7 +212,7 @@ cm.getConstructor('Com.BoxTools', function(classConstructor, className, classPro
             }else{
                 that.isInputsLinked = false;
                 cm.removeClass(that.nodes['content']['link'], 'active');
-                that.nodes['content']['link'].title = that.lang('link');
+                that.nodes['content']['link'].title = that.message('link');
             }
         }
         return that;

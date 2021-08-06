@@ -2,7 +2,7 @@ cm.define('Com.ColumnsHelper', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'DataConfig',
         'DataNodes',
         'Callbacks',

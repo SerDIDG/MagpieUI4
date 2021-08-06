@@ -4,7 +4,7 @@ cm.define('Com.CalendarEvents', {
         'Structure',
         'Stack',
         'DataConfig',
-        'Langs'
+        'Messages'
     ],
     'params' : {
         'node' : cm.node('div'),
@@ -47,7 +47,7 @@ function(params){
             'startYear' : that.params['startYear'],
             'endYear' : that.params['endYear'],
             'startWeekDay' : that.params['startWeekDay'],
-            'langs' : that.params['langs']
+            'messages' : that.params['messages']
         });
         // Render tooltip
         that.components['tooltip'] = new Com.Tooltip(that.params['Com.Tooltip']);
@@ -94,7 +94,7 @@ function(params){
             // Show tooltip
             that.components['tooltip']
                 .setTarget(params['node'])
-                .setTitle(cm.dateFormat(params['date'], that.params['format'], that.lang()))
+                .setTitle(cm.dateFormat(params['date'], that.params['format'], that.message()))
                 .setContent(myNodes['content'])
                 .show();
         }

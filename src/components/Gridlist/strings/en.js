@@ -1,4 +1,4 @@
-cm.setStrings('Com.Gridlist', {
+cm.setMessages('Com.Gridlist', {
 	'counter' : 'Count: %count%',
 	'check_all' : 'Check all',
 	'uncheck_all' : 'Uncheck all',
@@ -6,6 +6,6 @@ cm.setStrings('Com.Gridlist', {
 	'actions' : 'Actions'
 });
 
-cm.setStrings('Com.GridlistFilter', {
+cm.setMessages('Com.GridlistFilter', {
 	'placeholder' : 'Type query...'
 });

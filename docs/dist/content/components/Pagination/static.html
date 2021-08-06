@@ -25,21 +25,21 @@
                         'onPageRender' : function(that, page){
                             var itemNode, containerNode, innerNode;
                             // Structure
-                            containerNode = cm.Node('div', {'class' : 'pt__grid col-5 indent-12px'},
-                                innerNode = cm.Node('ul')
+                            containerNode = cm.node('div', {'class' : 'pt__grid col-5 indent-12px'},
+                                innerNode = cm.node('ul')
                             );
                             // Items
                             cm.forEach(page['data'], function(item){
-                                itemNode = cm.Node('li',
-                                    cm.Node('div', {'class' : 'pt__image is-hover'},
-                                        cm.Node('a', {
+                                itemNode = cm.node('li',
+                                    cm.node('div', {'class' : 'pt__image is-hover'},
+                                        cm.node('a', {
                                                 'class' : 'inner',
                                                 'target' : '_blank',
                                                 'href' : ['https://screensider.com', item['id']].join('/')
                                             },
-                                            cm.Node('img', {'class' : 'descr', 'src' : ['https://screensider.com/images/albums/', item['album_id'] ,'/', item['filename'] ,'-top.jpg'].join('')}),
-                                            cm.Node('div', {'class' : 'title'},
-                                                cm.Node('div', {'class' : 'inner'}, item['album_name'])
+                                            cm.node('img', {'class' : 'descr', 'src' : ['https://screensider.com/images/albums/', item['album_id'] ,'/', item['filename'] ,'-top.jpg'].join('')}),
+                                            cm.node('div', {'class' : 'title'},
+                                                cm.node('div', {'class' : 'inner'}, item['album_name'])
                                             )
                                         )
                                     )

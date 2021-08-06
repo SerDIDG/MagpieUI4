@@ -267,7 +267,7 @@ cm.getConstructor('Com.AbstractInput', function(classConstructor, className, cla
             });
         }
         if(that.params['title']){
-            that.nodes['container'].setAttribute('title', that.lang(that.params['title']));
+            that.nodes['container'].setAttribute('title', that.message(that.params['title']));
         }
         // Classes
         if(that.params['adaptive']){

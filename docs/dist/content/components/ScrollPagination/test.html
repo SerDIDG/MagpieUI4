@@ -24,10 +24,10 @@
                             // Here we render html structure
                             cm.forEach(page['data'], function(item){
                                 if(item['image']){
-                                    itemNode = cm.Node('li',
-                                        cm.Node('div', {'class' : 'pt__image'},
-                                            cm.Node('a', {'class' : 'inner'},
-                                                cm.Node('img', {'class' : 'descr', 'src' : item['image']['thumbnail']})
+                                    itemNode = cm.node('li',
+                                        cm.node('div', {'class' : 'pt__image'},
+                                            cm.node('a', {'class' : 'inner'},
+                                                cm.node('img', {'class' : 'descr', 'src' : item['image']['thumbnail']})
                                             )
                                         )
                                     );

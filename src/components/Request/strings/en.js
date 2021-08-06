@@ -1,3 +1,3 @@
-cm.setStrings('Com.Request', {
-	'server_error' : cm._strings.common['server_error']
+cm.setMessages('Com.Request', {
+	'server_error' : cm._messages.common['server_error']
 });

@@ -2,7 +2,7 @@ cm.define('Com.FileReader', {
     'modules' : [
         'Params',
         'Events',
-        'Langs'
+        'Messages'
     ],
     'events' : [
         'onConstruct',

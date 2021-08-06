@@ -2,7 +2,7 @@ cm.define('Com.Gridlist', {
     'modules' : [
         'Params',
         'Events',
-        'Langs',
+        'Messages',
         'Structure',
         'DataConfig',
         'Callbacks',
@@ -45,7 +45,7 @@ cm.define('Com.Gridlist', {
         'sort' : true,
         'sortBy' : 'id',                                            // Default sort by key in array
         'orderBy' : 'ASC',
-        'childsBy' : false,                                         // Render child rows after parent, (WIP - doesn't work checking / uncheking rows and statuses for now)
+        'childrenBy' : false,                                         // Render child rows after parent, (WIP - doesn't work checking / uncheking rows and statuses for now)
 
         // Visibility
         'showCounter' : false,
@@ -352,13 +352,13 @@ function(params){
             that.nodes['counter'] = cm.node('div', {'class' : 'pt__gridlist__counter'});
             cm.insertFirst(that.nodes['counter'], that.nodes['container']);
         }
-        that.nodes['counter'].innerHTML = cm.strReplace(that.lang('counter'), {
+        that.nodes['counter'].innerHTML = cm.strReplace(that.message('counter'), {
             '%count%' : count
         });
     };
 
     var renderEmptiness = function(container, errors){
-        errors = !cm.isEmpty(errors) ? errors : that.lang('empty');
+        errors = !cm.isEmpty(errors) ? errors : that.message('empty');
         if(that.nodes['empty'] && cm.isParent(container, that.nodes['empty'])){
             cm.remove(that.nodes['empty']);
         }
@@ -525,7 +525,7 @@ function(params){
                 case 'checkbox' :
                     cm.addClass(item['nodes']['container'], 'control');
                     item['nodes']['inner'].appendChild(
-                        item['nodes']['checkbox'] = cm.node('input', {'type' : 'checkbox', 'class' : 'checkbox', 'title' : that.lang('check_all')})
+                        item['nodes']['checkbox'] = cm.node('input', {'type' : 'checkbox', 'class' : 'checkbox', 'title' : that.message('check_all')})
                     );
                     item['nodes']['checkbox'].checked = that.isCheckedAll;
                     cm.addEvent(item['nodes']['checkbox'], 'click', function(){
@@ -630,7 +630,7 @@ function(params){
             'i' : i,
             'index' : data[that.params['uniqueKey']],
             'data' : data,
-            'childs' : [],
+            'children' : [],
             'isChecked' : false,
             'status' : data['_status'] || false,
             'nodes' : {
@@ -648,10 +648,10 @@ function(params){
                 renderCell(config, item)
             );
         });
-        // Render childs
-        if(that.params['childsBy']){
-            cm.forEach(data[that.params['childsBy']], function(child, childI){
-                renderRow(item['childs'], child, childI);
+        // Render children
+        if(that.params['childrenBy']){
+            cm.forEach(data[that.params['childrenBy']], function(child, childI){
+                renderRow(item['children'], child, childI);
             });
         }
         // Push to rows array
@@ -828,7 +828,7 @@ function(params){
         item['nodes']['node'] = cm.node('div', {'class' : ['pt__links', 'pull-right', config['class']].join(' ')},
             cm.node('ul',
                 item['nodes']['componentNode'] = cm.node('li', {'class' : 'com__menu', 'data-node' : 'ComMenu:{}:button'},
-                    cm.node('a', {'class' : 'label'}, that.lang('actions')),
+                    cm.node('a', {'class' : 'label'}, that.message('actions')),
                     cm.node('span', {'class' : 'cm-i__chevron-down xx-small display-inline'}),
                     cm.node('div', {'class' : 'pt__menu', 'data-node' : 'ComMenu.target'},
                         item['nodes']['itemsList'] = item['nodes']['actionsList'] = cm.node('ul', {'class' : 'pt__menu-dropdown'})

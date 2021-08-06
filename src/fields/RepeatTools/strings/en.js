@@ -1,4 +1,4 @@
-cm.setStrings('Com.RepeatTools', {
+cm.setMessages('Com.RepeatTools', {
 	'no-repeat' : 'No',
 	'repeat-x' : 'Horizontally',
 	'repeat-y' : 'Vertically',
