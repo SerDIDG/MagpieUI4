@@ -48,7 +48,7 @@ cm.define('Com.Dialog', {
             'hold' : true,
             'targetEvent' : 'click',
             'hideOnReClick' : true,
-            'className' : 'com__dialog__tooltip',
+            'classes' : ['com__dialog__tooltip'],
             'animate' : 'drop-bottom-left',
             'width' : 'targetWidth -16',
             'top' : 8,

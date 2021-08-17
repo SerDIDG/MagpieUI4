@@ -18,7 +18,7 @@ cm.define('Com.Menu', {
         'minWidth' : 'targetWidth',
         'tooltipConstructor' : 'Com.Tooltip',
         'tooltipParams' : {
-            'className' : 'com__menu-tooltip',
+            'classes' : ['com__menu-tooltip'],
             'targetEvent' : 'hover',
             'hideOnReClick' : true,
             'theme' : null,

@@ -40,7 +40,7 @@ cm.define('Com.ColorPicker', {
         'Com.Tooltip' : {
             'targetEvent' : 'click',
             'hideOnReClick' : true,
-            'className' : 'com__colorpicker__tooltip',
+            'classes' : ['com__colorpicker__tooltip'],
             'top' : cm._config.tooltipDown,
             'scroll' : false
         },

@@ -17,8 +17,9 @@ cm.define('Com.CalendarEvents', {
         'endYear' : new Date().getFullYear() + 10,
         'startWeekDay' : 0,
         'target' : '_blank',
-        'Com.Tooltip' : {
-            'className' : 'com__calendar-events__tooltip'
+        'tooltipConstructor' : 'Com.Tooltip',
+        'tooltipParams' : {
+            'classes' : ['com__calendar-events__tooltip']
         }
     }
 },
@@ -50,7 +51,9 @@ function(params){
             'messages' : that.params['messages']
         });
         // Render tooltip
-        that.components['tooltip'] = new Com.Tooltip(that.params['Com.Tooltip']);
+        cm.getConstructor(that.params['tooltipConstructor'], function(classConstructor){
+            that.components['tooltip'] = new classConstructor(that.params['tooltipParams']);
+        });
         // Append
         that.embedStructure(that.nodes['container']);
     };

@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.9 ************ */
+/*! ************ MagpieUI4 v4.0.11 ************ */
 @charset "UTF-8";/*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -4848,7 +4848,7 @@ span.CodeMirror-selectedtext { background: none; }
 @CmIconIA-Spinner-BorderSize: 3px;
 @CmIconIA-Spinner-DefaultBackground: @CmColor-Secondary-LightActive;
 @CmIconIA-Spinner-ActiveBackground: @CmColor-Primary-DarkDefault;
-@CmVersion: '4.0.9';
+@CmVersion: '4.0.11';
 @CmProtocol: '';
 
 // /* ******* SCREEN TYPES ******* */
@@ -7945,6 +7945,23 @@ button {
     > .l {
         overflow: hidden;
     }
+
+    &.is-flex {
+        display: flex;
+        align-items: center;
+
+        > .l {
+            float: none;
+            flex: auto;
+            overflow: visible;
+        }
+
+        > .r {
+            float: none;
+            flex: none;
+            align-self: flex-start;
+        }
+    }
 }
 
 /* *** ITEM *** */
@@ -8154,6 +8171,16 @@ button {
                 float: none;
                 margin: 0;
             }
+
+            &.is-adaptive {
+                &.is-flex {
+                    display: block;
+
+                    > .l {
+                        margin: 0 0 @CmIndent-Small;
+                    }
+                }
+            }
         }
     }
 
@@ -8319,7 +8346,7 @@ button {
 
 /* ******* PARTS: BUTTONS: ADAPTIVE ******* */
 
-@media only screen and (max-width : @CmScreen-Mobile) {
+@media only screen and (max-width : @CmUI-AdaptiveFrom) {
 
     html.is-adaptive {
         .pt__buttons {
@@ -11424,6 +11451,21 @@ button {
         }
     }
 
+    &.is-flex {
+        display: flex;
+
+        > dt,
+        > .field__title  {
+            flex: none;
+        }
+
+        > dd,
+        > .field__descr {
+            flex: auto;
+            margin-left: @CmForm-FieldIndent;
+        }
+    }
+
     &.is-box,
     &.is-form-box {
         .cm__box;
@@ -11659,24 +11701,37 @@ ul.pt__field__hint {
                 display: block;
             }
 
+            &.is-flex {
+                display: flex;
+
+                > dd,
+                > .field__descr {
+                    margin-left: @CmForm-FieldIndent;
+                }
+            }
+
+            &.is-adaptive {
+                display: block;
+
+                > dt,
+                > .field__title {
+                    width: auto;
+                    float: none;
+                }
+
+                > dd,
+                > .field__descr {
+                    margin: 0 0 @CmForm-FieldInnerIndent;
+                    float: none;
+
+                    &:last-child {
+                        margin: 0;
+                    }
+                }
+            }
+
             &.is-hidden {
                 display: none;
-            }
-
-            > dt,
-            > .field__title {
-                width: auto;
-                float: none;
-            }
-
-            > dd,
-            > .field__descr {
-                margin: 0 0 @CmForm-FieldInnerIndent;
-                float: none;
-
-                &:last-child {
-                    margin: 0;
-                }
             }
         }
     }

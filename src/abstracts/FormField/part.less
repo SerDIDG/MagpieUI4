@@ -134,6 +134,21 @@
         }
     }
 
+    &.is-flex {
+        display: flex;
+
+        > dt,
+        > .field__title  {
+            flex: none;
+        }
+
+        > dd,
+        > .field__descr {
+            flex: auto;
+            margin-left: @CmForm-FieldIndent;
+        }
+    }
+
     &.is-box,
     &.is-form-box {
         .cm__box;
@@ -369,24 +384,37 @@ ul.pt__field__hint {
                 display: block;
             }
 
+            &.is-flex {
+                display: flex;
+
+                > dd,
+                > .field__descr {
+                    margin-left: @CmForm-FieldIndent;
+                }
+            }
+
+            &.is-adaptive {
+                display: block;
+
+                > dt,
+                > .field__title {
+                    width: auto;
+                    float: none;
+                }
+
+                > dd,
+                > .field__descr {
+                    margin: 0 0 @CmForm-FieldInnerIndent;
+                    float: none;
+
+                    &:last-child {
+                        margin: 0;
+                    }
+                }
+            }
+
             &.is-hidden {
                 display: none;
-            }
-
-            > dt,
-            > .field__title {
-                width: auto;
-                float: none;
-            }
-
-            > dd,
-            > .field__descr {
-                margin: 0 0 @CmForm-FieldInnerIndent;
-                float: none;
-
-                &:last-child {
-                    margin: 0;
-                }
             }
         }
     }

@@ -11,7 +11,7 @@ cm.define('Com.HelpBubble', {
         'showLabel' : false,
         'tooltipConstructor' : 'Com.Tooltip',
         'tooltipParams' : {
-            'className' : 'com__help-bubble__tooltip'
+            'classes' : ['com__help-bubble__tooltip']
         },
         'containerConstructor' : 'Com.DialogContainer',
         'containerParams' : {

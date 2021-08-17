@@ -46,7 +46,7 @@ cm.define('Com.Select', {
         'Com.Tooltip' : {
             'targetEvent' : 'click',
             'hideOnReClick' : true,
-            'className' : 'com__select__tooltip',
+            'classes' : ['com__select__tooltip'],
             'width' : 'targetWidth',
             'top' : cm._config.tooltipDown
         }

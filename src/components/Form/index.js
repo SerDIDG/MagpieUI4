@@ -180,6 +180,7 @@ function(params){
             'system' : false,
             'name' : '',
             'dataName' : null,
+            'dataPath' : null,
             'label' : '',
             'originValue' : null,
             'required' : false,
@@ -199,9 +200,15 @@ function(params){
         params = cm.merge(cm.clone(field, true), params);
         // Validate
         params.fieldConstructor = !cm.isEmpty(params.fieldConstructor) ? params.fieldConstructor : 'Com.FormField';
-        params.value = !cm.isEmpty(that.params.data[params.name]) ? that.params.data[params.name] : params.value;
-        params.dataValue = !cm.isEmpty(that.params.data[params.dataName]) ? that.params.data[params.dataName] : params.dataValue;
         params.renderName = cm.isBoolean(params.renderName) ? params.renderName : that.params.renderNames;
+        // Value
+        if(params.dataPath){
+            var value = cm.reducePath(params.dataPath, that.params.data);
+            params.value = !cm.isEmpty(value) ? value : params.value;
+        }else{
+            params.value = !cm.isEmpty(that.params.data[params.name]) ? that.params.data[params.name] : params.value;
+        }
+        params.dataValue = !cm.isEmpty(that.params.data[params.dataName]) ? that.params.data[params.dataName] : params.dataValue;
         // Render controller
         if(params.render && field && !that.fields[params.name]){
             renderFieldController(params);
@@ -443,12 +450,10 @@ function(params){
 
     var sendCompleteHelper = function(data){
         data = !cm.isEmpty(data) ? data : that.get('sendPath');
-        cm.forEach(that.fields, function(field, name){
-            if(typeof data[name] !== 'undefined'){
-                that.setFieldParams(name, {
-                    'originValue' : data[name]
-                });
-            }
+        that.set(data, {
+            triggerEvents: false,
+            setFields: false,
+            setOrigin: true
         });
     };
 
@@ -797,16 +802,33 @@ function(params){
         return that.get('all');
     };
 
-    that.set = function(data, triggerEvents){
-        var field, setValue;
-        cm.forEach(data, function(value, name){
-            field = that.fields[name];
-            if(field && !field.system){
-                setValue = data[field.dataName] || value;
-                that.fields[name].controller.set(setValue, triggerEvents);
+    that.set = function(data, params){
+        // Validate params
+        params = cm.merge({
+            triggerEvents: true,
+            setFields: true,
+            setOrigin: false
+        }, params);
+        // Set values
+        var value;
+        cm.forEach(that.fields, function(field, name){
+            if(field.dataPath){
+                value = cm.reducePath(field.dataPath, data);
+            }else{
+                value = !cm.isUndefined(data[field.dataName]) ? data[field.dataName] : data[name];
+            }
+            if(!cm.isUndefined(value)){
+                if(params.setOrigin){
+                    that.setFieldParams(name, {originValue: value});
+                }
+                if(params.setFields) {
+                    field.controller.set(value, params.triggerEvents);
+                }
             }
         });
-        that.triggerEvent('onSet');
+        if(params.triggerEvents){
+            that.triggerEvent('onSet');
+        }
         return that;
     };
 

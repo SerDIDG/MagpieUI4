@@ -129,10 +129,10 @@ function(params){
         // Input
         that.params['disabled'] = that.params['node'].disabled || that.params['node'].readOnly || that.params['disabled'];
         // Tooltip
-        that.params['Com.Tooltip']['className'] = [
+        that.params['Com.Tooltip']['classes'] = [
             'com__ac-tooltip',
             [that.params['className'], 'tooltip'].join('__')
-        ].join(' ');
+        ];
     };
 
     var render = function(){

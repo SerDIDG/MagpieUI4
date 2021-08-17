@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.9 ************ */
+/*! ************ MagpieUI4 v4.0.11 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.9',
+    '_version': '4.0.11',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -2925,14 +2925,16 @@ cm.node = function(){
             if(cm.isUndefined(value)){
                 return;
             }
-            if(cm.isObject(value) && key !== 'class'){
+            if(cm.isObject(value) && !['class', 'classes', 'style', 'styles'].includes(key)){
                 value = JSON.stringify(value);
             }
             switch(key){
                 case 'style':
-                    el.style.cssText = value;
+                case 'styles':
+                    cm.addStyles(el, value);
                     break;
                 case 'class':
+                case 'classes':
                     cm.addClass(el, value);
                     break;
                 case 'innerHTML':
@@ -2949,7 +2951,7 @@ cm.node = function(){
     }
     for(var ln = args.length; i < ln; i++){
         if(typeof args[i] !== 'undefined'){
-            if(typeof args[i] === 'string' || typeof args[i] === 'number'){
+            if(cm.isString(args[i]) || cm.isNumber(args[i])){
                 cm.appendChild(cm.textNode(args[i]), el);
             }else{
                 cm.appendChild(args[i], el);
@@ -4313,7 +4315,7 @@ cm.getIndentX = function(node){
 
 cm.getIndentY = function(node){
     if(!node){
-        return null;
+        return;
     }
     return cm.getStyle(node, 'paddingTop', true)
         + cm.getStyle(node, 'paddingBottom', true)
@@ -4321,23 +4323,17 @@ cm.getIndentY = function(node){
         + cm.getStyle(node, 'borderBottomWidth', true);
 };
 
-cm.addStyles = function(node, str){
-    var arr = str.replace(/\s/g, '').split(';'),
-        style;
-
-    arr.forEach(function(item){
-        if(item.length > 0){
-            style = item.split(':');
-            // Add style to element
-            style[2] = cm.styleStrToKey(style[0]);
-            if(style[0] === 'float'){
-                node.style[style[2][0]] = style[1];
-                node.style[style[2][1]] = style[1];
-            }else{
-                node.style[style[2]] = style[1];
-            }
-        }
-    });
+cm.addStyles = function(node, data){
+    if(!cm.isNode(node)){
+        return;
+    }
+    if(cm.isObject(data)){
+        cm.forEach(data, function(value, key){
+            node.style[key] = value;
+        });
+    }else{
+        node.style.cssText = data;
+    }
     return node;
 };
 
@@ -7149,6 +7145,8 @@ function(params){
 cm.getConstructor('Com.AbstractController', function(classConstructor, className, classProto, classInherit){
     classProto.construct = function(params){
         var that = this;
+        // Variables
+        that.isConstructed = false;
         // Bind context to methods
         that.redrawHandler = that.redraw.bind(that);
         that.scrollHandler = that.scroll.bind(that);
@@ -8043,6 +8041,7 @@ cm.define('Com.AbstractFormField', {
         'title' : '',
         'hint' : '',
         'messagePosition' : 'content', // label | content
+        'adaptive' : true,
         'visible' : true,
         'disabled' : false,
         'checked' : null,
@@ -8352,6 +8351,9 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             that.nodes.content.input.setAttribute('multiple', 'multiple');
         }
         // Classes
+        if(that.params.adaptive){
+            cm.addClass(that.nodes.container, 'is-adaptive');
+        }
         if(!that.params.visible){
             that.hide(false);
         }else{
@@ -9870,7 +9872,7 @@ cm.define('Com.Tooltip', {
         'resizeInterval' : 5,
         'disabled' : false,
         'position' : 'absolute',
-        'className' : '',
+        'classes' : [],
         'theme' : 'theme-default',
         'animate' : false,
         'arrow' : false,
@@ -9923,21 +9925,27 @@ function(params){
     };
 
     var render = function(){
+        // Assemble CSS Classes
+        var classes = ['com__tooltip'];
+        if(!cm.isEmpty(that.params['theme'])){
+            classes.push(['com__tooltip', that.params['theme']].join('--'));
+        }
+        if(!cm.isEmpty(that.params['animate'])){
+            classes.push(['animate', that.params['animate']].join('--'))``
+        }
+        if(!cm.isEmpty(that.params['arrow'])){
+            classes.push(['arrow', that.params['arrow']].join('--'));
+        }
+        classes = cm.merge(classes, that.params['classes'])
         // Structure
-        that.nodes['container'] = cm.node('div', {'class' : 'com__tooltip'},
+        that.nodes['container'] = cm.node('div', {'class' : classes, 'style' : { 'position' : that.params['position'] }},
             that.nodes['inner'] = cm.node('div', {'class' : 'inner'},
                 that.nodes['content'] = cm.node('div', {'class' : 'scroll'})
             )
         );
-        cm.isString(that.params['scroll']) && cm.addClass(that.nodes['content'], ['is', that.params['scroll']].join('-'));
-        // Add position style
-        that.nodes['container'].style.position = that.params['position'];
-        // Add theme css class
-        !cm.isEmpty(that.params['theme']) && cm.addClass(that.nodes['container'], ['com__tooltip', that.params['theme']].join('--'));
-        !cm.isEmpty(that.params['animate']) && cm.addClass(that.nodes['container'], ['animate', that.params['animate']].join('--'));
-        !cm.isEmpty(that.params['arrow']) && cm.addClass(that.nodes['container'], ['arrow', that.params['arrow']].join('--'));
-        // Add css class
-        !cm.isEmpty(that.params['className']) && cm.addClass(that.nodes['container'], that.params['className']);
+        if(cm.isString(that.params['scroll'])){
+            cm.addClass(that.nodes['content'], ['is', that.params['scroll']].join('-'));
+        }
         // Set title
         renderTitle(that.params['title']);
         // Embed content
@@ -12169,8 +12177,9 @@ cm.define('Com.CalendarEvents', {
         'endYear' : new Date().getFullYear() + 10,
         'startWeekDay' : 0,
         'target' : '_blank',
-        'Com.Tooltip' : {
-            'className' : 'com__calendar-events__tooltip'
+        'tooltipConstructor' : 'Com.Tooltip',
+        'tooltipParams' : {
+            'classes' : ['com__calendar-events__tooltip']
         }
     }
 },
@@ -12202,7 +12211,9 @@ function(params){
             'messages' : that.params['messages']
         });
         // Render tooltip
-        that.components['tooltip'] = new Com.Tooltip(that.params['Com.Tooltip']);
+        cm.getConstructor(that.params['tooltipConstructor'], function(classConstructor){
+            that.components['tooltip'] = new classConstructor(that.params['tooltipParams']);
+        });
         // Append
         that.embedStructure(that.nodes['container']);
     };
@@ -13710,7 +13721,7 @@ cm.define('Com.Dialog', {
             'hold' : true,
             'targetEvent' : 'click',
             'hideOnReClick' : true,
-            'className' : 'com__dialog__tooltip',
+            'classes' : ['com__dialog__tooltip'],
             'animate' : 'drop-bottom-left',
             'width' : 'targetWidth -16',
             'top' : 8,
@@ -16145,7 +16156,7 @@ function(params){
 	that.callbacks.render = function(that){
 		var nodes = {};
 		// Structure
-		nodes['container'] = cm.node('dl', {'class' : 'pt__field'},
+		nodes['container'] = cm.node('dl', {'class' : 'pt__field is-adaptive'},
 			nodes['label'] = cm.node('dt',
 				cm.node('label', that.params['label'])
 			),
@@ -16488,6 +16499,7 @@ function(params){
             'system' : false,
             'name' : '',
             'dataName' : null,
+            'dataPath' : null,
             'label' : '',
             'originValue' : null,
             'required' : false,
@@ -16507,9 +16519,15 @@ function(params){
         params = cm.merge(cm.clone(field, true), params);
         // Validate
         params.fieldConstructor = !cm.isEmpty(params.fieldConstructor) ? params.fieldConstructor : 'Com.FormField';
-        params.value = !cm.isEmpty(that.params.data[params.name]) ? that.params.data[params.name] : params.value;
-        params.dataValue = !cm.isEmpty(that.params.data[params.dataName]) ? that.params.data[params.dataName] : params.dataValue;
         params.renderName = cm.isBoolean(params.renderName) ? params.renderName : that.params.renderNames;
+        // Value
+        if(params.dataPath){
+            var value = cm.reducePath(params.dataPath, that.params.data);
+            params.value = !cm.isEmpty(value) ? value : params.value;
+        }else{
+            params.value = !cm.isEmpty(that.params.data[params.name]) ? that.params.data[params.name] : params.value;
+        }
+        params.dataValue = !cm.isEmpty(that.params.data[params.dataName]) ? that.params.data[params.dataName] : params.dataValue;
         // Render controller
         if(params.render && field && !that.fields[params.name]){
             renderFieldController(params);
@@ -16751,12 +16769,10 @@ function(params){
 
     var sendCompleteHelper = function(data){
         data = !cm.isEmpty(data) ? data : that.get('sendPath');
-        cm.forEach(that.fields, function(field, name){
-            if(typeof data[name] !== 'undefined'){
-                that.setFieldParams(name, {
-                    'originValue' : data[name]
-                });
-            }
+        that.set(data, {
+            triggerEvents: false,
+            setFields: false,
+            setOrigin: true
         });
     };
 
@@ -17105,16 +17121,33 @@ function(params){
         return that.get('all');
     };
 
-    that.set = function(data, triggerEvents){
-        var field, setValue;
-        cm.forEach(data, function(value, name){
-            field = that.fields[name];
-            if(field && !field.system){
-                setValue = data[field.dataName] || value;
-                that.fields[name].controller.set(setValue, triggerEvents);
+    that.set = function(data, params){
+        // Validate params
+        params = cm.merge({
+            triggerEvents: true,
+            setFields: true,
+            setOrigin: false
+        }, params);
+        // Set values
+        var value;
+        cm.forEach(that.fields, function(field, name){
+            if(field.dataPath){
+                value = cm.reducePath(field.dataPath, data);
+            }else{
+                value = !cm.isUndefined(data[field.dataName]) ? data[field.dataName] : data[name];
+            }
+            if(!cm.isUndefined(value)){
+                if(params.setOrigin){
+                    that.setFieldParams(name, {originValue: value});
+                }
+                if(params.setFields) {
+                    field.controller.set(value, params.triggerEvents);
+                }
             }
         });
-        that.triggerEvent('onSet');
+        if(params.triggerEvents){
+            that.triggerEvent('onSet');
+        }
         return that;
     };
 
@@ -18235,7 +18268,7 @@ cm.define('Com.Glossary', {
         'node' : cm.node('div'),
         'showTitle' : true,
         'Com.Tooltip' : {
-            'className' : 'com__glossary__tooltip',
+            'classes' : ['com__glossary__tooltip'],
             'targetEvent' : 'hover'
         }
     }
@@ -19814,7 +19847,7 @@ cm.define('Com.HelpBubble', {
         'showLabel' : false,
         'tooltipConstructor' : 'Com.Tooltip',
         'tooltipParams' : {
-            'className' : 'com__help-bubble__tooltip'
+            'classes' : ['com__help-bubble__tooltip']
         },
         'containerConstructor' : 'Com.DialogContainer',
         'containerParams' : {
@@ -19901,6 +19934,7 @@ cm.getConstructor('Com.HelpBubble', function(classConstructor, className, classP
         return that;
     };
 });
+
 cm.define('Com.ImageBox', {
     'extend' : 'Com.AbstractController',
     'params' : {
@@ -20280,7 +20314,7 @@ cm.define('Com.Menu', {
         'minWidth' : 'targetWidth',
         'tooltipConstructor' : 'Com.Tooltip',
         'tooltipParams' : {
-            'className' : 'com__menu-tooltip',
+            'classes' : ['com__menu-tooltip'],
             'targetEvent' : 'hover',
             'hideOnReClick' : true,
             'theme' : null,
@@ -21178,6 +21212,12 @@ function(params){
     that.delayInterval = null;
 
     var init = function(){
+        // Binds
+        that.openHandler = that.open.bind(that);
+        that.closeHandler = that.close.bind(that);
+        that.toggleHandler = that.toggle.bind(that);
+        // Params
+        that.params['controllerEvents'] && that.bindControllerEvents(); // ToDo: move to abstract controller
         that.setParams(params);
         that.convertEvents(that.params['events']);
         validateParams();
@@ -21392,6 +21432,18 @@ function(params){
             cm.remove(that.nodes['container']);
         }
         return that;
+    };
+
+    that.bindControllerEvents = function(){
+        cm.forEach(that._raw['events'], function(name){
+            if(!that[name]){
+                that[name] = function(){};
+            }
+            if(!that[name + 'Handler']){
+                that[name + 'Handler'] = that[name].bind(that);
+            }
+            that.addEvent(name, that[name + 'Handler']);
+        });
     };
 
     that.getNodes = function(key){
@@ -26630,10 +26682,10 @@ function(params){
         // Input
         that.params['disabled'] = that.params['node'].disabled || that.params['node'].readOnly || that.params['disabled'];
         // Tooltip
-        that.params['Com.Tooltip']['className'] = [
+        that.params['Com.Tooltip']['classes'] = [
             'com__ac-tooltip',
             [that.params['className'], 'tooltip'].join('__')
-        ].join(' ');
+        ];
     };
 
     var render = function(){
@@ -28239,7 +28291,7 @@ cm.define('Com.ColorPicker', {
         'Com.Tooltip' : {
             'targetEvent' : 'click',
             'hideOnReClick' : true,
-            'className' : 'com__colorpicker__tooltip',
+            'classes' : ['com__colorpicker__tooltip'],
             'top' : cm._config.tooltipDown,
             'scroll' : false
         },
@@ -28563,7 +28615,7 @@ cm.define('Com.DatePicker', {
         'Com.Tooltip' : {
             'targetEvent' : 'click',
             'hideOnReClick' : false,
-            'className' : 'com__datepicker__tooltip',
+            'classes' : ['com__datepicker__tooltip'],
             'top' : cm._config.tooltipDown,
             'scroll' : false
         }
@@ -30563,6 +30615,7 @@ Com.FormFields.add('number', {
 Com.FormFields.add('hidden', {
     'node' : cm.node('input', {'type' : 'hidden'}),
     'visible' : false,
+    'adaptive' : false,
     'value' : '',
     'defaultValue' : '',
     'fieldConstructor' : 'Com.AbstractFormField',
@@ -31255,7 +31308,7 @@ cm.define('Com.Select', {
         'Com.Tooltip' : {
             'targetEvent' : 'click',
             'hideOnReClick' : true,
-            'className' : 'com__select__tooltip',
+            'classes' : ['com__select__tooltip'],
             'width' : 'targetWidth',
             'top' : cm._config.tooltipDown
         }

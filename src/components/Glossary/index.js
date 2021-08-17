@@ -15,7 +15,7 @@ cm.define('Com.Glossary', {
         'node' : cm.node('div'),
         'showTitle' : true,
         'Com.Tooltip' : {
-            'className' : 'com__glossary__tooltip',
+            'classes' : ['com__glossary__tooltip'],
             'targetEvent' : 'hover'
         }
     }

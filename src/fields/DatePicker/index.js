@@ -50,7 +50,7 @@ cm.define('Com.DatePicker', {
         'Com.Tooltip' : {
             'targetEvent' : 'click',
             'hideOnReClick' : false,
-            'className' : 'com__datepicker__tooltip',
+            'classes' : ['com__datepicker__tooltip'],
             'top' : cm._config.tooltipDown,
             'scroll' : false
         }

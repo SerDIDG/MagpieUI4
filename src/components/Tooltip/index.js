@@ -45,7 +45,7 @@ cm.define('Com.Tooltip', {
         'resizeInterval' : 5,
         'disabled' : false,
         'position' : 'absolute',
-        'className' : '',
+        'classes' : [],
         'theme' : 'theme-default',
         'animate' : false,
         'arrow' : false,
@@ -98,21 +98,27 @@ function(params){
     };
 
     var render = function(){
+        // Assemble CSS Classes
+        var classes = ['com__tooltip'];
+        if(!cm.isEmpty(that.params['theme'])){
+            classes.push(['com__tooltip', that.params['theme']].join('--'));
+        }
+        if(!cm.isEmpty(that.params['animate'])){
+            classes.push(['animate', that.params['animate']].join('--'))``
+        }
+        if(!cm.isEmpty(that.params['arrow'])){
+            classes.push(['arrow', that.params['arrow']].join('--'));
+        }
+        classes = cm.merge(classes, that.params['classes'])
         // Structure
-        that.nodes['container'] = cm.node('div', {'class' : 'com__tooltip'},
+        that.nodes['container'] = cm.node('div', {'class' : classes, 'style' : { 'position' : that.params['position'] }},
             that.nodes['inner'] = cm.node('div', {'class' : 'inner'},
                 that.nodes['content'] = cm.node('div', {'class' : 'scroll'})
             )
         );
-        cm.isString(that.params['scroll']) && cm.addClass(that.nodes['content'], ['is', that.params['scroll']].join('-'));
-        // Add position style
-        that.nodes['container'].style.position = that.params['position'];
-        // Add theme css class
-        !cm.isEmpty(that.params['theme']) && cm.addClass(that.nodes['container'], ['com__tooltip', that.params['theme']].join('--'));
-        !cm.isEmpty(that.params['animate']) && cm.addClass(that.nodes['container'], ['animate', that.params['animate']].join('--'));
-        !cm.isEmpty(that.params['arrow']) && cm.addClass(that.nodes['container'], ['arrow', that.params['arrow']].join('--'));
-        // Add css class
-        !cm.isEmpty(that.params['className']) && cm.addClass(that.nodes['container'], that.params['className']);
+        if(cm.isString(that.params['scroll'])){
+            cm.addClass(that.nodes['content'], ['is', that.params['scroll']].join('-'));
+        }
         // Set title
         renderTitle(that.params['title']);
         // Embed content

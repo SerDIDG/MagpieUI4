@@ -1266,14 +1266,16 @@ cm.node = function(){
             if(cm.isUndefined(value)){
                 return;
             }
-            if(cm.isObject(value) && key !== 'class'){
+            if(cm.isObject(value) && !['class', 'classes', 'style', 'styles'].includes(key)){
                 value = JSON.stringify(value);
             }
             switch(key){
                 case 'style':
-                    el.style.cssText = value;
+                case 'styles':
+                    cm.addStyles(el, value);
                     break;
                 case 'class':
+                case 'classes':
                     cm.addClass(el, value);
                     break;
                 case 'innerHTML':
@@ -1290,7 +1292,7 @@ cm.node = function(){
     }
     for(var ln = args.length; i < ln; i++){
         if(typeof args[i] !== 'undefined'){
-            if(typeof args[i] === 'string' || typeof args[i] === 'number'){
+            if(cm.isString(args[i]) || cm.isNumber(args[i])){
                 cm.appendChild(cm.textNode(args[i]), el);
             }else{
                 cm.appendChild(args[i], el);
@@ -2654,7 +2656,7 @@ cm.getIndentX = function(node){
 
 cm.getIndentY = function(node){
     if(!node){
-        return null;
+        return;
     }
     return cm.getStyle(node, 'paddingTop', true)
         + cm.getStyle(node, 'paddingBottom', true)
@@ -2662,23 +2664,17 @@ cm.getIndentY = function(node){
         + cm.getStyle(node, 'borderBottomWidth', true);
 };
 
-cm.addStyles = function(node, str){
-    var arr = str.replace(/\s/g, '').split(';'),
-        style;
-
-    arr.forEach(function(item){
-        if(item.length > 0){
-            style = item.split(':');
-            // Add style to element
-            style[2] = cm.styleStrToKey(style[0]);
-            if(style[0] === 'float'){
-                node.style[style[2][0]] = style[1];
-                node.style[style[2][1]] = style[1];
-            }else{
-                node.style[style[2]] = style[1];
-            }
-        }
-    });
+cm.addStyles = function(node, data){
+    if(!cm.isNode(node)){
+        return;
+    }
+    if(cm.isObject(data)){
+        cm.forEach(data, function(value, key){
+            node.style[key] = value;
+        });
+    }else{
+        node.style.cssText = data;
+    }
     return node;
 };
 
