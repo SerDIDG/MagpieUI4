@@ -104,7 +104,7 @@ function(params){
             classes.push(['com__tooltip', that.params['theme']].join('--'));
         }
         if(!cm.isEmpty(that.params['animate'])){
-            classes.push(['animate', that.params['animate']].join('--'))``
+            classes.push(['animate', that.params['animate']].join('--'));
         }
         if(!cm.isEmpty(that.params['arrow'])){
             classes.push(['arrow', that.params['arrow']].join('--'));

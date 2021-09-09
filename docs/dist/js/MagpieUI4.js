@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.13 ************ */
+/*! ************ MagpieUI4 v4.0.14 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.13',
+    '_version': '4.0.14',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -9932,7 +9932,7 @@ function(params){
             classes.push(['com__tooltip', that.params['theme']].join('--'));
         }
         if(!cm.isEmpty(that.params['animate'])){
-            classes.push(['animate', that.params['animate']].join('--'))``
+            classes.push(['animate', that.params['animate']].join('--'));
         }
         if(!cm.isEmpty(that.params['arrow'])){
             classes.push(['arrow', that.params['arrow']].join('--'));
@@ -18957,11 +18957,30 @@ function(params){
     };
 
     var renderEmptiness = function(container, errors){
-        errors = !cm.isEmpty(errors) ? errors : that.message('empty');
+        var message;
+        if(!cm.isEmpty(errors)){
+            if(cm.isObject(errors)){
+                message = cm.reducePath(that.params['responseMessageKey'], errors);
+            }else if(cm.isArray(errors)){
+                cm.forEach(errors, function(error){
+                    if(cm.isObject(error)){
+                        message = cm.reducePath(that.params['responseMessageKey'], error);
+                    }else{
+                        message = error;
+                    }
+                });
+            }else{
+                message = errors;
+            }
+        }else{
+            message = that.message('empty');
+        }
+
         if(that.nodes['empty'] && cm.isParent(container, that.nodes['empty'])){
             cm.remove(that.nodes['empty']);
         }
-        that.nodes['empty'] = cm.node('div', {'class' : 'cm__empty'}, errors);
+
+        that.nodes['empty'] = cm.node('div', {'class' : 'cm__empty'}, message);
         cm.appendChild(that.nodes['empty'], container);
     };
 

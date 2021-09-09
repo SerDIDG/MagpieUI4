@@ -358,11 +358,30 @@ function(params){
     };
 
     var renderEmptiness = function(container, errors){
-        errors = !cm.isEmpty(errors) ? errors : that.message('empty');
+        var message;
+        if(!cm.isEmpty(errors)){
+            if(cm.isObject(errors)){
+                message = cm.reducePath(that.params['responseMessageKey'], errors);
+            }else if(cm.isArray(errors)){
+                cm.forEach(errors, function(error){
+                    if(cm.isObject(error)){
+                        message = cm.reducePath(that.params['responseMessageKey'], error);
+                    }else{
+                        message = error;
+                    }
+                });
+            }else{
+                message = errors;
+            }
+        }else{
+            message = that.message('empty');
+        }
+
         if(that.nodes['empty'] && cm.isParent(container, that.nodes['empty'])){
             cm.remove(that.nodes['empty']);
         }
-        that.nodes['empty'] = cm.node('div', {'class' : 'cm__empty'}, errors);
+
+        that.nodes['empty'] = cm.node('div', {'class' : 'cm__empty'}, message);
         cm.appendChild(that.nodes['empty'], container);
     };
 
