@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.11 ************ */
+/*! ************ MagpieUI4 v4.0.12 ************ */
 @charset "UTF-8";/*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -4810,6 +4810,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 :root {
     --pt-buttons--indent: @CmForm-ButtonsIndent;
+    --pt-field--title-width: @CmForm-FieldTitleWidth;
 }
 
 
@@ -4848,7 +4849,7 @@ span.CodeMirror-selectedtext { background: none; }
 @CmIconIA-Spinner-BorderSize: 3px;
 @CmIconIA-Spinner-DefaultBackground: @CmColor-Secondary-LightActive;
 @CmIconIA-Spinner-ActiveBackground: @CmColor-Primary-DarkDefault;
-@CmVersion: '4.0.11';
+@CmVersion: '4.0.12';
 @CmProtocol: '';
 
 // /* ******* SCREEN TYPES ******* */
@@ -4957,7 +4958,11 @@ span.CodeMirror-selectedtext { background: none; }
 @PtBoxCode-PaddingY: @CmIndent-XXSmall;
 @PtBoxCode-PaddingX: @CmIndent-XSmall;
 
+// /* ******* LINKS ******* */
+
 @PtLinks-Indent: @CmIndent-XXXSmall;
+@PtLinks-Separator: '|';
+@PtLinks-Separator-Color: @CmFont-Base-Color;
 
 // /* ******* LIST ******* */
 
@@ -8145,6 +8150,8 @@ button {
 
 .pt__box-code {
     .cm__box;
+    .cm__scroll--auto;
+    .cm__scrollbar;
     width: 100%;
     min-height: @CmFont-Base-LineHeight + ((@PtBoxCode-PaddingY + @CmBorder-Width ) * 2);
     display: block;
@@ -8155,6 +8162,12 @@ button {
     border-radius: @CmBorder-Radius;
     font-family: "Courier New", Courier, monospace;
     resize: vertical;
+
+    &.is-borderless {
+        min-height: @CmFont-Base-LineHeight;
+        padding: 0;
+        border: none;
+    }
 }
 
 /* ******* PART: BOX: ADAPTIVE ******* */
@@ -9938,8 +9951,9 @@ button {
             }
 
             &:before {
-                content: '|';
                 margin: 0 @PtLinks-Indent;
+                content: @PtLinks-Separator;
+                color: @PtLinks-Separator-Color;
             }
 
             &:first-child:before {
@@ -9977,6 +9991,7 @@ button {
     }
 
 }
+
 /* ******* PARTS: LIST ******* */
 
 .pt__list {
@@ -11334,7 +11349,7 @@ button {
 
     > dt,
     > .field__title {
-        width: @CmForm-FieldTitleWidth;
+        width: var( --pt-field--title-width);
         display: block;
         margin: 0;
         padding: ((@CmForm-FieldHeight - @CmFont-Base-LineHeight) / 2) 0;
@@ -11350,7 +11365,7 @@ button {
     > dd,
     > .field__descr {
         display: block;
-        margin: 0 0 0 (@CmForm-FieldTitleWidth + @CmForm-FieldIndent);
+        margin: 0 0 0 calc(var(--pt-field--title-width) + @CmForm-FieldIndent);
         padding: 0;
         position: relative;
 
@@ -11461,6 +11476,7 @@ button {
 
         > dd,
         > .field__descr {
+            min-width: 0; // overflow fix
             flex: auto;
             margin-left: @CmForm-FieldIndent;
         }

@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.11 ************ */
+/*! ************ MagpieUI4 v4.0.12 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.11',
+    '_version': '4.0.12',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -8128,7 +8128,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             && that.params.placeholderAsterisk
             && !cm.isEmpty(that.params.placeholder)
         ){
-            that.params.placeholder = [that.params.placeholder, that.message('*')].join(' ');
+            that.params.placeholder = [that.params.placeholder, that.msg('*')].join(' ');
         }
         // Constructor params
         that.params.constructorParams.id = that.params.id;
@@ -8235,7 +8235,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             cm.appendChild(that.nodes.labelText, that.nodes.label);
         }
         // Required
-        that.nodes.required = cm.node('span', {'class' : 'required'}, that.message('*'));
+        that.nodes.required = cm.node('span', {'class' : 'required'}, that.msg('*'));
         if(that.params.required && that.params.requiredAsterisk){
             cm.appendChild(that.nodes.required, that.nodes.label);
         }
@@ -8498,7 +8498,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         return that;
     };
 
-    classProto.validateValue = function(){
+    classProto.validateValue = function(options){
         var that = this,
             constraintsData,
             testData,
@@ -8510,9 +8510,9 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
                 'value' : that.get()
             };
         if(cm.isEmpty(data.value)){
-            if(that.params.required){
+            if(that.params.required || options.required){
                 data.valid = false;
-                data.message = that.message('required');
+                data.message = that.msg('required');
                 return data;
             }else{
                 data.valid = true;
@@ -8521,14 +8521,14 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         }
         if(that.params.minLength && data.value.length < that.params.minLength){
             data.valid = false;
-            data.message = that.message('too_short', {
+            data.message = that.msg('too_short', {
                 '%count%' : that.params.minLength
             });
             return data;
         }
         if(that.params.maxLength && data.value.length > that.params.maxLength){
             data.valid = false;
-            data.message = that.message('too_long', {
+            data.message = that.msg('too_long', {
                 '%count%' : that.params.maxLength
             });
             return data;
@@ -8551,15 +8551,16 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             data;
         // Validate options
         options = cm.merge({
+            'required' : false,
             'silent' : false,
             'triggerEvents' : true
         }, options);
 
-        if(!that.params.required && !that.params.validate){
+        if(!that.params.required && !that.params.validate && !options.required){
             return true;
         }
 
-        data = that.validateValue();
+        data = that.validateValue(options);
         if(data.valid || options.silent){
             that.clearError();
         }else{
@@ -21927,14 +21928,6 @@ cm.getConstructor('Com.Request', function(classConstructor, className, classProt
         return that;
     };
 
-    classProto.validateParams = function(){
-        var that = this;
-        // Legacy parameter name
-        if(!cm.isUndefined(that.params.showOverlay)){
-            that.params.showLoader = that.params.showOverlay;
-        }
-    };
-
     classProto.destruct = function(){
         var that = this;
         if(!that.isDestructed){
@@ -21990,7 +21983,7 @@ cm.getConstructor('Com.Request', function(classConstructor, className, classProt
                 || that.params.overlayContainer
                 || document.body;
         }
-        if(that.params.showOverlay){
+        if(that.params.showLoader){
             cm.getConstructor(that.params.overlayConstructor, function(classConstructor){
                 that.components.overlay = new classConstructor(that.params.overlayParams);
             });
@@ -22878,21 +22871,22 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
     };
 
     classProto.set = function(route, hash, params){
-        var that = this,
-            urlParams = !cm.isEmpty(params.urlParams) ? params.urlParams : params.captures,
-            href = that.getURL(route, hash, urlParams);
-        // Important to override push / replace state params in this case
-        params = cm.merge(params, {
-            'pushState' : false,
-            'replaceState' : true
-        });
-        that.setURL(href, hash, params);
+        var that = this;
+        // Validate params
+        params = cm.merge({
+            urlParams: null,
+            captures: null
+        }, params);
+        // Get route url
+        var urlParams = !cm.isEmpty(params.urlParams) ? params.urlParams : params.captures;
+        var url = that.getURL(route, hash, urlParams);
+        that.setURL(url, hash, params);
         return that;
     };
 
-    classProto.setURL = function(route, hash, params){
+    classProto.setURL = function(url, hash, params){
         var that = this;
-        route = that.prepareRoute(route);
+        var route = that.prepareRoute(url);
         that.pushRoute(route[0], hash || route[1], params);
         return that;
     };
@@ -22947,7 +22941,7 @@ cm.getConstructor('Com.Router', function(classConstructor, className, classProto
             }else if(cm.isArray(item.name)){
                 cm.forEach(item.name, function(name){
                     delete that.routesBinds[name];
-                })
+                });
             }
             delete that.routes[route];
         }
