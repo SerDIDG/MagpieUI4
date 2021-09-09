@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.12 ************ */
+/*! ************ MagpieUI4 v4.0.13 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.12',
+    '_version': '4.0.13',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -6346,7 +6346,7 @@ Mod.Messages = {
     },
     'msg': function() {
         const that = this;
-        return that.lang.apply(that, arguments);
+        return that.message.apply(that, arguments);
     },
     'getMessage': function(str) {
         const that = this;
@@ -8128,7 +8128,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             && that.params.placeholderAsterisk
             && !cm.isEmpty(that.params.placeholder)
         ){
-            that.params.placeholder = [that.params.placeholder, that.msg('*')].join(' ');
+            that.params.placeholder = [that.params.placeholder, that.message('*')].join(' ');
         }
         // Constructor params
         that.params.constructorParams.id = that.params.id;
@@ -8235,7 +8235,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             cm.appendChild(that.nodes.labelText, that.nodes.label);
         }
         // Required
-        that.nodes.required = cm.node('span', {'class' : 'required'}, that.msg('*'));
+        that.nodes.required = cm.node('span', {'class' : 'required'}, that.message('*'));
         if(that.params.required && that.params.requiredAsterisk){
             cm.appendChild(that.nodes.required, that.nodes.label);
         }
@@ -8512,7 +8512,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         if(cm.isEmpty(data.value)){
             if(that.params.required || options.required){
                 data.valid = false;
-                data.message = that.msg('required');
+                data.message = that.message('required');
                 return data;
             }else{
                 data.valid = true;
@@ -8521,14 +8521,14 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         }
         if(that.params.minLength && data.value.length < that.params.minLength){
             data.valid = false;
-            data.message = that.msg('too_short', {
+            data.message = that.message('too_short', {
                 '%count%' : that.params.minLength
             });
             return data;
         }
         if(that.params.maxLength && data.value.length > that.params.maxLength){
             data.valid = false;
-            data.message = that.msg('too_long', {
+            data.message = that.message('too_long', {
                 '%count%' : that.params.maxLength
             });
             return data;
@@ -16987,7 +16987,7 @@ function(params){
     that.callbacks.renderErrorMessage = function(that, field, message, label){
         var messagePath = ['errors', message].join('.'),
             messageString = that.getMsg(messagePath);
-        message = !cm.isEmpty(messageString) ? that.msg(messagePath) : message;
+        message = !cm.isEmpty(messageString) ? that.message(messagePath) : message;
         if(field){
             field.controller.renderError(message);
         }

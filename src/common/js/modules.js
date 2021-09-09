@@ -406,7 +406,7 @@ Mod.Messages = {
     },
     'msg': function() {
         const that = this;
-        return that.lang.apply(that, arguments);
+        return that.message.apply(that, arguments);
     },
     'getMessage': function(str) {
         const that = this;

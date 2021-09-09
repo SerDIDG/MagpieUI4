@@ -138,7 +138,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             && that.params.placeholderAsterisk
             && !cm.isEmpty(that.params.placeholder)
         ){
-            that.params.placeholder = [that.params.placeholder, that.msg('*')].join(' ');
+            that.params.placeholder = [that.params.placeholder, that.message('*')].join(' ');
         }
         // Constructor params
         that.params.constructorParams.id = that.params.id;
@@ -245,7 +245,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             cm.appendChild(that.nodes.labelText, that.nodes.label);
         }
         // Required
-        that.nodes.required = cm.node('span', {'class' : 'required'}, that.msg('*'));
+        that.nodes.required = cm.node('span', {'class' : 'required'}, that.message('*'));
         if(that.params.required && that.params.requiredAsterisk){
             cm.appendChild(that.nodes.required, that.nodes.label);
         }
@@ -522,7 +522,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         if(cm.isEmpty(data.value)){
             if(that.params.required || options.required){
                 data.valid = false;
-                data.message = that.msg('required');
+                data.message = that.message('required');
                 return data;
             }else{
                 data.valid = true;
@@ -531,14 +531,14 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         }
         if(that.params.minLength && data.value.length < that.params.minLength){
             data.valid = false;
-            data.message = that.msg('too_short', {
+            data.message = that.message('too_short', {
                 '%count%' : that.params.minLength
             });
             return data;
         }
         if(that.params.maxLength && data.value.length > that.params.maxLength){
             data.valid = false;
-            data.message = that.msg('too_long', {
+            data.message = that.message('too_long', {
                 '%count%' : that.params.maxLength
             });
             return data;

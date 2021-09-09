@@ -667,7 +667,7 @@ function(params){
     that.callbacks.renderErrorMessage = function(that, field, message, label){
         var messagePath = ['errors', message].join('.'),
             messageString = that.getMsg(messagePath);
-        message = !cm.isEmpty(messageString) ? that.msg(messagePath) : message;
+        message = !cm.isEmpty(messageString) ? that.message(messagePath) : message;
         if(field){
             field.controller.renderError(message);
         }
