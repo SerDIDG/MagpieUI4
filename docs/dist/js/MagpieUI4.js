@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.14 ************ */
+/*! ************ MagpieUI4 v4.0.15 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.14',
+    '_version': '4.0.15',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -21937,7 +21937,6 @@ cm.getConstructor('Com.Request', function(classConstructor, className, classProt
         that.sendHandler = that.send.bind(that);
         that.setParams(params);
         that.convertEvents(that.params.events);
-        that.validateParams();
         that.addToStack(that.params.node);
         that.triggerEvent('onRenderStart');
         that.render();

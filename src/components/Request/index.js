@@ -82,7 +82,6 @@ cm.getConstructor('Com.Request', function(classConstructor, className, classProt
         that.sendHandler = that.send.bind(that);
         that.setParams(params);
         that.convertEvents(that.params.events);
-        that.validateParams();
         that.addToStack(that.params.node);
         that.triggerEvent('onRenderStart');
         that.render();
