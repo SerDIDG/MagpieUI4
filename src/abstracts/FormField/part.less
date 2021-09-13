@@ -53,8 +53,7 @@
         }
 
         .input {
-            border-color: @CmColor-Success-DarkDefault;
-            background-color: @CmColor-Success-LightHighlight;
+            .input.input-success;
         }
     }
 
@@ -69,8 +68,7 @@
         }
 
         .input {
-            border-color: @CmColor-Warning-DarkDefault;
-            background-color: @CmColor-Warning-LightHighlight;
+            .input.input-warning;
         }
     }
 
@@ -86,8 +84,7 @@
         }
 
         .input {
-            border-color: @CmColor-Danger-DarkDefault;
-            background-color: @CmColor-Danger-LightHighlight;
+            .input.input-error;
         }
     }
 
@@ -144,7 +141,8 @@
 
         > dd,
         > .field__descr {
-            min-width: 0; // overflow fix
+            /* Fix for overflow in flex model */
+            min-width: 0;
             flex: auto;
             margin-left: @CmForm-FieldIndent;
         }

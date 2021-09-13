@@ -475,7 +475,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
 
     classProto.set = function(value, triggerEvents){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.set) && that.components.controller.set(value, triggerEvents);
+        cm.isFunction(that.components.controller?.set) && that.components.controller.set(value, triggerEvents);
         return that;
     };
 
@@ -488,23 +488,23 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             case 'text':
                 return that.getText();
             default:
-                return that.components.controller && cm.isFunction(that.components.controller.get) ? that.components.controller.get() : null;
+                return cm.isFunction(that.components.controller?.get) ? that.components.controller.get() : null;
         }
     };
 
     classProto.getRaw = function(){
         var that = this;
-        return that.components.controller && cm.isFunction(that.components.controller.getRaw) ? that.components.controller.getRaw() : that.get();
+        return cm.isFunction(that.components.controller?.getRaw) ? that.components.controller.getRaw() : that.get();
     };
 
     classProto.getText = function(){
         var that = this;
-        return that.components.controller && cm.isFunction(that.components.controller.getText) ? that.components.controller.getText() : that.get();
+        return cm.isFunction(that.components.controller?.getText) ? that.components.controller.getText() : that.get();
     };
 
     classProto.reset = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.reset) && that.components.controller.reset();
+        cm.isFunction(that.components.controller?.reset) && that.components.controller.reset();
         return that;
     };
 
@@ -550,7 +550,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
                 return constraintsData;
             }
         }
-        if(that.components.controller && cm.isFunction(that.components.controller.validate)){
+        if(cm.isFunction(that.components.controller?.validate)){
             return that.components.controller.validate(data);
         }
         return data;
@@ -672,6 +672,10 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             cm.insertLast(that.nodes.errors, that.nodes.messages);
         }
 
+        if(cm.isFunction(that.components.controller?.toggleError)){
+            return that.components.controller.toggleError(true);
+        }
+
         return that;
     };
 
@@ -679,6 +683,11 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         var that = this;
         cm.removeClass(that.nodes.container, 'error');
         cm.remove(that.nodes.errors);
+
+        if(cm.isFunction(that.components.controller?.toggleError)){
+            return that.components.controller.toggleError(false);
+        }
+
         return that;
     };
 
@@ -708,25 +717,25 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
 
     classProto.enable = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.enable) && that.components.controller.enable();
+        cm.isFunction(that.components.controller?.enable) && that.components.controller.enable();
         return that;
     };
 
     classProto.disable = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.disable) && that.components.controller.disable();
+        cm.isFunction(that.components.controller?.disable) && that.components.controller.disable();
         return that;
     };
 
     classProto.focus = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.focus) && that.components.controller.focus();
+        cm.isFunction(that.components.controller?.focus) && that.components.controller.focus();
         return that;
     };
 
     classProto.blur = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.blur) && that.components.controller.blur();
+        cm.isFunction(that.components.controller?.blur) && that.components.controller.blur();
         return that;
     };
 

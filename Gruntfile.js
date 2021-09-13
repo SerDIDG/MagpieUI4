@@ -252,16 +252,35 @@ module.exports = function(grunt) {
             }
         },
 
+        babel: {
+            options: {
+                sourceMap: false,
+                presets: ['@babel/preset-env']
+            },
+            build: {
+                files: [{
+                    src: ['<%= paths.dist %>/js/<%= pkg.name %>.js'],
+                    dest: '<%= paths.dist %>/js/<%= pkg.name %>.babel.js'
+                },{
+                    src : '<%= paths.dist %>/js/<%= pkg.name %>.ru.js',
+                    dest : '<%= paths.dist %>/js/<%= pkg.name %>.ru.babel.js'
+                },{
+                    src : '<%= paths.dist %>/js/<%= pkg.name %>.en.js',
+                    dest : '<%= paths.dist %>/js/<%= pkg.name %>.en.babel.js'
+                }]
+            }
+        },
+
         uglify : {
             build : {
                 files: [{
-                    src: ['<%= paths.dist %>/js/<%= pkg.name %>.js'],
+                    src: ['<%= paths.dist %>/js/<%= pkg.name %>.babel.js'],
                     dest: '<%= paths.dist %>/js/<%= pkg.name %>.min.js'
                 },{
-                    src : '<%= paths.dist %>/js/<%= pkg.name %>.ru.js',
+                    src : '<%= paths.dist %>/js/<%= pkg.name %>.ru.babel.js',
                     dest : '<%= paths.dist %>/js/<%= pkg.name %>.ru.min.js'
                 },{
-                    src : '<%= paths.dist %>/js/<%= pkg.name %>.en.js',
+                    src : '<%= paths.dist %>/js/<%= pkg.name %>.en.babel.js',
                     dest : '<%= paths.dist %>/js/<%= pkg.name %>.en.min.js'
                 }]
             },
@@ -457,7 +476,7 @@ module.exports = function(grunt) {
 
     // Custom Tasks
     grunt.registerTask('default', ['clean', 'pre', 'scripts', 'images', 'styles', 'fonts', 'libs', 'stuff']);
-    grunt.registerTask('optimize', ['clean:temp', 'default', 'uglify:build', 'cssmin', 'imagemin', 'copy:images_optimize', 'clean:temp']);
+    grunt.registerTask('optimize', ['clean:temp', 'default', 'babel:build', 'uglify:build', 'cssmin', 'imagemin', 'copy:images_optimize', 'clean:temp']);
     grunt.registerTask('watcher', ['watch']);
 
     grunt.registerTask('scripts', ['concat:scripts', 'concat:scripts_strings', 'replace:scripts', 'concat:scripts_docs']);

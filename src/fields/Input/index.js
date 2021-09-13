@@ -280,6 +280,16 @@ cm.getConstructor('Com.Input', function(classConstructor, className, classProto,
         that.nodes['content']['input'].blur();
         return that;
     };
+
+    classProto.toggleError = function(value){
+        var that = this;
+        if(value === true){
+            cm.addClass(that.nodes['content']['input'], 'input-error');
+        }else {
+            cm.removeClass(that.nodes['content']['input'], 'input-error');
+        }
+        return that;
+    };
 });
 
 /* ****** FORM FIELD COMPONENT ******* */

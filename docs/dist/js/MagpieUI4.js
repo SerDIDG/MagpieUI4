@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.15 ************ */
+/*! ************ MagpieUI4 v4.0.16 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1598,7 +1598,7 @@ if(!Date.now){
     }
 })();
 window.cm = {
-    '_version': '4.0.15',
+    '_version': '4.0.16',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -8465,7 +8465,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
 
     classProto.set = function(value, triggerEvents){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.set) && that.components.controller.set(value, triggerEvents);
+        cm.isFunction(that.components.controller?.set) && that.components.controller.set(value, triggerEvents);
         return that;
     };
 
@@ -8478,23 +8478,23 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             case 'text':
                 return that.getText();
             default:
-                return that.components.controller && cm.isFunction(that.components.controller.get) ? that.components.controller.get() : null;
+                return cm.isFunction(that.components.controller?.get) ? that.components.controller.get() : null;
         }
     };
 
     classProto.getRaw = function(){
         var that = this;
-        return that.components.controller && cm.isFunction(that.components.controller.getRaw) ? that.components.controller.getRaw() : that.get();
+        return cm.isFunction(that.components.controller?.getRaw) ? that.components.controller.getRaw() : that.get();
     };
 
     classProto.getText = function(){
         var that = this;
-        return that.components.controller && cm.isFunction(that.components.controller.getText) ? that.components.controller.getText() : that.get();
+        return cm.isFunction(that.components.controller?.getText) ? that.components.controller.getText() : that.get();
     };
 
     classProto.reset = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.reset) && that.components.controller.reset();
+        cm.isFunction(that.components.controller?.reset) && that.components.controller.reset();
         return that;
     };
 
@@ -8540,7 +8540,7 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
                 return constraintsData;
             }
         }
-        if(that.components.controller && cm.isFunction(that.components.controller.validate)){
+        if(cm.isFunction(that.components.controller?.validate)){
             return that.components.controller.validate(data);
         }
         return data;
@@ -8662,6 +8662,10 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
             cm.insertLast(that.nodes.errors, that.nodes.messages);
         }
 
+        if(cm.isFunction(that.components.controller?.toggleError)){
+            return that.components.controller.toggleError(true);
+        }
+
         return that;
     };
 
@@ -8669,6 +8673,11 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
         var that = this;
         cm.removeClass(that.nodes.container, 'error');
         cm.remove(that.nodes.errors);
+
+        if(cm.isFunction(that.components.controller?.toggleError)){
+            return that.components.controller.toggleError(false);
+        }
+
         return that;
     };
 
@@ -8698,25 +8707,25 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
 
     classProto.enable = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.enable) && that.components.controller.enable();
+        cm.isFunction(that.components.controller?.enable) && that.components.controller.enable();
         return that;
     };
 
     classProto.disable = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.disable) && that.components.controller.disable();
+        cm.isFunction(that.components.controller?.disable) && that.components.controller.disable();
         return that;
     };
 
     classProto.focus = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.focus) && that.components.controller.focus();
+        cm.isFunction(that.components.controller?.focus) && that.components.controller.focus();
         return that;
     };
 
     classProto.blur = function(){
         var that = this;
-        that.components.controller && cm.isFunction(that.components.controller.blur) && that.components.controller.blur();
+        cm.isFunction(that.components.controller?.blur) && that.components.controller.blur();
         return that;
     };
 
@@ -27205,7 +27214,6 @@ function(params){
     };
 
     that.enable = function(){
-        var that = this;
         if(that.disabled){
             that.disabled = false;
             that.params['node'].disabled = false;
@@ -27215,11 +27223,19 @@ function(params){
     };
 
     that.disable = function(){
-        var that = this;
         if(!that.disabled){
             that.disabled = true;
             that.params['node'].disabled = true;
             that.triggerEvent('onDisable');
+        }
+        return that;
+    };
+
+    that.toggleError = function(value){
+        if(value === true){
+            cm.addClass(that.params['node'], 'input-error');
+        }else {
+            cm.removeClass(that.params['node'], 'input-error');
         }
         return that;
     };
@@ -30554,6 +30570,16 @@ cm.getConstructor('Com.Input', function(classConstructor, className, classProto,
         that.nodes['content']['input'].blur();
         return that;
     };
+
+    classProto.toggleError = function(value){
+        var that = this;
+        if(value === true){
+            cm.addClass(that.nodes['content']['input'], 'input-error');
+        }else {
+            cm.removeClass(that.nodes['content']['input'], 'input-error');
+        }
+        return that;
+    };
 });
 
 /* ****** FORM FIELD COMPONENT ******* */
@@ -32012,6 +32038,15 @@ function(params){
             if(optionsLength){
                 components['menu'].enable();
             }
+        }
+        return that;
+    };
+
+    that.toggleError = function(value){
+        if(value === true){
+            cm.addClass(that.params['node'], 'input-error');
+        }else {
+            cm.removeClass(that.params['node'], 'input-error');
         }
         return that;
     };

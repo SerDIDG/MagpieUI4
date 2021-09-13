@@ -742,6 +742,15 @@ function(params){
         return that;
     };
 
+    that.toggleError = function(value){
+        if(value === true){
+            cm.addClass(that.params['node'], 'input-error');
+        }else {
+            cm.removeClass(that.params['node'], 'input-error');
+        }
+        return that;
+    };
+
     that.getNodes = function(key){
         return nodes[key] || nodes;
     };

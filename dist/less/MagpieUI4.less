@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.15 ************ */
+/*! ************ MagpieUI4 v4.0.16 ************ */
 @charset "UTF-8";/*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -4849,7 +4849,7 @@ span.CodeMirror-selectedtext { background: none; }
 @CmIconIA-Spinner-BorderSize: 3px;
 @CmIconIA-Spinner-DefaultBackground: @CmColor-Secondary-LightActive;
 @CmIconIA-Spinner-ActiveBackground: @CmColor-Primary-DarkDefault;
-@CmVersion: '4.0.15';
+@CmVersion: '4.0.16';
 @CmProtocol: '';
 
 // /* ******* SCREEN TYPES ******* */
@@ -6724,6 +6724,21 @@ tbody, thead, td, th, tr {
         background-color: @CmInput-DisabledBackground;
         border-color: @CmInput-DisableBorder;
         cursor: default;
+    }
+
+    &.input-success {
+        border-color: @CmColor-Success-DarkDefault;
+        background-color: @CmColor-Success-LightHighlight;
+    }
+
+    &.input-warning {
+        border-color: @CmColor-Warning-DarkDefault;
+        background-color: @CmColor-Warning-LightHighlight;
+    }
+
+    &.input-error {
+        border-color: @CmColor-Danger-DarkDefault;
+        background-color: @CmColor-Danger-LightHighlight;
     }
 
     &.input-dark {
@@ -11385,8 +11400,7 @@ button {
         }
 
         .input {
-            border-color: @CmColor-Success-DarkDefault;
-            background-color: @CmColor-Success-LightHighlight;
+            .input.input-success;
         }
     }
 
@@ -11401,8 +11415,7 @@ button {
         }
 
         .input {
-            border-color: @CmColor-Warning-DarkDefault;
-            background-color: @CmColor-Warning-LightHighlight;
+            .input.input-warning;
         }
     }
 
@@ -11418,8 +11431,7 @@ button {
         }
 
         .input {
-            border-color: @CmColor-Danger-DarkDefault;
-            background-color: @CmColor-Danger-LightHighlight;
+            .input.input-error;
         }
     }
 
@@ -11476,7 +11488,8 @@ button {
 
         > dd,
         > .field__descr {
-            min-width: 0; // overflow fix
+            /* Fix for overflow in flex model */
+            min-width: 0;
             flex: auto;
             margin-left: @CmForm-FieldIndent;
         }

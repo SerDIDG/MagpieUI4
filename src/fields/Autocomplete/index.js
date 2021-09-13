@@ -640,7 +640,6 @@ function(params){
     };
 
     that.enable = function(){
-        var that = this;
         if(that.disabled){
             that.disabled = false;
             that.params['node'].disabled = false;
@@ -650,11 +649,19 @@ function(params){
     };
 
     that.disable = function(){
-        var that = this;
         if(!that.disabled){
             that.disabled = true;
             that.params['node'].disabled = true;
             that.triggerEvent('onDisable');
+        }
+        return that;
+    };
+
+    that.toggleError = function(value){
+        if(value === true){
+            cm.addClass(that.params['node'], 'input-error');
+        }else {
+            cm.removeClass(that.params['node'], 'input-error');
         }
         return that;
     };

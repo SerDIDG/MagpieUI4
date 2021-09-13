@@ -1,6 +1,6 @@
 {
   "name": "MagpieUI4",
-  "version": "4.0.15",
+  "version": "4.0.16",
   "description": "Collection of JavaScript and CSS snippets.",
   "license": "MIT",
   "author": {
@@ -10,10 +10,12 @@
   },
   "repository": "SerDIDG/MagpieUI4",
   "devDependencies": {
+    "@babel/preset-env": "^7.15.6",
     "@lodder/time-grunt": "^4.0.0",
     "animate.css": "^4.0.0",
     "codemirror": "^5.53.2",
     "grunt": "^1.3.0",
+    "grunt-babel": "^8.0.0",
     "grunt-cli": "^1.3.2",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "~1.0.1",
