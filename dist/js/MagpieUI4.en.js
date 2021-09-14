@@ -76,7 +76,9 @@ cm.setMessages('Com.Gridlist', {
 });
 
 cm.setMessages('Com.GridlistFilter', {
-	'placeholder' : 'Type query...'
+	'placeholder' : 'Type query...',
+	'search' : '',
+	'clear' : 'Clear'
 });
 
 cm.setMessages('Com.MultipleField', {

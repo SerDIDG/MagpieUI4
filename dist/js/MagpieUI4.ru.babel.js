@@ -58,7 +58,9 @@ cm.setMessages('Com.Gridlist', {
   'actions': 'Действия'
 });
 cm.setMessages('Com.GridlistFilter', {
-  'placeholder': 'Впишите текст для поиска...'
+  'placeholder': 'Впишите текст для поиска...',
+  'search': '',
+  'clear': 'Очистить'
 });
 cm.setMessages('Com.MultipleField', {
   'add': 'Добавить',
