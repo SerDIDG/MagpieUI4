@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.17 ************ */
+/*! ************ MagpieUI4 v4.0.18 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1196,7 +1196,7 @@ else {
 })(Math);
 
 window.cm = {
-    '_version': '4.0.17',
+    '_version': '4.0.18',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -5297,7 +5297,12 @@ cm.createSvg = function(){
     var node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     node.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    node.setAttribute('version', '1.1');
+    return node;
+};
+
+cm.createSvgUse = function(href){
+    var node = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    node.setAttributeNS('http://www.w3.org/1999/xlink', 'href', href);
     return node;
 };
 
@@ -24680,6 +24685,12 @@ cm.define('Com.Tabset', {
 
         'adaptive' : true,
         'className' : '',
+        'classes' : {
+            'container' : [],
+            'tabs' : [],
+            'title' : [],
+            'content' : []
+        },
         'icons' : {
             'menu' : 'icon default linked'
         },
@@ -24754,6 +24765,11 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
             that.nodes['headerUL'] = cm.node('ul')
         );
         that.triggerEvent('onRenderViewProcess');
+        // Classes
+        cm.addClass(that.nodes['container'], that.params.classes?.container);
+        cm.addClass(that.nodes['headerTabs'], that.params.classes?.tabs);
+        cm.addClass(that.nodes['headerTitle'], that.params.classes?.title);
+        cm.addClass(that.nodes['content'], that.params.classes?.content);
         // Adaptive
         if(that.params['adaptive']){
             cm.addClass(that.nodes['container'], 'is-adaptive');
@@ -24765,11 +24781,14 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         }
         // Tabs positions
         cm.addClass(that.nodes['container'], ['is-tabs', that.params['tabsPosition']].join('-'));
+        cm.addClass(that.nodes['headerTabs'], ['is-tabs', that.params['tabsPosition']].join('-'));
         if(/top|bottom/.test(that.params['tabsPosition'])){
             cm.addClass(that.nodes['container'], ['is-tabs-pull', that.params['tabsAlign']].join('-'));
+            cm.addClass(that.nodes['headerTabs'], ['is-tabs-pull', that.params['tabsAlign']].join('-'));
         }
         if(that.params['tabsFlexible']){
             cm.addClass(that.nodes['container'], 'is-tabs-flexible');
+            cm.addClass(that.nodes['headerTabs'], 'is-tabs-flexible');
         }
         // Animate
         if(that.params['animateSwitch']){

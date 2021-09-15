@@ -4040,6 +4040,11 @@ cm.createSvg = function(){
     var node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     node.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    node.setAttribute('version', '1.1');
+    return node;
+};
+
+cm.createSvgUse = function(href){
+    var node = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    node.setAttributeNS('http://www.w3.org/1999/xlink', 'href', href);
     return node;
 };
