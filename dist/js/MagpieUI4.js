@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.18 ************ */
+/*! ************ MagpieUI4 v4.0.19 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1196,7 +1196,7 @@ else {
 })(Math);
 
 window.cm = {
-    '_version': '4.0.18',
+    '_version': '4.0.19',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -31012,7 +31012,6 @@ function(params){
         options = {},
         optionsList = [],
         optionsLength = 0,
-        groups = [],
 
         oldActive,
         active;
@@ -31538,6 +31537,13 @@ function(params){
             }else if(options[value]){
                 set(options[value], triggerEvents);
             }
+        }
+        return that;
+    };
+
+    that.setByIndex = function(index){
+        if(optionsLength){
+            set(optionsList[index] || optionsList[0]);
         }
         return that;
     };

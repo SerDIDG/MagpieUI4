@@ -61,7 +61,6 @@ function(params){
         options = {},
         optionsList = [],
         optionsLength = 0,
-        groups = [],
 
         oldActive,
         active;
@@ -587,6 +586,13 @@ function(params){
             }else if(options[value]){
                 set(options[value], triggerEvents);
             }
+        }
+        return that;
+    };
+
+    that.setByIndex = function(index){
+        if(optionsLength){
+            set(optionsList[index] || optionsList[0]);
         }
         return that;
     };
