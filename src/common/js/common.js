@@ -3671,8 +3671,7 @@ cm.ajax = function(o){
             'onError' : function(){},
             'onAbort' : function(){},
             'onResolve' : function(){},
-            'onReject': function(){},
-            'handler' : false
+            'onReject': function(){}
         }, o),
         successStatuses = [200, 201, 202, 204],
         variables = cm._getVariables(),
@@ -3800,6 +3799,7 @@ cm.ajax = function(o){
     var loadHandler = function(e){
         if(config['httpRequestObject'].readyState === 4){
             response = config['httpRequestObject'].response;
+            config['onEnd'](response, e);
             if(cm.inArray(successStatuses, config['httpRequestObject'].status)){
                 config['onSuccess'](response, e);
                 config['onResolve'](response, e);
@@ -3807,36 +3807,24 @@ cm.ajax = function(o){
                 config['onError'](response, e);
                 config['onReject'](response, e);
             }
-            deprecatedHandler(response);
-            config['onEnd'](response, e);
         }
     };
 
     var successHandler = function(){
+        config['onEnd'].apply(config['onEnd'], arguments);
         config['onSuccess'].apply(config['onSuccess'], arguments);
         config['onResolve'].apply(config['onResolve'], arguments);
-        deprecatedHandler.apply(deprecatedHandler, arguments);
-        config['onEnd'].apply(config['onEnd'], arguments);
     };
 
     var errorHandler = function(){
+        config['onEnd'].apply(config['onEnd'], arguments);
         config['onError'].apply(config['onError'], arguments);
         config['onReject'].apply(config['onReject'], arguments);
-        deprecatedHandler.apply(deprecatedHandler, arguments);
-        config['onEnd'].apply(config['onEnd'], arguments);
     };
 
     var abortHandler = function(){
-        config['onAbort'].apply(config['onAbort'], arguments);
-        deprecatedHandler.apply(deprecatedHandler, arguments);
         config['onEnd'].apply(config['onEnd'], arguments);
-    };
-
-    var deprecatedHandler = function(){
-        if(cm.isFunction(config['handler'])){
-            cm.errorLog({'type' : 'attention', 'name' : 'cm.ajax', 'message' : 'Parameter "handler" is deprecated. Use "onSuccess", "onError" or "onAbort" callbacks instead.'});
-            config['handler'].apply(config['handler'], arguments);
-        }
+        config['onAbort'].apply(config['onAbort'], arguments);
     };
 
     var sendJSONP = function(){
