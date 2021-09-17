@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.20 ************ */
+/*! ************ MagpieUI4 v4.0.21 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1196,7 +1196,7 @@ else {
 })(Math);
 
 window.cm = {
-    '_version': '4.0.20',
+    '_version': '4.0.21',
     '_lang': 'en',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
@@ -5704,6 +5704,7 @@ Mod.Params = {
         const that = this;
         replace = cm.isUndefined(replace) ? false : replace;
         that.params = cm.merge(replace ? that._raw.params : that.params, params);
+        that._params = replace ? params : cm.merge(that._params, params);
         that._update = cm.clone(that._update);
         that._update.params = cm.merge(that._update.params, that.params);
         // Validate params
@@ -11563,6 +11564,7 @@ function(params){
         // Init custom selects
         selects['years'] = new Com.Select({
                 'node' : nodes['years'],
+                'className' : ['select', 'years'],
                 'renderInBody' : that.params['renderSelectsInBody']
             })
             .set(current['year'])
@@ -11570,6 +11572,7 @@ function(params){
 
         selects['months'] = new Com.Select({
                 'node' : nodes['months'],
+                'className' : ['select', 'months'],
                 'renderInBody' : that.params['renderSelectsInBody']
             })
             .set(current['month'])
@@ -16804,7 +16807,11 @@ function(params){
     };
 
     that.send = function(){
-        var data = {
+        if(that.isProcess){
+            return that.abort();
+        }
+
+        let data = {
             'valid' : true
         };
         // Validate
@@ -24673,7 +24680,7 @@ cm.define('Com.Tabset', {
 
         'adaptive' : true,
         'className' : '',
-        'classes' : {
+        'componentClasses' : {
             'container' : [],
             'tabs' : [],
             'title' : [],
@@ -24754,10 +24761,10 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         );
         that.triggerEvent('onRenderViewProcess');
         // Classes
-        cm.addClass(that.nodes['container'], that.params.classes?.container);
-        cm.addClass(that.nodes['headerTabs'], that.params.classes?.tabs);
-        cm.addClass(that.nodes['headerTitle'], that.params.classes?.title);
-        cm.addClass(that.nodes['content'], that.params.classes?.content);
+        cm.addClass(that.nodes['container'], that.params.componentClasses?.container);
+        cm.addClass(that.nodes['headerTabs'], that.params.componentClasses?.tabs);
+        cm.addClass(that.nodes['headerTitle'], that.params.componentClasses?.title);
+        cm.addClass(that.nodes['content'], that.params.componentClasses?.content);
         // Adaptive
         if(that.params['adaptive']){
             cm.addClass(that.nodes['container'], 'is-adaptive');
@@ -26272,16 +26279,19 @@ cm.define('Com.Autocomplete', {
             'url' : '',                                             // Request URL. Variables: %baseUrl%, %query%, %callback%.
             'params' : ''                                           // Params object. Variables: %baseUrl%, %query%, %callback%.
         },
-        'classes' : {
-            'list' : 'pt__list',
-            'listItem' : 'pt__list__item'
+        'componentClasses' : {
+            'list' : ['pt__list',],
+            'listItem' : ['pt__list__item',],
+            'tooltip' : [],
         },
         'icons' : {
             'search' : 'icon default linked'
         },
-        'Com.Tooltip' : {
+        'tooltipConstructor' : 'Com.Tooltip',
+        'tooltipParams' : {
             'hideOnOut' : true,
             'targetEvent' : 'none',
+            'classes' : [],
             'width' : 'targetWidth',
             'top' : 'targetHeight + 4'
         }
@@ -26342,30 +26352,29 @@ function(params){
         // Input
         that.params['disabled'] = that.params['node'].disabled || that.params['node'].readOnly || that.params['disabled'];
         // Tooltip
-        that.params['Com.Tooltip']['classes'] = [
-            'com__ac-tooltip',
-            [that.params['className'], 'tooltip'].join('__')
-        ];
+        that.params['tooltipParams']['classes'] = cm.extend(that.params['componentClasses']['tooltip'], that.params['tooltipParams']['classes']);
     };
 
     var render = function(){
         // Init tooltip
-        that.components['tooltip'] = new Com.Tooltip(
-            cm.merge(that.params['Com.Tooltip'], {
-                'container' : that.params['container'],
-                'target' : that.params['target'],
-                'events' : {
-                    'onShowStart' : function(){
-                        that.isOpen = true;
-                        cm.addEvent(document, 'mousedown', bodyEvent);
-                    },
-                    'onHideStart' : function(){
-                        that.isOpen = false;
-                        cm.removeEvent(document, 'mousedown', bodyEvent);
+        cm.getConstructor(that.params['tooltipConstructor'], function(ClassConstructor){
+            that.components['tooltip']  = new ClassConstructor(
+                cm.merge(that.params['tooltipParams'], {
+                    'container' : that.params['container'],
+                    'target' : that.params['target'],
+                    'events' : {
+                        'onShowStart' : function(){
+                            that.isOpen = true;
+                            cm.addEvent(document, 'mousedown', bodyEvent);
+                        },
+                        'onHideStart' : function(){
+                            that.isOpen = false;
+                            cm.removeEvent(document, 'mousedown', bodyEvent);
+                        }
                     }
-                }
-            })
-        );
+                })
+            );
+        });
         // Set input
         that.setInput(that.params['node']);
         // Set
@@ -26948,7 +26957,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
 
     classProto.callbacks.renderListStructure = function(that, params){
         var nodes = {};
-        nodes['container'] = cm.node('div', {'class' : that.params['classes']['list']},
+        nodes['container'] = cm.node('div', {'class' : that.params['componentClasses']['list']},
             nodes['items'] = cm.node('ul')
         );
         return nodes;
@@ -26959,7 +26968,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
         item['nodes'] = that.callbacks.renderItemStructure(that, params, item);
         that.params['listItemNowrap'] && cm.addClass(item['nodes']['container'], 'is-nowrap');
         // Highlight selected option
-        if(that.value == item['data']['value']){
+        if(that.value === item['data']['value']){
             cm.addClass(item['nodes']['container'], 'active');
             that.selectedItemIndex = item['i'];
         }
@@ -26971,7 +26980,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
 
     classProto.callbacks.renderItemStructure = function(that, params, item){
         var nodes = {};
-        nodes['container'] = cm.node('li', {'class' : that.params['classes']['listItem']},
+        nodes['container'] = cm.node('li', {'class' : that.params['componentClasses']['listItem']},
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'content', 'innerHTML' : item['data']['text']})
             )
@@ -26996,7 +27005,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
     classProto.callbacks.renderLoaderItemStructure = function(that, params){
         var nodes = {};
         // Structure
-        nodes['container'] = cm.node('li', {'class' : that.params['classes']['listItem']},
+        nodes['container'] = cm.node('li', {'class' : that.params['componentClasses']['listItem']},
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'content'},
                     cm.node('span', {'class' : 'icon small cm-ia__spinner'}),
@@ -27065,7 +27074,7 @@ cm.getConstructor('Com.Autocomplete', function(classConstructor, className, clas
     classProto.callbacks.renderListSuggestionItemStructure = function(that, params, item){
         var nodes = {};
         // Structure
-        nodes['container'] = cm.node('li', {'class' : that.params['classes']['listItem']},
+        nodes['container'] = cm.node('li', {'class' : that.params['componentClasses']['listItem']},
             cm.node('div', {'class' : 'inner'},
                 cm.node('div', {'class' : 'content'},
                     cm.node('span', {'class' : 'icon small add'}),

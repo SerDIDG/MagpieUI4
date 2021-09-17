@@ -66,13 +66,13 @@
     }
 
     &:hover,
+    &:focus,
     &.hover {
         text-decoration: none;
         .mx__transition(all, @CmUI-Transition-DurationReverse);
     }
 
     &:active,
-    &:focus,
     &.active {
         text-decoration: none;
         background-color: @CmColor-Primary-LightActive;
@@ -80,12 +80,12 @@
 
     &:not(.disabled) {
         &:hover,
+        &:focus,
         &.hover {
             background-color: @CmColor-Secondary-LightHover;
         }
 
         &:active,
-        &:focus,
         &.active {
             &:hover,
             &.hover {

@@ -49,7 +49,7 @@ cm.define('Com.Tabset', {
 
         'adaptive' : true,
         'className' : '',
-        'classes' : {
+        'componentClasses' : {
             'container' : [],
             'tabs' : [],
             'title' : [],
@@ -130,10 +130,10 @@ cm.getConstructor('Com.Tabset', function(classConstructor, className, classProto
         );
         that.triggerEvent('onRenderViewProcess');
         // Classes
-        cm.addClass(that.nodes['container'], that.params.classes?.container);
-        cm.addClass(that.nodes['headerTabs'], that.params.classes?.tabs);
-        cm.addClass(that.nodes['headerTitle'], that.params.classes?.title);
-        cm.addClass(that.nodes['content'], that.params.classes?.content);
+        cm.addClass(that.nodes['container'], that.params.componentClasses?.container);
+        cm.addClass(that.nodes['headerTabs'], that.params.componentClasses?.tabs);
+        cm.addClass(that.nodes['headerTitle'], that.params.componentClasses?.title);
+        cm.addClass(that.nodes['content'], that.params.componentClasses?.content);
         // Adaptive
         if(that.params['adaptive']){
             cm.addClass(that.nodes['container'], 'is-adaptive');

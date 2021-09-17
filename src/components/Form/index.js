@@ -884,7 +884,11 @@ function(params){
     };
 
     that.send = function(){
-        var data = {
+        if(that.isProcess){
+            return that.abort();
+        }
+
+        let data = {
             'valid' : true
         };
         // Validate

@@ -173,6 +173,7 @@ Mod.Params = {
         const that = this;
         replace = cm.isUndefined(replace) ? false : replace;
         that.params = cm.merge(replace ? that._raw.params : that.params, params);
+        that._params = replace ? params : cm.merge(that._params, params);
         that._update = cm.clone(that._update);
         that._update.params = cm.merge(that._update.params, that.params);
         // Validate params

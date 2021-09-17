@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/*! ************ MagpieUI4 v4.0.20 ************ */
+/*! ************ MagpieUI4 v4.0.21 ************ */
 /*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -4282,8 +4282,8 @@ span.CodeMirror-selectedtext {
 }
 @font-face {
   font-family: 'Magpie-UI-Glyphs';
-  src: url('../fonts/Magpie-UI-Glyphs.eot?4.0.20');
-  src: url('../fonts/Magpie-UI-Glyphs.eot?#iefix4.0.20') format('embedded-opentype'), url('../fonts/Magpie-UI-Glyphs.woff?4.0.20') format('woff'), url('../fonts/Magpie-UI-Glyphs.ttf?4.0.20') format('truetype'), url('../fonts/Magpie-UI-Glyphs.svg?4.0.20#Magpie-UI-Glyphs') format('svg');
+  src: url('../fonts/Magpie-UI-Glyphs.eot?4.0.21');
+  src: url('../fonts/Magpie-UI-Glyphs.eot?#iefix4.0.21') format('embedded-opentype'), url('../fonts/Magpie-UI-Glyphs.woff?4.0.21') format('woff'), url('../fonts/Magpie-UI-Glyphs.ttf?4.0.21') format('truetype'), url('../fonts/Magpie-UI-Glyphs.svg?4.0.21#Magpie-UI-Glyphs') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -9528,26 +9528,25 @@ button::-moz-focus-inner {
   text-overflow: ellipsis;
 }
 .pt__list__item:hover,
+.pt__list__item:focus,
 .pt__list__item.hover {
   text-decoration: none;
   -webkit-transition: all 100ms ease-in-out 0ms;
   transition: all 100ms ease-in-out 0ms;
 }
 .pt__list__item:active,
-.pt__list__item:focus,
 .pt__list__item.active {
   text-decoration: none;
   background-color: hsl(210, 70%, 91%);
 }
 .pt__list__item:not(.disabled):hover,
+.pt__list__item:not(.disabled):focus,
 .pt__list__item:not(.disabled).hover {
   background-color: hsl(0, 0%, 95%);
 }
 .pt__list__item:not(.disabled):active:hover,
-.pt__list__item:not(.disabled):focus:hover,
 .pt__list__item:not(.disabled).active:hover,
 .pt__list__item:not(.disabled):active.hover,
-.pt__list__item:not(.disabled):focus.hover,
 .pt__list__item:not(.disabled).active.hover {
   background-color: hsl(210, 70%, 86%);
 }

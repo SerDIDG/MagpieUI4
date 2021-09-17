@@ -103,6 +103,7 @@ function(params){
         // Init custom selects
         selects['years'] = new Com.Select({
                 'node' : nodes['years'],
+                'className' : ['select', 'years'],
                 'renderInBody' : that.params['renderSelectsInBody']
             })
             .set(current['year'])
@@ -110,6 +111,7 @@ function(params){
 
         selects['months'] = new Com.Select({
                 'node' : nodes['months'],
+                'className' : ['select', 'months'],
                 'renderInBody' : that.params['renderSelectsInBody']
             })
             .set(current['month'])
