@@ -783,7 +783,7 @@ function(params){
     };
 
     var renderCellNumber = function(config, row, item){
-        item['nodes']['inner'].innerHTML = cm.splitNumber(item['text']);
+        item['nodes']['inner'].innerHTML = cm.formatNumber(item['text']);
     };
 
     var renderCellDate = function(config, row, item){

@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.21 ************ */
+/*! ************ MagpieUI4 v4.0.22 ************ */
 @charset "UTF-8";/*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -4849,7 +4849,7 @@ span.CodeMirror-selectedtext { background: none; }
 @CmIconIA-Spinner-BorderSize: 3px;
 @CmIconIA-Spinner-DefaultBackground: @CmColor-Secondary-LightActive;
 @CmIconIA-Spinner-ActiveBackground: @CmColor-Primary-DarkDefault;
-@CmVersion: '4.0.21';
+@CmVersion: '4.0.22';
 @CmProtocol: '';
 
 // /* ******* SCREEN TYPES ******* */
@@ -10085,7 +10085,6 @@ button {
     &:active,
     &.active {
         text-decoration: none;
-        background-color: @CmColor-Primary-LightActive;
     }
 
     &:not(.disabled) {
@@ -10097,6 +10096,8 @@ button {
 
         &:active,
         &.active {
+            background-color: @CmColor-Primary-LightActive;
+
             &:hover,
             &.hover {
                 background-color: @CmColor-Primary-LightActiveHover;

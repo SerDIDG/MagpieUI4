@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.21 ************ */
+/*! ************ MagpieUI4 v4.0.22 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1196,8 +1196,9 @@ else {
 })(Math);
 
 window.cm = {
-    '_version': '4.0.21',
+    '_version': '4.0.22',
     '_lang': 'en',
+    '_locale' : 'en-IN',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
     '_isDocumentLoad': false,
@@ -3299,20 +3300,21 @@ cm.cutHTML = function(str){
     return str.replace(/<[^>]*>/g, '');
 };
 
-cm.splitNumber = function(str){
-    return str.toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ');
+cm.formatNumber = function(number, locale, params){
+    locale = !cm.isEmpty(locale) ? locale : cm._locale;
+    return new Intl.NumberFormat(locale, params).format(number);
 };
 
-cm.getPercentage = function(num, total){
-    return num / total / 100;
+cm.getPercentage = function(number, total){
+    return number / total / 100;
 };
 
 cm.rand = function(min, max){
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-cm.isEven = function(num){
-    return /^(.*)(0|2|4|6|8)$/.test(num);
+cm.isEven = function(number){
+    return /^(.*)(0|2|4|6|8)$/.test(number);
 };
 
 cm.addLeadZero = function(x){
@@ -19023,7 +19025,7 @@ function(params){
     };
 
     var renderCellNumber = function(config, row, item){
-        item['nodes']['inner'].innerHTML = cm.splitNumber(item['text']);
+        item['nodes']['inner'].innerHTML = cm.formatNumber(item['text']);
     };
 
     var renderCellDate = function(config, row, item){

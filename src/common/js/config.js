@@ -1,6 +1,7 @@
 window.cm = {
     '_version': '@@VERSION',
     '_lang': 'en',
+    '_locale' : 'en-IN',
     '_loadTime': Date.now(),
     '_isDocumentReady': false,
     '_isDocumentLoad': false,
