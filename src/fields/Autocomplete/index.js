@@ -53,15 +53,21 @@ cm.define('Com.Autocomplete', {
         'suggestionQueryName' : 'text',
         'responseKey' : 'data',                                     // Instead of using filter callback, you can provide response array key
         'preloadData' : false,
-        'request' : {
+        'list' : {
             'type' : 'json',
-            'method' : 'get',
+            'method' : 'GET',
             'url' : '',                                             // Request URL. Variables: %baseUrl%, %query%, %callback%.
             'params' : ''                                           // Params object. Variables: %baseUrl%, %query%, %callback%.
         },
+        'read' : {
+            'type' : 'json',
+            'method' : 'GET',
+            'url' : '',                                             // Request URL. Variables: %baseUrl%, %id%, %callback%.
+            'params' : ''                                           // Params object. Variables: %baseUrl%, %id%, %callback%.
+        },
         'componentClasses' : {
-            'list' : ['pt__list',],
-            'listItem' : ['pt__list__item',],
+            'list' : ['pt__list'],
+            'listItem' : ['pt__list__item'],
             'tooltip' : [],
         },
         'icons' : {
@@ -123,7 +129,7 @@ function(params){
             that.params['target'] = that.params['node'];
         }
         // If URL parameter exists, use request
-        that.isRequest = !cm.isEmpty(that.params['request']['url']);
+        that.isRequest = !cm.isEmpty(that.params['list']['url']);
         // Prepare data
         that.params['data'] = cm.merge(that.params['data'], that.params['options']);
         that.params['data'] = that.callbacks.convert(that, that.params['data']);
@@ -220,7 +226,7 @@ function(params){
 
     var requestHandler = function(){
         var query = that.params['node'].value.trim(),
-            config = cm.clone(that.params['request']),
+            config = cm.clone(that.params['list']),
             delay = that.params['showListOnEmpty'] && cm.isEmpty(query) ? 0 : that.params['delay'];
         // Clear tooltip ajax/static delay and filtered items list
         that.valueText = query;
