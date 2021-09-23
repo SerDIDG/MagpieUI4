@@ -61,6 +61,7 @@ function(params){
         options = {},
         optionsList = [],
         optionsLength = 0,
+        groups = [],
 
         oldActive,
         active;
@@ -750,9 +751,11 @@ function(params){
 
     that.toggleError = function(value){
         if(value === true){
-            cm.addClass(that.params['node'], 'input-error');
+            cm.addClass(nodes['container'], 'error');
+            cm.addClass(nodes['text'], 'input-error');
         }else {
-            cm.removeClass(that.params['node'], 'input-error');
+            cm.removeClass(nodes['container'], 'error');
+            cm.removeClass(nodes['text'], 'input-error');
         }
         return that;
     };

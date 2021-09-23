@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.23 ************ */
+/*! ************ MagpieUI4 v4.0.24 ************ */
 // TinyColor v1.4.2
 // https://github.com/bgrins/TinyColor
 // Brian Grinstead, MIT License
@@ -1196,7 +1196,7 @@ else {
 })(Math);
 
 window.cm = {
-    '_version': '4.0.23',
+    '_version': '4.0.24',
     '_lang': 'en',
     '_locale' : 'en-IN',
     '_loadTime': Date.now(),
@@ -8461,33 +8461,32 @@ cm.getConstructor('Com.AbstractFormField', function(classConstructor, className,
 });
 
 cm.define('Com.AbstractInputContainer', {
-    'extend' : 'Com.AbstractController',
-    'events' : [
+    extend: 'Com.AbstractController',
+    events: [
         'onRenderControllerStart',
         'onRenderControllerProcess',
         'onRenderController',
         'onRenderControllerEnd',
         'onSelect',
         'onChange',
-        'onReset'
+        'onReset',
     ],
-    'params' : {
-        'renderStructure' : false,
-        'embedStructureOnRender' : false,
-        'controllerEvents' : true,
-        'constructor' : 'Com.AbstractInput',
-        'params' : {}
-    }
+    params: {
+        renderStructure: false,
+        embedStructureOnRender: false,
+        controllerEvents: true,
+        constructor: 'Com.AbstractInput',
+        params: {},
+    },
 },
-function(params){
-    var that = this;
-    // Call parent class construct
-    Com.AbstractController.apply(that, arguments);
+function() {
+    Com.AbstractController.apply(this, arguments);
 });
 
-cm.getConstructor('Com.AbstractInputContainer', function(classConstructor, className, classProto, classInherit){
-    classProto.construct = function(){
-        var that = this;
+cm.getConstructor('Com.AbstractInputContainer', function(classConstructor, className, classProto, classInherit) {
+    classProto.construct = function() {
+        const that = this;
+        // Binds
         that.resetHandler = that.reset.bind(that);
         that.enableHandler = that.enable.bind(that);
         that.disableHandler = that.disable.bind(that);
@@ -8495,91 +8494,106 @@ cm.getConstructor('Com.AbstractInputContainer', function(classConstructor, class
         classInherit.prototype.construct.apply(that, arguments);
     };
 
-    classProto.onValidateParams = function(){
-        var that = this;
-        that.components['formField'] = that.params['formField'];
-        that.components['form'] = that.params['form'];
+    classProto.onValidateParams = function() {
+        const that = this;
+        that.components.formField = that.params.formField;
+        that.components.form = that.params.form;
     };
 
-    classProto.renderViewModel = function(){
-        var that = this;
-        // Render Select
+    classProto.renderViewModel = function() {
+        const that = this;
         that.renderController();
-        return that;
     };
 
-    classProto.renderController = function(){
-        var that = this,
-            params;
-        cm.getConstructor(that.params['constructor'], function(classConstructor){
+    classProto.renderController = function() {
+        const that = this;
+        cm.getConstructor(that.params.constructor, (ClassConstructor) => {
             that.triggerEvent('onRenderControllerStart');
-            params = that.validateControllerParams();
-            that.components['controller'] = new classConstructor(params);
-            that.triggerEvent('onRenderControllerProcess', that.components['controller']);
+            let params = that.validateControllerParams();
+            that.components.controller = new ClassConstructor(params);
+            that.triggerEvent('onRenderControllerProcess', that.components.controller);
             that.renderControllerEvents();
-            that.triggerEvent('onRenderController', that.components['controller']);
-            that.triggerEvent('onRenderControllerEnd', that.components['controller']);
+            that.triggerEvent('onRenderController', that.components.controller);
+            that.triggerEvent('onRenderControllerEnd', that.components.controller);
         });
     };
 
-    classProto.validateControllerParams = function(){
-        var that = this;
-        return cm.merge(that.params['params'], {
-            'node' : that.params['node'],
-            'value' : that.params['value'],
-            'defaultValue' : that.params['defaultValue']
+    classProto.validateControllerParams = function() {
+        const that = this;
+        return cm.merge(that.params.constructorParams, {
+            node: that.params.node,
+            value: that.params.value,
+            defaultValue: that.params.defaultValue,
         });
     };
 
-    classProto.renderControllerEvents = function(){
+    classProto.renderControllerEvents = function() {
         var that = this;
-        that.components['controller'].addEvent('onSelect', function(controller, data){
+        that.components.controller.addEvent('onSelect', (Controller, data) => {
             that.triggerEvent('onSelect', data);
         });
-        that.components['controller'].addEvent('onChange', function(controller, data){
+        that.components.controller.addEvent('onChange', (Controller, data) => {
             that.triggerEvent('onChange', data);
         });
-        that.components['controller'].addEvent('onReset', function(controller, data){
+        that.components.controller.addEvent('onReset', (Controller, data) => {
             that.triggerEvent('onReset', data);
         });
-        return that;
     };
 
     /******* PUBLIC *******/
 
-    classProto.set = function(value){
+    classProto.set = function(value) {
         var that = this;
-        that.components['controller'] && cm.isFunction(that.components['controller'].set) && that.components['controller'].set(value);
+        cm.isFunction(that.components.controller?.set) && that.components.controller.set(value);
         return that;
     };
 
-    classProto.get = function(){
+    classProto.get = function() {
         var that = this;
-        return that.components['controller'] && cm.isFunction(that.components['controller'].get)  && that.components['controller'].get();
+        return cm.isFunction(that.components.controller?.get) && that.components.controller.get();
     };
 
-    classProto.getRaw = function(){
+    classProto.getRaw = function() {
         var that = this;
-        return that.components['controller'] && cm.isFunction(that.components['controller'].getRaw)  && that.components['controller'].getRaw() || that.get();
+        return cm.isFunction(that.components.controller?.getRaw) && that.components.controller.getRaw() || that.get();
     };
 
-    classProto.reset = function(){
+    classProto.reset = function() {
         var that = this;
-        return that.components['controller'] && cm.isFunction(that.components['controller'].reset)  && that.components['controller'].reset();
+        return cm.isFunction(that.components.controller?.reset) && that.components.controller.reset();
     };
 
-    classProto.enable = function(){
+    classProto.enable = function() {
         var that = this;
-        that.components['controller'] && cm.isFunction(that.components['controller'].enable)  && that.components['controller'].enable();
+        cm.isFunction(that.components.controller?.enable) && that.components.controller.enable();
         return that;
     };
 
-    classProto.disable = function(){
+    classProto.disable = function() {
         var that = this;
-        that.components['controller'] && cm.isFunction(that.components['controller'].disable)  && that.components['controller'].disable();
+        cm.isFunction(that.components.controller?.disable) && that.components.controller.disable();
+        return that;
+    };
+
+    classProto.blur = function() {
+        var that = this;
+        cm.isFunction(that.components.controller?.enable) && that.components.controller.enable();
+        return that;
+    };
+
+    classProto.focus = function() {
+        var that = this;
+        cm.isFunction(that.components.controller?.enable) && that.components.controller.enable();
+        return that;
+    };
+
+    classProto.toggleError = function(value) {
+        var that = this;
+        cm.isFunction(that.components.controller?.toggleError) && that.components.controller.toggleError(value);
         return that;
     };
 });
+
 cm.define('Com.AbstractInput', {
     'extend' : 'Com.AbstractController',
     'events' : [
@@ -31017,6 +31031,7 @@ function(params){
         options = {},
         optionsList = [],
         optionsLength = 0,
+        groups = [],
 
         oldActive,
         active;
@@ -31706,9 +31721,11 @@ function(params){
 
     that.toggleError = function(value){
         if(value === true){
-            cm.addClass(that.params['node'], 'input-error');
+            cm.addClass(nodes['container'], 'error');
+            cm.addClass(nodes['text'], 'input-error');
         }else {
-            cm.removeClass(that.params['node'], 'input-error');
+            cm.removeClass(nodes['container'], 'error');
+            cm.removeClass(nodes['text'], 'input-error');
         }
         return that;
     };
