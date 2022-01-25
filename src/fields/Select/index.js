@@ -350,6 +350,13 @@ function(params){
         nodes['hidden'].appendChild(item['optgroup']);
         // Push to groups array
         groups.push(item);
+        return item;
+    };
+
+    var getGroup = function(name){
+        return groups.find(function(item){
+            return item.name === name;
+        });
     };
 
     /* *** OPTIONS *** */
@@ -370,8 +377,17 @@ function(params){
         if(options[item['value']]){
             removeOption(options[item['value']]);
         }
-        // Add link to group
-        item['group'] = group;
+        // Add link to a group
+        if(!cm.isEmpty(item['group'])){
+            item['_group'] = getGroup(item['group']);
+            if(!item['_group']){
+                item['_group'] = renderGroup(item['group']);
+            }
+        }
+        if(!cm.isUndefined(group)){
+            item['_group'] = group;
+            item['group'] = group['name'];
+        }
         // Structure
         item['node'] = cm.node('li', {'class' : item['className']},
             cm.node('a', {'innerHTML' : item['text'], 'title' : item['text']})
@@ -388,9 +404,9 @@ function(params){
         item['hidden'] && cm.addClass(item['node'], 'hidden');
         item['disabled'] && cm.addClass(item['node'], 'disabled');
         // Append
-        if(group){
-            group['items'].appendChild(item['node']);
-            group['optgroup'].appendChild(item['option']);
+        if(item['_group']){
+            item['_group']['items'].appendChild(item['node']);
+            item['_group']['optgroup'].appendChild(item['option']);
         }else{
             nodes['items'].appendChild(item['node']);
             nodes['hidden'].appendChild(item['option']);
@@ -402,7 +418,7 @@ function(params){
         if(item['select']){
             set(item, false);
         }
-        return true;
+        return item;
     };
 
     var editOption = function(option, text){
@@ -478,7 +494,7 @@ function(params){
             cm.removeClass(item['node'], 'active');
         });
         if(option['group']){
-            nodes['text'].value = [cm.decode(option['group']['name']), cm.decode(option['text'])].join(' > ');
+            nodes['text'].value = [cm.decode(option['group']), cm.decode(option['text'])].join(' > ');
         }else{
             nodes['text'].value = cm.decode(option['text']);
         }

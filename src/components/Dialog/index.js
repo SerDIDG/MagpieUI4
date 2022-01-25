@@ -40,6 +40,7 @@ cm.define('Com.Dialog', {
         'closeButtonOutside' : false,
         'closeButton' : true,
         'closeOnBackground' : true,
+        'closeOnEsc' : true,
         'buttons' : false,
         'showHelp' : false,
         'help' : '',
@@ -123,7 +124,7 @@ function(params){
 
     var render = function(){
         // Structure
-        nodes['container'] = cm.node('div', {'class' : 'com__dialog'},
+        nodes['container'] = cm.node('div', {'class' : 'com__dialog', 'role' : 'dialog'},
             nodes['bg'] = cm.node('div', {'class' : 'bg'}),
             nodes['window'] = cm.node('div', {'class' : 'com__dialog__window window'},
                 nodes['windowInner'] = cm.node('div', {'class' : 'inner'})
@@ -154,7 +155,11 @@ function(params){
         // Render close button
         if(that.params['closeButtonOutside']){
             nodes['bg'].appendChild(
-                nodes['closeOutside'] = cm.node('div', {'class' : that.params['icons']['closeOutside'], 'title' : that.message('closeTitle')}, that.message('close'))
+                nodes['closeOutside'] = cm.node('div', {
+                    'class' : that.params['icons']['closeOutside'],
+                    'title' : that.message('closeTitle'),
+                    'role' : 'button'
+                }, that.message('close'))
             );
             cm.addEvent(nodes['closeOutside'], 'click', close);
         }
@@ -162,7 +167,11 @@ function(params){
             cm.addClass(nodes['container'], 'has-close-inside');
             cm.addClass(nodes['window'], 'has-close-inside');
             nodes['window'].appendChild(
-                nodes['closeInside'] = cm.node('div', {'class' : that.params['icons']['closeInside'], 'title' : that.message('closeTitle')}, that.message('close'))
+                nodes['closeInside'] = cm.node('div', {
+                    'class' : that.params['icons']['closeInside'],
+                    'title' : that.message('closeTitle'),
+                    'role' : 'button'
+                }, that.message('close'))
             );
             cm.addEvent(nodes['closeInside'], 'click', close);
         }
@@ -208,7 +217,7 @@ function(params){
             // Remove old nodes
             cm.remove(nodes['title']);
             // Render new nodes
-            nodes['title'] = cm.node('div', {'class' : 'title'});
+            nodes['title'] = cm.node('div', {'class' : 'title', 'role' : 'heading'});
             if(!cm.isEmpty(title)){
                 if(cm.isNode(title)){
                     cm.appendChild(title, nodes['title']);
@@ -483,10 +492,12 @@ function(params){
     };
 
     var windowClickEvent = function(e){
-        // ESC key
-        if(cm.isKey(e, 'escape')){
-            that.isFocus && close();
-        }
+        // Close dialog when ESC key pressed
+        cm.handleKey(e, 'escape', function(){
+            if(that.params.closeOnEsc && that.isFocus){
+                close();
+            }
+        });
     };
 
     var clearResizeInterval = function(){

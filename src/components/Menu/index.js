@@ -15,15 +15,17 @@ cm.define('Com.Menu', {
         'event' : 'hover',
         'top' : 'targetHeight',
         'left' : 0,
+        'adaptiveFrom' : null,
+        'adaptiveTop' : null,
+        'adaptiveLeft' : null,
         'minWidth' : 'targetWidth',
         'tooltipConstructor' : 'Com.Tooltip',
         'tooltipParams' : {
-            'classes' : ['com__menu-tooltip'],
+            'className' : 'com__menu-tooltip',
             'targetEvent' : 'hover',
             'hideOnReClick' : true,
             'theme' : null,
-            'hold' : true,
-            'holdMethod' : 'prepend'
+            'hold' : true
         }
     }
 },
@@ -49,9 +51,12 @@ function(params){
 
     var validateParams = function(){
         that.params['tooltipParams']['targetEvent'] = that.params['event'];
+        that.params['tooltipParams']['minWidth'] = that.params['minWidth'];
         that.params['tooltipParams']['top'] = that.params['top'];
         that.params['tooltipParams']['left'] = that.params['left'];
-        that.params['tooltipParams']['minWidth'] = that.params['minWidth'];
+        that.params['tooltipParams']['adaptiveFrom'] = that.params['adaptiveFrom'];
+        that.params['tooltipParams']['adaptiveTop'] = that.params['adaptiveTop'];
+        that.params['tooltipParams']['adaptiveLeft'] = that.params['adaptiveLeft'];
     };
 
     var render = function(){

@@ -112,7 +112,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         that.triggerEvent('onRender');
         that.triggerEvent('onRenderEnd');
         that.triggerEvent('onConstructEnd');
-        return that;
     };
 
     classProto.destruct = function(){
@@ -131,7 +130,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
             that.removeFromStack();
             that.triggerEvent('onDestructEnd');
         }
-        return that;
     };
 
     classProto.redraw = function(params){
@@ -152,7 +150,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
                 });
                 break;
         }
-        return that;
     };
 
     classProto.scroll = function(params){
@@ -164,7 +161,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
                 that.triggerEvent('onScroll');
             });
         }
-        return that;
     };
 
     classProto.bindControllerEvents = function(){
@@ -178,14 +174,12 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
             }
             that.addEvent(name, that[name + 'Handler']);
         });
-        return that;
     };
 
     classProto.initComponents = function(){
         var that = this;
         that.triggerEvent('onInitComponentsStart');
         that.triggerEvent('onInitComponentsEnd');
-        return that;
     };
 
     classProto.validateParams = function(){
@@ -194,7 +188,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         that.triggerEvent('onValidateParams');
         that.triggerEvent('onValidateParamsProcess');
         that.triggerEvent('onValidateParamsEnd');
-        return that;
     };
 
     classProto.render = function(){
@@ -213,7 +206,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
                 that.redraw(that.params['redrawOnRender'])
             }
         }
-        return that;
     };
 
     classProto.renderView = function(){
@@ -222,19 +214,16 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
         that.nodes['container'] = cm.node('div', {'class' : 'com__abstract'});
         that.triggerEvent('onRenderViewProcess');
         that.triggerEvent('onRenderViewEnd');
-        return that;
     };
 
     classProto.renderViewModel = function(){
         var that = this;
         that.triggerEvent('onRenderViewModel');
-        return that;
     };
 
     classProto.setAttributes = function(){
         var that = this;
         cm.addClass(that.nodes['container'], that.params['className']);
-        return that;
     };
 
     classProto.setEvents = function(){
@@ -252,7 +241,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
             that.triggerEvent('onSetCustomEvents');
         }
         that.triggerEvent('onSetEventsEnd');
-        return that;
     };
 
     classProto.unsetEvents = function(){
@@ -270,7 +258,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
             that.triggerEvent('onUnsetCustomEvents');
         }
         that.triggerEvent('onUnsetEventsEnd');
-        return that;
     };
 
     classProto.constructCollector = function(node){
@@ -285,7 +272,6 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
                 });
             }
         }
-        return that;
     };
 
     classProto.destructCollector = function(node){
@@ -300,6 +286,5 @@ cm.getConstructor('Com.AbstractController', function(classConstructor, className
                 });
             }
         }
-        return that;
     };
 });

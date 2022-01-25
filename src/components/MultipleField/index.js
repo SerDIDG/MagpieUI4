@@ -325,7 +325,7 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
             that.processItem(item, {
                 'triggerEvents' : params['triggerEvents'],
                 'immediately' : params['immediately'],
-                'callback' : function(){
+                'callback' : function(item){
                     params['triggerEvents'] && that.triggerEvent('onItemAddEnd', item);
                     params['callback'](item);
                 }
@@ -413,6 +413,7 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
         var that = this;
         params = cm.merge({
             'triggerEvents' : true,
+            'immediately' : false,
             'callback' : function(){}
         }, params);
         // Remove sortable item
@@ -420,12 +421,13 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
             that.components['sortable'].removeItem(item['container']);
         }
         // Remove from array
-        that.items.splice(that.items.indexOf(item), 1);
+        that.items = cm.arrayRemove(that.items, item);
         that.resetIndexes();
         // Toggle item visibility
         params['triggerEvents'] && that.triggerEvent('onItemRemove', item);
         that.hideItem(item, {
             'triggerEvents' : params['triggerEvents'],
+            'immediately' : params['immediately'],
             'callback' : function(){
                 cm.remove(item['container']);
                 params['triggerEvents'] && that.triggerEvent('onItemRemoveEnd', item);
@@ -585,11 +587,11 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
 
     /* ******* PUBLIC ******* */
 
-    classProto.clear = function(){
+    classProto.clear = function(params){
         var that = this;
-        cm.forEach(that.items, function(item){
-            that.deleteItem(item);
-        });
+        while(that.items.length){
+            that.deleteItem(that.items[0], params);
+        }
         return that;
     };
 
@@ -604,6 +606,15 @@ cm.getConstructor('Com.MultipleField', function(classConstructor, className, cla
         if(cm.isNumber(item) && that.items[item]){
             that.deleteItem(that.items[item], params);
         }else if(cm.inArray(that.items, item)){
+            that.deleteItem(item, params);
+        }
+        return that;
+    };
+
+    classProto.removeItemById = function(id, params){
+        var that = this,
+            item = that.getItemById(id);
+        if(item){
             that.deleteItem(item, params);
         }
         return that;

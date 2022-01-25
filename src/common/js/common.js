@@ -1943,25 +1943,34 @@ cm.decode = (function(){
     };
 })();
 
-cm.copyToClipboard = (function(){
-    var node, success;
-    return function(text, callback){
-        callback = cm.isFunction(callback) ? callback : function(){};
-        if(!node){
-            node = cm.node('textarea', {'class' : 'cm__textarea-clipboard'});
-            cm.insertFirst(node, document.body);
-        }
-        if(!cm.isEmpty(text)){
-            node.value = text;
-            node.select();
-            success = document.execCommand('copy');
-            if(!success){
-                cm.errorLog({'type' : 'error', 'name' : 'cm.copyToClipboard', 'message' : 'Unable to copy text to clipboard!'});
-            }
-            callback(success);
-        }
-    };
-})();
+cm.copyToClipboard = function(text, callback){
+    var node, successful;
+
+    if(cm.isEmpty(text)){
+        return;
+    }
+
+    node = cm.node('textarea');
+    node.value = text;
+    cm.appendChild(node, document.body);
+
+    node.select();
+    successful = document.execCommand( 'copy' );
+    cm.remove(node);
+
+    if(!successful){
+        cm.errorLog({'type' : 'error', 'name' : 'cm.copyToClipboard', 'message' : 'Unable to copy text to clipboard!'});
+    }
+    cm.isFunction(callback) && callback(successful);
+};
+
+cm.share = function(data){
+    try {
+        navigator.share(data)
+    } catch(err) {
+        cm.errorLog({'type' : 'error', 'name' : 'cm.share', 'message' : 'Unable to share text!'});
+    }
+};
 
 cm.RegExpEscape = function(s) {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -2056,7 +2065,7 @@ cm.rand = function(min, max){
 };
 
 cm.isEven = function(number){
-    return /^(.*)(0|2|4|6|8)$/.test(number);
+    return !(number % 2);
 };
 
 cm.addLeadZero = function(x){

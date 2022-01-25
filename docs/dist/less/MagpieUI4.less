@@ -1,4 +1,4 @@
-/*! ************ MagpieUI4 v4.0.24 ************ */
+/*! ************ MagpieUI4 v4.0.25 ************ */
 @charset "UTF-8";/*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -4849,7 +4849,7 @@ span.CodeMirror-selectedtext { background: none; }
 @CmIconIA-Spinner-BorderSize: 3px;
 @CmIconIA-Spinner-DefaultBackground: @CmColor-Secondary-LightActive;
 @CmIconIA-Spinner-ActiveBackground: @CmColor-Primary-DarkDefault;
-@CmVersion: '4.0.24';
+@CmVersion: '4.0.25';
 @CmProtocol: '';
 
 // /* ******* SCREEN TYPES ******* */
@@ -5171,7 +5171,7 @@ span.CodeMirror-selectedtext { background: none; }
 // /* ******* MAGPIE UI: COMMON ******* */
 // /* ************************************************ */
 
-@import (css) url('@{CmProtocol}//fonts.googleapis.com/css?family=@{CmUI-GoogleFont}:@{CmUI-GoogleFont-Weight}');
+@import (css) url('@{CmProtocol}//fonts.googleapis.com/css?family=@{CmUI-GoogleFont}:@{CmUI-GoogleFont-Weight}&display=swap');
 
 @font-face {
     font-family: @CmIconVars-Family;
@@ -14417,6 +14417,16 @@ ul.pt__field__hint {
     }
 }
 
+.com__gallery-popup__title-line {
+    .cm__text-nowrap;
+
+    .counter {
+        &:not(:last-child) {
+            margin-right: @CmIndent-Medium;
+        }
+    }
+}
+
 @ComGallery-Background: @CmColor-Gallery;
 
 @ComGalleryControls-Button-Size: @CmSize-XSmall;
@@ -14501,11 +14511,11 @@ ul.pt__field__hint {
     }
 
     td, th {
-        min-height: @CmFont-UI-LineHeight;
+        min-height: @PtGridlist-Cell-LineHeight;
         vertical-align: top;
         text-align: left;
         padding: @PtGridlist-Cell-Padding;
-        line-height: @CmFont-UI-LineHeight;
+        line-height: @PtGridlist-Cell-LineHeight;
         background-clip: padding-box;
 
         > .inner {
@@ -14846,6 +14856,14 @@ ul.pt__field__hint {
         .pt__gridlist.is-adaptive {
             .pt__gridlist__has-background;
 
+            thead, tbody, tr, td {
+                display: block;
+            }
+
+            thead {
+                margin-bottom: @CmIndent-XXSmall;
+            }
+
             tr {
                 td, th {
                     width: auto !important;
@@ -14856,26 +14874,8 @@ ul.pt__field__hint {
                     text-align: left !important;
                 }
 
-                td, th {
-                    &:first-child {
-                        border-top: @CmIndent-XXSmall solid transparent;
-                    }
-                }
-            }
-
-            tbody, thead {
-                &:first-child {
-                    tr {
-                        &:first-child {
-                            td, th {
-                                border-top: @PtGridlist-Cell-SpaceBorder;
-
-                                &:first-child {
-                                    border: none;
-                                }
-                            }
-                        }
-                    }
+                &:not(:last-child) {
+                    margin-bottom: @CmIndent-XXSmall;
                 }
             }
 
@@ -14889,6 +14889,7 @@ ul.pt__field__hint {
 
 @PtGridlist-AdaptiveFrom: @CmUI-AdaptiveFrom;
 @PtGridlist-FontSize: @CmFont-Base-Size;
+@PtGridlist-LineHeight: @CmFont-UI-LineHeight;
 @PtGridlist-Title-FontSize: @PtGridlist-FontSize;
 @PtGridlist-Title-DefaultBackground: @PtGridlist-Cell-DefaultBackground;
 @PtGridlist-Title-HoverBackground: @PtGridlist-Cell-HoverBackground;
@@ -14898,6 +14899,7 @@ ul.pt__field__hint {
 @PtGridlist-Cell-SpaceSize: 1px;
 @PtGridlist-Cell-SpaceBorder: @PtGridlist-Cell-SpaceSize solid transparent;
 @PtGridlist-Cell-FontSize: @PtGridlist-FontSize;
+@PtGridlist-Cell-LineHeight: @PtGridlist-LineHeight;
 @PtGridlist-Cell-DefaultBackground: @CmColor-Primary-LightDefault;
 @PtGridlist-Cell-HoverBackground: @CmColor-Primary-LightHover;
 @PtGridlist-Cell-ActiveBackground: @CmColor-Primary-LightActive;
@@ -18076,57 +18078,8 @@ ul.pt__field__hint {
             }
         }
 
-        .input__cover {
-            display: flex;
-            visibility: hidden;
-            position: absolute;
-            z-index: 2;
-            opacity: 0;
-            background-color: @ComImageInput-CoverBackground;
-            border-radius: @CmBorder-Radius;
-            .mx__position(0, 0, 0 ,0);
-            .mx__transition(all, @CmUI-Transition-Duration);
-            transition-delay: @ComImageInput-CoverDelay;
-        }
-
-        .input__label {
-            display: flex;
-            overflow: hidden;
-            padding: @ComImageInput-ButtonsIndent;
-            flex: 1 1 0;
-            align-items: center;
-            justify-content: center;
-
-            .cm__link {
-                .cm__text-nowrap;
-                color: @CmColor-Font-Opposite;
-            }
-        }
-
-        .input__buttons {
-            display: flex;
-            padding: @half_buttons_indent;
-            flex-flow: column nowrap;
-
-            .button-alike {
-                display: flex;
-                min-height: auto;
-                margin: @half_buttons_indent;
-                padding: 0;
-                flex: 1 1 100%;
-                justify-content: center;
-
-                span {
-                    margin: auto;
-                }
-
-                &.is-hidden {
-                    display: none;
-                }
-            }
-        }
-
         &:hover,
+        &:focus,
         &:active {
             .input__cover {
                 visibility: visible;
@@ -18138,6 +18091,67 @@ ul.pt__field__hint {
 
         &.is-hidden {
             opacity: 0;
+        }
+    }
+
+    .input__cover {
+        display: flex;
+        visibility: hidden;
+        position: absolute;
+        z-index: 2;
+        opacity: 0;
+        background-color: @ComImageInput-CoverBackground;
+        border-radius: @CmBorder-Radius;
+        .mx__position(0, 0, 0 ,0);
+        .mx__transition(all, @CmUI-Transition-Duration);
+        transition-delay: @ComImageInput-CoverDelay;
+    }
+
+    .input__label {
+        display: flex;
+        overflow: hidden;
+        padding: @ComImageInput-ButtonsIndent;
+        flex: 1 1 0;
+        align-items: center;
+        justify-content: center;
+
+        .cm__link {
+            .cm__text-nowrap;
+            color: @CmColor-Font-Opposite;
+        }
+    }
+
+    .input__buttons {
+        display: flex;
+        padding: @half_buttons_indent;
+        flex-flow: column nowrap;
+
+        .button-alike {
+            display: flex;
+            min-height: auto;
+            margin: @half_buttons_indent;
+            padding: 0;
+            flex: 1 1 100%;
+            justify-content: center;
+
+            span {
+                margin: auto;
+            }
+
+            &.is-hidden {
+                display: none;
+            }
+        }
+    }
+
+    &.disabled {
+        .input__button--browse,
+        .input__button--remove {
+            display: none;
+        }
+
+        .com__file-dropzone {
+            display: none;
         }
     }
 }
@@ -18605,21 +18619,9 @@ ul.pt__field__hint {
         }
     }
 
-    html.ie9 & {
-        > .inner {
-            .clearfix;
-            display: block;
-
-            > .field {
-                display: table-cell;
-                flex: none;
-
-            }
-
-            > .sep {
-                display: table-cell;
-            }
-        }
+    &.size-full {
+        max-width: none;
+        display: block;
     }
 }
 

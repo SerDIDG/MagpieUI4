@@ -161,9 +161,7 @@ function(params){
                         break;
                 }
                 that.components.loader = new classConstructor(
-                    cm.merge(that.params.overlayParams, {
-                        'container' : overlayContainer
-                    })
+                    cm.merge({'container': overlayContainer}, that.params.overlayParams)
                 );
             });
         }
@@ -262,6 +260,7 @@ function(params){
             'spinner' : false,
             'spinnerClass' : '',
             'action' : 'submit',          // submit | reset | clear | custom
+            'container' : that.nodes.buttonsHolder,
             'handler' : function(){}
         }, params);
         // Render
@@ -319,7 +318,7 @@ function(params){
                     });
                     break;
             }
-            cm.appendChild(params.node, that.nodes.buttonsHolder);
+            cm.appendChild(params.node, params.container);
             // Export
             that.buttons[params.name] = params;
         }
@@ -980,6 +979,10 @@ function(params){
 
     that.getButtonsContainer = function(){
         return that.nodes.buttonsContainer;
+    };
+
+    that.getNodes = function(key){
+        return that.nodes[key] || that.nodes;
     };
 
     init();

@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/*! ************ MagpieUI4 v4.0.24 ************ */
+/*! ************ MagpieUI4 v4.0.25 ************ */
 /*!
  * animate.css - https://animate.style/
  * Version - 4.1.1
@@ -7,7 +7,7 @@
  *
  * Copyright (c) 2020 Animate.css
  */
-@import url('//fonts.googleapis.com/css?family=Open+Sans:100,300,400,600,700,800');
+@import url('//fonts.googleapis.com/css?family=Open+Sans:100,300,400,600,700,800&display=swap');
 :root {
   --animate-duration: 1s;
   --animate-delay: 1s;
@@ -4282,8 +4282,8 @@ span.CodeMirror-selectedtext {
 }
 @font-face {
   font-family: 'Magpie-UI-Glyphs';
-  src: url('../fonts/MagpieUI4/Magpie-UI-Glyphs.eot?4.0.24');
-  src: url('../fonts/MagpieUI4/Magpie-UI-Glyphs.eot?#iefix4.0.24') format('embedded-opentype'), url('../fonts/MagpieUI4/Magpie-UI-Glyphs.woff?4.0.24') format('woff'), url('../fonts/MagpieUI4/Magpie-UI-Glyphs.ttf?4.0.24') format('truetype'), url('../fonts/MagpieUI4/Magpie-UI-Glyphs.svg?4.0.24#Magpie-UI-Glyphs') format('svg');
+  src: url('../fonts/MagpieUI4/Magpie-UI-Glyphs.eot?4.0.25');
+  src: url('../fonts/MagpieUI4/Magpie-UI-Glyphs.eot?#iefix4.0.25') format('embedded-opentype'), url('../fonts/MagpieUI4/Magpie-UI-Glyphs.woff?4.0.25') format('woff'), url('../fonts/MagpieUI4/Magpie-UI-Glyphs.ttf?4.0.25') format('truetype'), url('../fonts/MagpieUI4/Magpie-UI-Glyphs.svg?4.0.25#Magpie-UI-Glyphs') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -14216,6 +14216,14 @@ ul.pt__field__hint li:before {
   height: 100%;
   box-sizing: border-box;
 }
+.com__gallery-popup__title-line {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.com__gallery-popup__title-line .counter:not(:last-child) {
+  margin-right: 24px;
+}
 /* ******* COMPONENTS: GLOSSARY ******* */
 .com__glossary .com__glossary__title {
   cursor: default;
@@ -14730,6 +14738,15 @@ ul.pt__field__hint li:before {
   html.is-adaptive .pt__gridlist.is-adaptive tr:active td {
     background-color: hsl(0, 0%, 91%);
   }
+  html.is-adaptive .pt__gridlist.is-adaptive thead,
+  html.is-adaptive .pt__gridlist.is-adaptive tbody,
+  html.is-adaptive .pt__gridlist.is-adaptive tr,
+  html.is-adaptive .pt__gridlist.is-adaptive td {
+    display: block;
+  }
+  html.is-adaptive .pt__gridlist.is-adaptive thead {
+    margin-bottom: 8px;
+  }
   html.is-adaptive .pt__gridlist.is-adaptive tr td,
   html.is-adaptive .pt__gridlist.is-adaptive tr th {
     width: auto !important;
@@ -14738,21 +14755,8 @@ ul.pt__field__hint li:before {
   html.is-adaptive .pt__gridlist.is-adaptive tr th {
     text-align: left !important;
   }
-  html.is-adaptive .pt__gridlist.is-adaptive tr td:first-child,
-  html.is-adaptive .pt__gridlist.is-adaptive tr th:first-child {
-    border-top: 8px solid transparent;
-  }
-  html.is-adaptive .pt__gridlist.is-adaptive tbody:first-child tr:first-child td,
-  html.is-adaptive .pt__gridlist.is-adaptive thead:first-child tr:first-child td,
-  html.is-adaptive .pt__gridlist.is-adaptive tbody:first-child tr:first-child th,
-  html.is-adaptive .pt__gridlist.is-adaptive thead:first-child tr:first-child th {
-    border-top: 1px solid transparent;
-  }
-  html.is-adaptive .pt__gridlist.is-adaptive tbody:first-child tr:first-child td:first-child,
-  html.is-adaptive .pt__gridlist.is-adaptive thead:first-child tr:first-child td:first-child,
-  html.is-adaptive .pt__gridlist.is-adaptive tbody:first-child tr:first-child th:first-child,
-  html.is-adaptive .pt__gridlist.is-adaptive thead:first-child tr:first-child th:first-child {
-    border: none;
+  html.is-adaptive .pt__gridlist.is-adaptive tr:not(:last-child) {
+    margin-bottom: 8px;
   }
   html.is-adaptive .pt__gridlist.is-adaptive > .com__columns__chassis {
     display: none;
@@ -18366,7 +18370,19 @@ html.ie9 .com__palette .b-range {
   object-fit: cover;
   object-position: center center;
 }
-.com__image-input__content .input__holder .input__cover {
+.com__image-input__content .input__holder:hover .input__cover,
+.com__image-input__content .input__holder:focus .input__cover,
+.com__image-input__content .input__holder:active .input__cover {
+  visibility: visible;
+  opacity: 1;
+  -webkit-transition: all 100ms ease-in-out 0ms;
+  transition: all 100ms ease-in-out 0ms;
+  transition-delay: 0ms;
+}
+.com__image-input__content .input__holder.is-hidden {
+  opacity: 0;
+}
+.com__image-input__content .input__cover {
   display: flex;
   visibility: hidden;
   position: absolute;
@@ -18382,7 +18398,7 @@ html.ie9 .com__palette .b-range {
   transition: all 250ms ease-in-out 0ms;
   transition-delay: 300ms;
 }
-.com__image-input__content .input__holder .input__label {
+.com__image-input__content .input__label {
   display: flex;
   overflow: hidden;
   padding: 4px;
@@ -18390,27 +18406,27 @@ html.ie9 .com__palette .b-range {
   align-items: center;
   justify-content: center;
 }
-.com__image-input__content .input__holder .input__label .cm__link,
-.com__image-input__content .input__holder .input__label .link,
-.com__image-input__content .input__holder .input__label .link--inner,
-.com__image-input__content .input__holder .input__label a,
-.com__image-input__content .input__holder .input__label .com__glossary .com__glossary__title {
+.com__image-input__content .input__label .cm__link,
+.com__image-input__content .input__label .link,
+.com__image-input__content .input__label .link--inner,
+.com__image-input__content .input__label a,
+.com__image-input__content .input__label .com__glossary .com__glossary__title {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   color: #ffffff;
 }
-.com__image-input__content .input__holder .input__buttons {
+.com__image-input__content .input__buttons {
   display: flex;
   padding: 2px;
   flex-flow: column nowrap;
 }
-.com__image-input__content .input__holder .input__buttons .button-alike,
-.com__image-input__content .input__holder .input__buttons .button,
-.com__image-input__content .input__holder .input__buttons .browse-button,
-.com__image-input__content .input__holder .input__buttons .cm__button-wrapper,
-.com__image-input__content .input__holder .input__buttons .com__menu,
-.com__image-input__content .input__holder .input__buttons .com__pagination__bar ul li a {
+.com__image-input__content .input__buttons .button-alike,
+.com__image-input__content .input__buttons .button,
+.com__image-input__content .input__buttons .browse-button,
+.com__image-input__content .input__buttons .cm__button-wrapper,
+.com__image-input__content .input__buttons .com__menu,
+.com__image-input__content .input__buttons .com__pagination__bar ul li a {
   display: flex;
   min-height: auto;
   margin: 2px;
@@ -18418,32 +18434,28 @@ html.ie9 .com__palette .b-range {
   flex: 1 1 100%;
   justify-content: center;
 }
-.com__image-input__content .input__holder .input__buttons .button-alike span,
-.com__image-input__content .input__holder .input__buttons .button span,
-.com__image-input__content .input__holder .input__buttons .browse-button span,
-.com__image-input__content .input__holder .input__buttons .cm__button-wrapper span,
-.com__image-input__content .input__holder .input__buttons .com__menu span,
-.com__image-input__content .input__holder .input__buttons .com__pagination__bar ul li a span {
+.com__image-input__content .input__buttons .button-alike span,
+.com__image-input__content .input__buttons .button span,
+.com__image-input__content .input__buttons .browse-button span,
+.com__image-input__content .input__buttons .cm__button-wrapper span,
+.com__image-input__content .input__buttons .com__menu span,
+.com__image-input__content .input__buttons .com__pagination__bar ul li a span {
   margin: auto;
 }
-.com__image-input__content .input__holder .input__buttons .button-alike.is-hidden,
-.com__image-input__content .input__holder .input__buttons .button.is-hidden,
-.com__image-input__content .input__holder .input__buttons .browse-button.is-hidden,
-.com__image-input__content .input__holder .input__buttons .cm__button-wrapper.is-hidden,
-.com__image-input__content .input__holder .input__buttons .com__menu.is-hidden,
-.com__image-input__content .input__holder .input__buttons .com__pagination__bar ul li a.is-hidden {
+.com__image-input__content .input__buttons .button-alike.is-hidden,
+.com__image-input__content .input__buttons .button.is-hidden,
+.com__image-input__content .input__buttons .browse-button.is-hidden,
+.com__image-input__content .input__buttons .cm__button-wrapper.is-hidden,
+.com__image-input__content .input__buttons .com__menu.is-hidden,
+.com__image-input__content .input__buttons .com__pagination__bar ul li a.is-hidden {
   display: none;
 }
-.com__image-input__content .input__holder:hover .input__cover,
-.com__image-input__content .input__holder:active .input__cover {
-  visibility: visible;
-  opacity: 1;
-  -webkit-transition: all 100ms ease-in-out 0ms;
-  transition: all 100ms ease-in-out 0ms;
-  transition-delay: 0ms;
+.com__image-input__content.disabled .input__button--browse,
+.com__image-input__content.disabled .input__button--remove {
+  display: none;
 }
-.com__image-input__content .input__holder.is-hidden {
-  opacity: 0;
+.com__image-input__content.disabled .com__file-dropzone {
+  display: none;
 }
 .com__image-input__content--default .input__holder .input__label {
   display: none;
@@ -18899,24 +18911,9 @@ html.ie9 .com__palette .b-range {
   text-align: center;
   line-height: 32px;
 }
-html.ie9 .com__timeselect > .inner {
+.com__timeselect.size-full {
+  max-width: none;
   display: block;
-}
-html.ie9 .com__timeselect > .inner:after {
-  content: ".";
-  display: block;
-  clear: both;
-  visibility: hidden;
-  line-height: 0;
-  font-size: 0;
-  height: 0;
-}
-html.ie9 .com__timeselect > .inner > .field {
-  display: table-cell;
-  flex: none;
-}
-html.ie9 .com__timeselect > .inner > .sep {
-  display: table-cell;
 }
 /* ******* COMPONENTS: TINT RANGE ******* */
 .com__tint-range {

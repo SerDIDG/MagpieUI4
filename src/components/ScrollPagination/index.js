@@ -14,7 +14,9 @@ cm.define('Com.ScrollPagination', {
         'onFinalize',
         'onSetCount',
         'onButtonShow',
-        'onButtonHide'
+        'onButtonHide',
+        'onLoaderShow',
+        'onLoaderHide'
     ],
     'params' : {
         'controllerEvents' : true,
@@ -204,7 +206,7 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
     classProto.keyDownEvent = function(e){
         var that = this;
         cm.handleKey(e, 'escape', function(){
-            if(!cm.isProcess && !cm.isFinalize && that.params['showButton'] !== 'none'){
+            if(!that.isDisabled && !that.isProcess && !that.isFinalize && that.params['showButton'] !== 'none'){
                 that.callbacks.showButton(that);
             }
         });
@@ -303,7 +305,7 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
             tokenItem = cm.reducePath(that.params['responseTokenKey'], response);
         if(cm.isEmpty(errorsItem)){
             if(!cm.isEmpty(dataItem)){
-                if(!that.params['responseHTML'] && that.params['perPage']){
+                if(cm.isArray(dataItem) && that.params['perPage']){
                     data = dataItem.slice(0, that.params['perPage']);
                 }else{
                     data = dataItem;
@@ -391,6 +393,7 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
                 'pages' : that.nodes['pages'],
                 'container' : cm.node(that.params['pageTag']),
                 'data' : data,
+                'isEmpty' : false,
                 'isVisible' : false
             };
         // Clear container
@@ -428,10 +431,12 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
             if(that.isButton){
                 cm.addClass(that.nodes['button'], 'is-hidden');
                 cm.removeClass(that.nodes['loader'], 'is-hidden');
+                that.triggerEvent('onLoaderShow');
             }else{
                 that.loaderDelay = setTimeout(function(){
                     cm.removeClass(that.nodes['loader'], 'is-hidden');
                     cm.removeClass(that.nodes['bar'], 'is-hidden');
+                    that.triggerEvent('onLoaderShow');
                 }, that.params['loaderDelay']);
             }
         }
@@ -443,6 +448,7 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
         // Hide Loader
         that.loaderDelay && clearTimeout(that.loaderDelay);
         cm.addClass(that.nodes['loader'], 'is-hidden');
+        that.triggerEvent('onLoaderHide');
         // Check pages count
         if(that.itemCount === 0 || (that.pageCount > 0 && that.pageCount === that.currentPage)){
             that.callbacks.finalize(that);
@@ -616,6 +622,11 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
         return that.currentAction;
     };
 
+    classProto.getPages = function(){
+        var that = this;
+        return that.pages;
+    };
+
     classProto.setPage = function(){
         var that = this;
         that.previousPage = that.currentPage;
@@ -646,6 +657,23 @@ cm.getConstructor('Com.ScrollPagination', function(classConstructor, className, 
             return page['isVisible'];
         }
         return false;
+    };
+
+    classProto.isEmpty = function(){
+        var that = this,
+            isEmpty = true;
+        cm.forEach(that.pages, function(page){
+            if(page.isEmpty === false){
+                isEmpty = false;
+            }
+        });
+        return isEmpty;
+    };
+
+    classProto.finalize = function(){
+        var that = this;
+        that.callbacks.finalize(that);
+        return that;
     };
 
     classProto.abort = function(){

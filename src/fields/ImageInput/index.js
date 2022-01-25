@@ -6,7 +6,8 @@ cm.define('Com.ImageInput', {
         'size' : 'default',                     // default, full, custom
         'aspect' : false,                       // 1x1, 3x2, etc
         'types' : {
-            'video' : /video\/(mp4|webm|ogg|avi)/
+            'video' : /video\/(mp4|webm|ogg|avi)/,
+            'embed' : /application\/pdf/
         },
         'preview' : true,
         'previewConstructor' : 'Com.ImagePreviewContainer',
@@ -48,7 +49,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
                     cm.node('div', {'class' : 'input__cover'},
                         nodes['label'] = cm.node('div', {'class' : 'input__label'}),
                         nodes['buttonsInner'] = cm.node('div', {'class' : 'input__buttons'},
-                            nodes['clear'] = cm.node('div', {'class' : 'cm__button-wrapper'},
+                            nodes['clear'] = cm.node('div', {'class' : 'cm__button-wrapper input__button--remove'},
                                 cm.node('button', {'type' : 'button', 'class' : 'button button-danger'},
                                     cm.node('span', that.message('remove'))
                                 )
@@ -81,7 +82,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
     classProto.renderButtons = function(){
         var that = this;
         if(that.params['preview']){
-            that.nodes['content']['preview'] = cm.node('div', {'class' : 'cm__button-wrapper'},
+            that.nodes['content']['preview'] = cm.node('div', {'class' : 'cm__button-wrapper input__button--preview'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
                     cm.node('span', that.message('preview'))
                 )
@@ -89,7 +90,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
             cm.insertFirst(that.nodes['content']['preview'], that.nodes['content']['buttonsInner']);
         }
         if(that.params['local']){
-            that.nodes['content']['browseLocal'] = cm.node('div', {'class' : 'browse-button'},
+            that.nodes['content']['browseLocal'] = cm.node('div', {'class' : 'browse-button input__button--browse'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
                     cm.node('span', that.message('_browse_local'))
                 ),
@@ -97,11 +98,14 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
                     that.nodes['content']['input'] = cm.node('input', {'type' : 'file'})
                 )
             );
+            if(!cm.isEmpty(that.params.accept) && cm.isArray(that.params.accept)){
+                that.nodes['content']['input'].accept = that.params['accept'].join(',');
+            }
             cm.addEvent(that.nodes['content']['input'], 'change', that.browseActionHandler);
             cm.insertFirst(that.nodes['content']['browseLocal'], that.nodes['content']['buttonsInner']);
         }
         if(that.params['fileManager']){
-            that.nodes['content']['browseFileManager'] = cm.node('div', {'class' : 'cm__button-wrapper'},
+            that.nodes['content']['browseFileManager'] = cm.node('div', {'class' : 'cm__button-wrapper input__button--browse'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
                     cm.node('span', that.message('_browse_filemanager'))
                 )
@@ -109,7 +113,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
             cm.insertFirst(that.nodes['content']['browseFileManager'], that.nodes['content']['buttonsInner']);
         }
         if(that.params['fileUploader']){
-            that.nodes['content']['browseFileUploader'] = cm.node('div', {'class' : 'cm__button-wrapper'},
+            that.nodes['content']['browseFileUploader'] = cm.node('div', {'class' : 'cm__button-wrapper input__button--browse'},
                 cm.node('button', {'type' : 'button', 'class' : 'button button-primary'},
                     cm.node('span', that.message('browse'))
                 )
@@ -149,6 +153,7 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
         var that = this;
         // Clear
         that.nodes['content']['image'].style.backgroundImage = '';
+        cm.remove(that.nodes['content']['iframe']);
         cm.remove(that.nodes['content']['video']);
         // Set
         if(cm.isEmpty(that.value)){
@@ -165,6 +170,11 @@ cm.getConstructor('Com.ImageInput', function(classConstructor, className, classP
                 that.nodes['content']['video'].autoplay = false;
                 that.nodes['content']['video'].loop = true;
                 cm.appendChild(that.nodes['content']['video'], that.nodes['content']['image']);
+            /*
+            }else if(that.params.types.embed.test(that.value.type)) {
+                that.nodes['content']['iframe'] = cm.node('iframe', {'src' : that.value['url']});
+                cm.appendChild(that.nodes['content']['iframe'], that.nodes['content']['image']);
+            */
             }else{
                 that.nodes['content']['image'].style.backgroundImage = cm.URLToCSSURL(that.value['url']);
             }

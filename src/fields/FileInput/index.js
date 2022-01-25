@@ -12,8 +12,11 @@ cm.define('Com.FileInput', {
         'showClearButton' : true,
         'autoOpen' : false,
         'placeholder' : null,
+
+        'accept' : [],                      // empty - accept all, example: ['image/png', 'image/jpeg']
         'readValueType' : 'base64',         // base64 | binary
-        'outputValueType' : 'object',         // file | object
+        'outputValueType' : 'object',       // file | object
+
         'local' : true,
         'fileManager' : false,
         'fileManagerConstructor' : 'Com.AbstractFileManagerContainer',
@@ -22,6 +25,7 @@ cm.define('Com.FileInput', {
                 'max' : 1
             }
         },
+
         'fileUploader' : false,
         'fileUploaderConstructor' : 'Com.FileUploaderContainer',
         'fileUploaderParams' : {
@@ -29,6 +33,7 @@ cm.define('Com.FileInput', {
                 'max' : 1
             }
         },
+
         'dropzone' : true,
         'dropzoneConstructor' : 'Com.FileDropzone',
         'dropzoneParams' : {
@@ -36,6 +41,7 @@ cm.define('Com.FileInput', {
             'max' : 1,
             'rollover' : true
         },
+
         'fileReaderConstructor' : 'Com.FileReader',
         'fileReaderParams' : {}
     }
@@ -113,6 +119,7 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
             cm.getConstructor(that.params['dropzoneConstructor'], function(classObject){
                 that.components['dropzone'] = new classObject(
                     cm.merge(that.params['dropzoneParams'], {
+                        'disabled' : that.params['disabled'],
                         'container' : that.nodes['content']['inner'],
                         'target' : that.nodes['content']['content']
                     })
@@ -148,7 +155,6 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
                 });
             });
         }
-        return that;
     };
 
     classProto.renderContent = function(){
@@ -182,6 +188,9 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
                     nodes['input'] = cm.node('input', {'type' : 'file'})
                 )
             );
+            if(!cm.isEmpty(that.params.accept) && cm.isArray(that.params.accept)){
+                nodes['input'].accept = that.params['accept'].join(',');
+            }
             cm.addEvent(nodes['input'], 'change', that.browseActionHandler);
             cm.insertFirst(nodes['browseLocal'], nodes['buttonsInner']);
         }
@@ -233,6 +242,19 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
         }
     };
 
+    classProto.isAcceptableFileFormat = function(item){
+        var that = this;
+        if(
+            !cm.isEmpty(item) &&
+            !cm.isEmpty(item.type) &&
+            !cm.isEmpty(that.params.accept) &&
+            cm.isArray(that.params.accept)
+        ){
+            return cm.inArray(that.params.accept, item.type);
+        }
+        return true;
+    };
+
     /* *** DATA *** */
 
     classProto.get = function(){
@@ -249,7 +271,10 @@ cm.getConstructor('Com.FileInput', function(classConstructor, className, classPr
     classProto.validateValue = function(value){
         var that = this,
             item = that.components['validator'].validate(value);
-        return (!cm.isEmpty(item['value']) || !cm.isEmpty(item['file'])) ? item : '';
+        return (
+            that.isAcceptableFileFormat(item) &&
+            (!cm.isEmpty(item['value']) || !cm.isEmpty(item['file']))
+        ) ? item : '';
     };
 
     classProto.setData = function(){
